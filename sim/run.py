@@ -21,12 +21,8 @@ VU = VUnit.from_argv()
 
 VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08"])
 
-print(os.getcwd())
-print(Path(__file__))
-print(Path(__file__).parent)
-print(Path(__file__).parent.parent / "src")
-VU.add_library("lib").add_source_files(Path(__file__).parent / "*.vhd") # sim
 
+VU.add_library("lib").add_source_files(Path(__file__).parent / "*.vhd") # sim
 VU.add_source_files(Path(__file__).parent.parent / "src" / "*.vhd", "lib", allow_empty=True) # src
 
 
