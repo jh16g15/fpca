@@ -73,7 +73,7 @@ begin
         when OPCODE_OP => 
           encoding <= R_type;
         
-        when OPCODE_LOAD, OPCODE_OP_IMM, OPCODE_JALR, OPCODE_SYSTEM => 
+        when OPCODE_LOAD | OPCODE_OP_IMM | OPCODE_JALR | OPCODE_SYSTEM => 
           encoding <= I_type;
 
         when OPCODE_STORE => 
@@ -82,7 +82,7 @@ begin
         when OPCODE_BRANCH => 
           encoding <= B_type;
         
-        when OPCODE_AUIPC, OPCODE_LUI => 
+        when OPCODE_AUIPC | OPCODE_LUI => 
           encoding <= U_type;
         
         when OPCODE_JAL => 
