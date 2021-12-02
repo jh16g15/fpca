@@ -21,9 +21,17 @@ VU = VUnit.from_argv()
 
 VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08"])
 
+## need to use "resolve()" to get abspath
+# print(f"0:{os.listdir(Path(__file__).resolve().parents[0])}")
+# print(f"1:{os.listdir(Path(__file__).resolve().parents[1])}")
+# print(f"2:{os.listdir(Path(__file__).resolve().parents[2])}")
 
-VU.add_library("lib").add_source_files(Path(__file__).parent / "*.vhd") # sim
-VU.add_source_files(Path(__file__).parent.parent / "src" / "*.vhd", "lib", allow_empty=True) # src
+sim_dir = Path(__file__).parent
+src_dir = Path(__file__).resolve().parents[1] / "src"
+
+VU.add_library("lib")
+VU.add_source_files(sim_dir / "*.vhd", "lib")
+VU.add_source_files(src_dir / "*.vhd", "lib")
 
 
 
