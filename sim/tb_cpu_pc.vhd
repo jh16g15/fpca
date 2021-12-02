@@ -3,7 +3,11 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+library vunit_lib;
+context vunit_lib.vunit_context;
+
 entity tb_cpu_pc is
+    generic (runner_cfg : string);
 end entity tb_cpu_pc;
 
 architecture rtl of tb_cpu_pc is
@@ -38,7 +42,7 @@ begin
 
     stim : process is 
     begin
-        
+        test_runner_setup(runner, runner_cfg);
         branch_en_in <= '0';
         branch_addr_in <= x"1000_0000";
         wait for 152 ns;
@@ -46,8 +50,9 @@ begin
         wait for CLK_PERIOD;
         branch_en_in <= '0';
         wait for 152 ns;
-        assert false report "end of test" severity failure;
-        wait;
+        
+        test_runner_cleanup(runner); -- Simulation ends here
+        
     end process;
 
 end architecture rtl;
