@@ -132,6 +132,14 @@ package riscv_instructions_pkg is
 
     --! Sign Extends a std_logic_vector
     function extend_slv(in_vec: std_logic_vector; new_len : integer := 32) return std_logic_vector;
+    --! converts integer to "signed" slv 
+    function int2slv(in_int: integer; new_len : integer := 32) return std_logic_vector;
+    --! converts integer to "unsigned" slv 
+    function uint2slv(in_uint: integer; new_len : integer := 32) return std_logic_vector;
+    --! converts "unsigned" slv to integer
+    function slv2uint(in_vec: std_logic_vector) return integer;
+    --! converts "signed" slv to integer
+    function slv2int(in_vec: std_logic_vector) return integer;
 
 end package;
 
@@ -142,5 +150,30 @@ package body riscv_instructions_pkg is
     begin 
         return std_logic_vector(resize(signed(in_vec), new_len));
     end function;
+
+--! converts integer to "signed" slv 
+function int2slv(in_int: integer; new_len : integer := 32) return std_logic_vector is
+begin 
+    return std_logic_vector(to_signed(in_int), new_len);
+end function;
+
+
+--! converts integer to "unsigned" slv 
+function uint2slv(in_uint: integer; new_len : integer := 32) return std_logic_vector is
+begin 
+    return std_logic_vector(to_unsigned(in_uint), new_len);
+end function;
+
+--! converts "unsigned" slv to integer
+function slv2uint(in_vec: std_logic_vector) return integer is
+begin 
+    return integer(to_unsigned(in_vec));
+end function;
+
+--! converts "signed" slv to integer
+function slv2int(in_vec: std_logic_vector) return integer is
+begin 
+    return integer(to_signed(in_vec));
+end function;
 
 end package body;
