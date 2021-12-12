@@ -116,10 +116,10 @@ begin
           imm32(31 downto 13) <= (others => instr_in(31)); -- sign extension
           imm32(12 downto 1) <= imm12;
           imm32(0) <= '0';
-        when U_type => 
+        when U_type => -- for LUI/AUIPC, load top 20 bits
           imm20 := instr_in(31 downto 12);
-          imm32(31 downto 20) <= (others => instr_in(31)); -- sign extension
-          imm32(19 downto  0) <= imm20;
+          imm32(31 downto 12) <= imm20;
+          imm32(11 downto  0) <= (others => '0');
         when J_type => -- imm[20:1], as in 2 byte increments, so we '-1' from each index to match the RV32 numbering
           imm20(20-1) := instr_in(31);
           imm20(10-1 downto 1-1) := instr_in(30 downto 21);
