@@ -130,7 +130,17 @@ package riscv_instructions_pkg is
     constant OP_SRA_FUNC7  : std_logic_vector(6 downto 0) := b"010_0000";
 
 
-
-    
+    --! Sign Extends a std_logic_vector
+    function extend_slv(in_vec: std_logic_vector; new_len : integer := 32) return std_logic_vector;
 
 end package;
+
+package body riscv_instructions_pkg is
+    
+    --! Sign Extends a std_logic_vector
+    function extend_slv(in_vec: std_logic_vector; new_len : integer := 32) return std_logic_vector is
+    begin 
+        return std_logic_vector(resize(signed(in_vec), new_len));
+    end function;
+
+end package body;

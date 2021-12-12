@@ -60,12 +60,12 @@ begin
     );
 
     stim : process is 
+        variable imm12_plus : std_logic_vector(12 downto 0);
+        variable imm20_plus : std_logic_vector(20 downto 0);
     begin
         test_runner_setup(runner, runner_cfg);
 
         -- test immediate encoding/decoding
-        -- I type (OP_IMM)
-        -- Test Immediate all 0's
         info("I type (OP_IMM) Test Immediate all 0's");
         --           Imm      rs1        funct3      rd        opcode
         instr_in <= x"000" & b"00010" & OP_ADD_FUNC3 & b"00001" & OPCODE_OP_IMM;
@@ -79,7 +79,6 @@ begin
         check(funct3_out= OP_ADD_FUNC3, "funct3 Check");
         
         -- test immediate encoding/decoding
-        
         info("I type (OP_IMM) Test Immediate all 1's");
         --           Imm      rs1        funct3      rd        opcode
         instr_in <= x"FFF" & b"00010" & OP_ADD_FUNC3 & b"00001" & OPCODE_OP_IMM;
@@ -118,14 +117,48 @@ begin
         -- check(funct7_out=  b"000_0000", "funct7 Check");
         check(funct3_out= OP_ADD_FUNC3, "funct3 Check");
         
+        
+        info("R type (OP) Test");
+        --           funct7          rs2       rs1        funct3      rd        opcode
+        instr_in <= OP_SRA_FUNC7 & b"10000" & b"01000" & OP_SRA_FUNC3 & b"00100" & OPCODE_OP;
+        wait for 1 ns;
+        check(rs1_addr_out=  b"0_1000", "$RS1 Check");
+        check(rs2_addr_out=  b"1_0000", "$RS2 Check");
+        check(rd_addr_out=   b"0_0100", "$RD  Check");
+        -- check(imm_out=    x"0000_0000", "Imm  Check");
+        check(opcode_out=  OPCODE_OP, "Opcode Check");
+        check(funct7_out=  OP_SRA_FUNC7, "funct7 Check");
+        check(funct3_out=  OP_SRA_FUNC3, "funct3 Check");
 
 
+        info("S type (STORE) Test (sign extend 0s)");
+        imm12_plus := b"0" & x"678"; -- not using 13th bit
+        --           Imm                        rs2      rs1            funct3            Imm                  opcode
+        instr_in <= imm12_plus(11 downto 5) & b"11111" & b"01010" & STORE_SW_FUNC3 & imm12_plus(4 downto 0) & OPCODE_STORE;
+
+        wait for 1 ns;
+        check(rs1_addr_out=  b"01010", "$RS1 Check");
+        check(rs2_addr_out=  b"11111", "$RS2 Check");
+        -- check(rd_addr_out=   b"0_0001", "$RD  Check");
+        check(imm_out=    extend_slv(imm12_plus(11 downto 0)),  "Imm  Check");  -- sign extend zero's
+        check(opcode_out= OPCODE_STORE, "Opcode Check");
+        -- check(funct7_out=  b"000_0000", "funct7 Check");
+        check(funct3_out= STORE_SW_FUNC3, "funct3 Check");
 
 
+        info("S type (STORE) Test (sign extend 1s)");
+        imm12_plus := b"0" & x"800"; -- not using 13th bit
+        --           Imm                        rs2      rs1            funct3            Imm                  opcode
+        instr_in <= imm12_plus(11 downto 5) & b"11111" & b"01010" & STORE_SW_FUNC3 & imm12_plus(4 downto 0) & OPCODE_STORE;
 
-
-
-
+        wait for 1 ns;
+        check(rs1_addr_out=  b"01010", "$RS1 Check");
+        check(rs2_addr_out=  b"11111", "$RS2 Check");
+        -- check(rd_addr_out=   b"0_0001", "$RD  Check");
+        check(imm_out=    extend_slv(imm12_plus(11 downto 0)),  "Imm  Check");  -- sign extend one's
+        check(opcode_out= OPCODE_STORE, "Opcode Check");
+        -- check(funct7_out=  b"000_0000", "funct7 Check");
+        check(funct3_out= STORE_SW_FUNC3, "funct3 Check");
 
 
 
