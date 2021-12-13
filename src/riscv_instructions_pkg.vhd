@@ -154,26 +154,26 @@ package body riscv_instructions_pkg is
 --! converts integer to "signed" slv 
 function int2slv(in_int: integer; new_len : integer := 32) return std_logic_vector is
 begin 
-    return std_logic_vector(to_signed(in_int), new_len);
+    return std_logic_vector(to_signed(in_int, new_len));
 end function;
 
 
 --! converts integer to "unsigned" slv 
 function uint2slv(in_uint: integer; new_len : integer := 32) return std_logic_vector is
 begin 
-    return std_logic_vector(to_unsigned(in_uint), new_len);
+    return std_logic_vector(to_unsigned(in_uint, new_len));
 end function;
 
 --! converts "unsigned" slv to integer
 function slv2uint(in_vec: std_logic_vector) return integer is
 begin 
-    return integer(to_unsigned(in_vec));
+    return to_integer(unsigned(in_vec));
 end function;
 
 --! converts "signed" slv to integer
 function slv2int(in_vec: std_logic_vector) return integer is
 begin 
-    return integer(to_signed(in_vec));
+    return to_integer(signed(in_vec));
 end function;
 
 end package body;
