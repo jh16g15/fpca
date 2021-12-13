@@ -5,3 +5,5 @@ sim/vunit_out
 software/test2
 software/work
 software/test
+sim/teroshdl_out.xml
+sim/teroshdl_export.json
