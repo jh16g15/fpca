@@ -126,8 +126,9 @@ begin
           imm20(11-1) := instr_in(20);
           imm20(19-1 downto 12-1) := instr_in(19 downto 12);
 
-          imm32(31 downto 20) <= (others => instr_in(31)); -- sign extension
-          imm32(19 downto  0) <= imm20;
+          imm32(31 downto 21) <= (others => instr_in(31)); -- sign extension
+          imm32(20 downto  1) <= imm20;
+          imm32(0) <= '0';
 
         when others => 
           imm32 <= (others => '-'); -- is "don't care" supported?
