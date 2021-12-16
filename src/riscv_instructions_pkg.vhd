@@ -13,6 +13,32 @@ package riscv_instructions_pkg is
 
   type t_encoding is (R_type, I_type, S_type, B_type, U_type, J_type);
 
+  -- Instruction Encodings
+  
+
+--+----------------------------+----------+------------+---------+------------------+---------+---------+---------+
+--|          31 - 25           | 24 - 20  |  19 - 15   | 14 - 12 |      11 - 7      |  6 - 0  |  Type   | Example |
+--+----------------------------+----------+------------+---------+------------------+---------+---------+---------+
+--| funct7                     | rs2      | rs1        | funct3  | rd               | opcode  | R-Type  | OP      |
+--|              Imm[11:0]                | rs1        | funct3  | rd               | opcode  | I-Type  | OP-IMM  |
+--| Imm[11:5]                  | rs2      | rs1        | funct3  | imm[4:0]         | opcode  | S-Type  | Store   |
+--| Imm[12] Imm[10:5]          | rs2      | rs1        | funct3  | Imm[4:1] Imm[11] | opcode  | B-type  | Branch  |
+--|                                  Imm[31:12]                  | rd               | opcode  | U-Type  | LUI     |
+--| Imm[20]        Imm[10:1]     Imm[11]  |       Imm[19:12]     | rd               | opcode  | J-Type  | JAL     |
+--+----------------------------+----------+------------+---------+------------------+---------+---------+---------+
+
+  --! Assembles a 32 bit instruction from its arguments
+  function f_build_instr(
+    opcode : std_logic_vector(OPCODE_ADDR_W-1 downto 0) := (others => '0');
+    rs1 : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
+    rs2 : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
+    rsd : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
+    funct3 : std_logic_vector(FUNCT3_ADDR_W-1 downto 0) := (others => '0');
+    funct7 : std_logic_vector(FUNCT7_ADDR_W-1 downto 0) := (others => '0');
+    Imm12 : std_logic_vector(12-1 downto 0) := (others => '0');
+    Imm20 : std_logic_vector(20-1 downto 0) := (others => '0')
+    ) return std_logic_vector(INSTR_ADDR_W-1 downto 0);
+
   -- Opcodes
   ------------------------------------
   -- most of these I am not implementing in RV32I
@@ -143,6 +169,40 @@ package riscv_instructions_pkg is
 end package;
 
 package body riscv_instructions_pkg is
+
+  --! Assembles a 32 bit instruction from its arguments
+  function f_build_instr(
+  opcode : std_logic_vector(OPCODE_ADDR_W-1 downto 0) := (others => '0');
+  rs1 : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
+  rs2 : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
+  rsd : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
+  funct3 : std_logic_vector(FUNCT3_ADDR_W-1 downto 0) := (others => '0');
+  funct7 : std_logic_vector(FUNCT7_ADDR_W-1 downto 0) := (others => '0');
+  Imm12 : std_logic_vector(12-1 downto 0) := (others => '0');
+  Imm20 : std_logic_vector(20-1 downto 0) := (others => '0')
+  ) return std_logic_vector(INSTR_ADDR_W-1 downto 0) is 
+    variable enc : t_encoding;
+    variable instr : std_logic_vector(INSTR_ADDR_W-1 downto 0) := (others => '0');
+  begin
+    case (opcode) is
+      when OPCODE_OP => enc <= R_type;
+      when OPCODE_LOAD | OPCODE_OP_IMM | OPCODE_JALR | OPCODE_SYSTEM => enc <= I_type;
+      when OPCODE_STORE => enc <= S_type;
+      when OPCODE_BRANCH => enc <= B_type;
+      when OPCODE_AUIPC | OPCODE_LUI => enc <= U_type;
+      when OPCODE_JAL => enc <= J_type;
+      when others => null;
+    end case;
+    case(enc) is
+      when R_type => instr := funct7 & rs2 & rs1 & funct3 & rd & opcode; 
+      when I_type => instr := imm12  & rs1 & funct3 & rd & opcode;
+      when S_type => instr := imm12(11 downto 5) & rs2 & rs1 & funct3 & imm12(4 downto 0) & opcode;      
+      when B_type => instr := imm12(12-1) & imm12(10-1 downto 5-1) & rs2 & rs1 & funct3 & imm12(4-1 downto 1-1) & imm12(11-1) & opcode;
+      when U_type => instr := imm20 & rd & opcode;
+      when J_type => instr := imm20(20-1) & imm20(10-1 downto 1-1)  & imm20(11-1)  & imm20(19-1 downto 12-1)  & rd & opcode;
+    end case;
+    return instr;
+  end function f_build_instr;
 
   --! Sign Extends a std_logic_vector
   function extend_slv(in_vec : std_logic_vector; new_len : integer := 32) return std_logic_vector is
