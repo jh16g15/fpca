@@ -74,7 +74,7 @@ begin
           when OP_XOR_FUNC3   => alu_out <= rs1 xor rs2;
           when OP_OR_FUNC3    => alu_out <= rs1 or rs2;
           when OP_AND_FUNC3   => alu_out <= rs1 and rs2;
-          when OP_SLL_FUNC3   => alu_out <= rs1 sll rs2(4 downto 0);
+          when OP_SLL_FUNC3   => alu_out <= rs1 sll slv2uint(rs2(4 downto 0));
           when OP_SRL_FUNC3   => alu_out <= std_logic_vector(shift_right(unsigned(rs1), slv2uint(rs2(4 downto 0)))) when funct7(5) = '0' else std_logic_vector(shift_right(signed(rs1), slv2uint(rs2(4 downto 0))));
           when others => report "Invalid FUNC3 for OP" severity Failure;
         end case;
