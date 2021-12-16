@@ -32,12 +32,12 @@ package riscv_instructions_pkg is
     opcode : std_logic_vector(OPCODE_ADDR_W-1 downto 0) := (others => '0');
     rs1 : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
     rs2 : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
-    rsd : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
+    rd  : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
     funct3 : std_logic_vector(FUNCT3_ADDR_W-1 downto 0) := (others => '0');
     funct7 : std_logic_vector(FUNCT7_ADDR_W-1 downto 0) := (others => '0');
     Imm12 : std_logic_vector(12-1 downto 0) := (others => '0');
     Imm20 : std_logic_vector(20-1 downto 0) := (others => '0')
-    ) return std_logic_vector(INSTR_ADDR_W-1 downto 0);
+    ) return std_logic_vector;
 
   -- Opcodes
   ------------------------------------
@@ -175,22 +175,22 @@ package body riscv_instructions_pkg is
   opcode : std_logic_vector(OPCODE_ADDR_W-1 downto 0) := (others => '0');
   rs1 : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
   rs2 : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
-  rsd : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
+  rd : std_logic_vector(REG_ADDR_W-1 downto 0) := (others => '0');
   funct3 : std_logic_vector(FUNCT3_ADDR_W-1 downto 0) := (others => '0');
   funct7 : std_logic_vector(FUNCT7_ADDR_W-1 downto 0) := (others => '0');
   Imm12 : std_logic_vector(12-1 downto 0) := (others => '0');
   Imm20 : std_logic_vector(20-1 downto 0) := (others => '0')
-  ) return std_logic_vector(INSTR_ADDR_W-1 downto 0) is 
+  ) return std_logic_vector is 
     variable enc : t_encoding;
     variable instr : std_logic_vector(INSTR_ADDR_W-1 downto 0) := (others => '0');
   begin
     case (opcode) is
-      when OPCODE_OP => enc <= R_type;
-      when OPCODE_LOAD | OPCODE_OP_IMM | OPCODE_JALR | OPCODE_SYSTEM => enc <= I_type;
-      when OPCODE_STORE => enc <= S_type;
-      when OPCODE_BRANCH => enc <= B_type;
-      when OPCODE_AUIPC | OPCODE_LUI => enc <= U_type;
-      when OPCODE_JAL => enc <= J_type;
+      when OPCODE_OP => enc := R_type;
+      when OPCODE_LOAD | OPCODE_OP_IMM | OPCODE_JALR | OPCODE_SYSTEM => enc := I_type;
+      when OPCODE_STORE => enc := S_type;
+      when OPCODE_BRANCH => enc := B_type;
+      when OPCODE_AUIPC | OPCODE_LUI => enc := U_type;
+      when OPCODE_JAL => enc := J_type;
       when others => null;
     end case;
     case(enc) is
