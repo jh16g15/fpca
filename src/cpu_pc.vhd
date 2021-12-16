@@ -11,6 +11,7 @@ entity cpu_pc is
   port (
     clk : in std_logic;
     reset : in std_logic;
+    halt : in std_logic;
     branch_addr_in : in std_logic_vector(31 downto 0);
     branch_en_in : in std_logic;
     pc_out : out std_logic_vector(31 downto 0);
@@ -35,13 +36,13 @@ begin
             if reset = '1' then
                 pc <= G_PC_RESET_ADDR;
             else
-                
-                if branch_en_in = '1' then
-                  pc<= unsigned(branch_addr_in);
-                else
-                  pc <= next_pc;
+                if halt = '0' then
+                  if branch_en_in = '1' then
+                    pc<= unsigned(branch_addr_in);
+                  else
+                    pc <= next_pc;
+                  end if;
                 end if;
-
             end if;
         end if;
     end process;

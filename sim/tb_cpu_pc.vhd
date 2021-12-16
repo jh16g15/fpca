@@ -14,14 +14,12 @@ architecture rtl of tb_cpu_pc is
     signal clk : std_logic := '0';
     constant CLK_PERIOD : time := 10 ns;
     signal reset : std_logic := '1';
-
+    signal halt : std_logic := '0';
     signal branch_addr_in : std_logic_vector(31 downto 0);
     signal branch_en_in : std_logic;
     signal pc_out : std_logic_vector(31 downto 0);
     signal next_pc_out : std_logic_vector(31 downto 0);
     
-    
-
 begin
 
     clk <= not clk after CLK_PERIOD/2;
@@ -34,6 +32,7 @@ begin
     Port map (
         clk => clk,
         reset => reset,
+        halt => halt,
         branch_addr_in => branch_addr_in,
         branch_en_in => branch_en_in,
         pc_out => pc_out,
