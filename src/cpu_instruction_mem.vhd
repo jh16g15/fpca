@@ -4,6 +4,7 @@ use ieee.numeric_std.all;
 
 use std.textio.all;
 use work.riscv_instructions_pkg.all;
+use work.joe_common_pkg.all;
 
 --! Fetches 32bit words
 entity cpu_instruction_mem is

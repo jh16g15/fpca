@@ -3,6 +3,11 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.riscv_instructions_pkg.all;
+use work.joe_common_pkg.all;
+
+-- TODO: This actually implements a lot of the instruction decoding that perhaps
+-- should be elsewhere...
+
 
 entity cpu_alu is
   -- generic (
