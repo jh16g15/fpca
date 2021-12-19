@@ -18,6 +18,7 @@ from vunit import VUnit
 import os
 
 VU = VUnit.from_argv()
+VU.add_verification_components()
 
 VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08"])
 
@@ -26,7 +27,7 @@ VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08"])
 # print(f"1:{os.listdir(Path(__file__).resolve().parents[1])}")
 # print(f"2:{os.listdir(Path(__file__).resolve().parents[2])}")
 
-sim_dir = Path(__file__).parent
+sim_dir = Path(__file__).parent / "tb"
 src_dir = Path(__file__).resolve().parents[1] / "src"
 
 VU.add_library("lib")

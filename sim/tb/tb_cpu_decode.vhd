@@ -7,6 +7,7 @@ library vunit_lib;
 context vunit_lib.vunit_context;
 -- use work.vivado_vunit_pkg.all;
 
+use work.joe_common_pkg.all;
 use work.riscv_instructions_pkg.all;
 
 entity tb_cpu_decode is

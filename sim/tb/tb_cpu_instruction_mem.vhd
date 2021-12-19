@@ -3,15 +3,16 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.riscv_instructions_pkg.all;
+use work.joe_common_pkg.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
 
-entity cpu_instruction_mem_tb is
+entity tb_cpu_instruction_mem is
     generic (runner_cfg : string);
 end;
 
-architecture bench of cpu_instruction_mem_tb is
+architecture bench of tb_cpu_instruction_mem is
     -- Clock period
     constant clk_period : time := 10 ns;
     -- Generics
