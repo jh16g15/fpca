@@ -6,6 +6,8 @@ use work.wb_pkg.all;
 use work.joe_common_pkg.all;
 
 --! A simple wishbone B4 slave implementing a register bank
+--! Synchronous read, so adds 1 wait state.
+--!
 --! Supports a maximum of 64 RW and 64 RO registers (all 32-bit) - this is 128 registers or 512 bytes
 --! 
 --! Addressing:
