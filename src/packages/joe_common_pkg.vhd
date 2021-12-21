@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
+use std.textio.all;
 
 package joe_common_pkg is
 
@@ -12,7 +13,7 @@ package joe_common_pkg is
     type t_slv8_arr is array (integer range <>) of std_logic_vector(7 downto 0);
     
     --! Sign Extends a std_logic_vector
-    function extend_slv(in_vec : std_logic_vector; new_len : integer := 32) return std_logic_vector;
+    function extend_slv(in_vec : std_logic_vector; new_len : integer := 32; sign_ext : std_logic := '1') return std_logic_vector;
     --! converts integer to "signed" slv 
     function int2slv(in_int : integer; new_len : integer := 32) return std_logic_vector;
     --! converts integer to "unsigned" slv 
@@ -30,6 +31,13 @@ package joe_common_pkg is
     --! Returns the Ceiling of Log2(a)
     function clog2(a : positive) return positive;
 
+    --! Initialises a 32bit wide RAM from the contents of a file
+    --! Supports "hex" and "bin" modes
+    --! Adapted From https://vhdlwhiz.com/initialize-ram-from-file/
+    function init_mem32(filepath : string; depth: integer := 512; mode : string := "hex") return t_slv32_arr;
+
+    --! Initialise an 8-bit wide RAM from the contents of a file containing 32bit wide data
+    function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; mode : string := "hex") return t_slv8_arr;
 end package;
 
 package body joe_common_pkg is
@@ -40,10 +48,14 @@ package body joe_common_pkg is
         return positive(ceil(log2(real(a))));
     end function;
 
-    --! Sign Extends a std_logic_vector
-    function extend_slv(in_vec : std_logic_vector; new_len : integer := 32) return std_logic_vector is
+    --! Sign/Zero Extends a std_logic_vector
+    function extend_slv(in_vec : std_logic_vector; new_len : integer := 32; sign_ext : std_logic := '1') return std_logic_vector is
     begin
-        return std_logic_vector(resize(signed(in_vec), new_len));
+        if sign_ext = '1' then
+            return std_logic_vector(resize(signed(in_vec), new_len));
+        else
+            return std_logic_vector(resize(unsigned(in_vec), new_len));
+        end if;
     end function;
 
     --! converts integer to "signed" slv 
@@ -85,6 +97,49 @@ package body joe_common_pkg is
     function s_sub(a, b : std_logic_vector) return std_logic_vector is
     begin
         return std_logic_vector(signed(a) - signed(b));
+    end function;
+
+    --! Initialises a 32bit wide RAM from the contents of a file
+    --! Supports "hex" and "bin" modes
+    function init_mem32(filepath : string; depth: integer := 512; mode : string := "hex") return t_slv32_arr is
+        file init_file : text open read_mode is filepath;
+        variable text_line : line;
+        variable mem_contents : t_slv32_arr( 0 to depth-1) := (others => (others => '0'));
+    begin
+        if filepath = "" then
+            return mem_contents;
+        end if;
+        for i in 0 to depth-1 loop
+            readline(init_file, text_line);
+            case(mode) is
+                when "hex" => hread(text_line, mem_contents(i));
+                when "bin" => bread(text_line, mem_contents(i)); 
+                when others => hread(text_line, mem_contents(i));
+            end case;
+        end loop;
+        return mem_contents;
+    end function;
+
+    --! Initialise an 8-bit wide RAM from the contents of a file containing 32bit wide data
+    function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; mode : string := "hex") return t_slv8_arr is
+        file init_file : text open read_mode is filepath;
+        variable text_line : line;
+        variable mem_contents : t_slv8_arr( 0 to depth-1) := (others => (others => '0'));
+        variable line_contents : std_logic_vector(31 downto 0);
+    begin
+        if filepath = "" then
+            return mem_contents;
+        end if;
+        for i in 0 to depth-1 loop
+            readline(init_file, text_line);
+            case(mode) is
+                when "hex" => hread(text_line, line_contents);
+                when "bin" => bread(text_line, line_contents); 
+                when others => hread(text_line, line_contents);
+            end case;
+            mem_contents(i) := line_contents( 8*(byte_index+1)-1 downto 8*(byte_index));
+        end loop;
+        return mem_contents;
     end function;
 
 end package body;
