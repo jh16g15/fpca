@@ -31,7 +31,9 @@ end entity;
 
 architecture rtl of wb_sp_bram is
     constant C_RAM_DEPTH_WORDS : integer := 2**G_MEM_ADR_W;
-    signal mem : t_slv32_arr( 0 to C_RAM_DEPTH_WORDS-1) := init_mem32(G_INIT_FILE);
+    signal mem : t_slv32_arr( 0 to C_RAM_DEPTH_WORDS-1) := init_mem32(G_INIT_FILE, C_RAM_DEPTH_WORDS);
+    
+
     
 
 begin
