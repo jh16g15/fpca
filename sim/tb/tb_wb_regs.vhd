@@ -25,7 +25,7 @@ architecture bench of tb_wb_regs is
 
     -- Ports
     signal wb_clk      : std_logic;
-    signal wb_reset    : std_logic := '1';
+    signal wb_reset    : std_logic := '0';
     signal wb_mosi     : t_wb_mosi;
     signal wb_miso     : t_wb_miso;
     signal rw_regs_out : t_slv32_arr(G_NUM_RW_REGS - 1 downto 0);
@@ -100,7 +100,9 @@ begin
         show(tb_logger, display_handler, verbose);
         show(default_logger, display_handler, verbose);
         show(master_logger, display_handler, verbose);
-        show(com_logger, display_handler, verbose);
+        -- show(com_logger, display_handler, verbose);
+        -- show passing assertions
+        -- show(get_logger(default_checker), display_handler, pass);
 
         wait until rising_edge(wb_clk);
         wb_reset <= '0';
@@ -119,19 +121,18 @@ begin
 
                 info(tb_logger, "Read from RO");
                 read_bus(net, bus_handle, x"100", tmp_rdata);
-                wait until wb_miso.ack = '1' and rising_edge(clk);
                 check_equal(tmp_rdata, std_logic_vector'(x"0000_0000"), "read data");
 
-                read_bus(net, bus_handle, x"101", tmp_rdata);
-                wait until wb_miso.ack = '1' and rising_edge(clk);
+                read_bus(net, bus_handle, x"104", tmp_rdata);
+                -- wait until wb_miso.ack = '1' and rising_edge(clk);
                 check_equal(tmp_rdata, std_logic_vector'(x"1111_1111"), "read data");
 
-                read_bus(net, bus_handle, x"102",tmp_rdata);
-                wait until wb_miso.ack = '1' and rising_edge(clk);
+                read_bus(net, bus_handle, x"108",tmp_rdata);
+                -- wait until wb_miso.ack = '1' and rising_edge(clk);
                 check_equal(tmp_rdata, std_logic_vector'(x"2222_2222"), "read data");
 
-                read_bus(net, bus_handle, x"103", tmp_rdata);
-                wait until wb_miso.ack = '1' and rising_edge(clk);
+                read_bus(net, bus_handle, x"10C", tmp_rdata);
+                -- wait until wb_miso.ack = '1' and rising_edge(clk);
                 check_equal(tmp_rdata, std_logic_vector'(x"3333_3333"), "read data");
 
                 
@@ -140,6 +141,8 @@ begin
 
         test_runner_cleanup(runner);
     end process main;
+
+    test_runner_watchdog(runner, 10 us);
 
     clk_process : process
     begin

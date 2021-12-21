@@ -74,6 +74,8 @@ begin
                     -- always ACK this cycle (sync operation with 1 wait state)
                     wb_miso_out.ack <= '1';
 
+                    -- report("Received transaction with BANK_SEL bit (" & to_string(C_BANK_SEL_BIT_INDEX) & ") = " & to_string(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX)));
+                    -- report("Address Index = " & to_hstring(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX-1 downto 2)));
                     if wb_mosi_in.we = '1' then
                         -- write logic
                         if (wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX) = '0')  then -- if addressing a RW register

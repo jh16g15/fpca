@@ -33,6 +33,7 @@ src_dir = Path(__file__).resolve().parents[1] / "src"
 VU.add_library("lib")
 VU.add_source_files(sim_dir / "*.vhd", "lib")
 VU.add_source_files(src_dir / "*.vhd", "lib")
+VU.add_source_files(src_dir / "packages" / "*.vhd", "lib")
 
 
 
