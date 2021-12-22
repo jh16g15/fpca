@@ -34,10 +34,10 @@ package joe_common_pkg is
     --! Initialises a 32bit wide RAM from the contents of a file
     --! Supports "hex" and "bin" modes
     --! Adapted From https://vhdlwhiz.com/initialize-ram-from-file/
-    impure function init_mem32(filepath : string; depth: integer := 512; mode : string := "hex") return t_slv32_arr;
+    impure function init_mem32(filepath : string; depth: integer := 512; hex_mode : std_logic := '1') return t_slv32_arr;
 
     --! Initialise an 8-bit wide RAM from the contents of a file containing 32bit wide data
-    impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; mode : string := "hex") return t_slv8_arr;
+    impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; hex_mode : std_logic := '1') return t_slv8_arr;
 end package;
 
 package body joe_common_pkg is
@@ -101,7 +101,7 @@ package body joe_common_pkg is
 
     --! Initialises a 32bit wide RAM from the contents of a file
     --! Supports "hex" and "bin" modes
-    impure function init_mem32(filepath : string; depth: integer := 512; mode : string := "hex") return t_slv32_arr is
+    impure function init_mem32(filepath : string; depth: integer := 512; hex_mode : std_logic  := '1') return t_slv32_arr is
         file init_file : text;
         variable text_line : line;
         variable mem_contents : t_slv32_arr( 0 to depth-1) := (others => (others => '0'));
@@ -117,9 +117,9 @@ package body joe_common_pkg is
             report "reading line " & to_string(i) severity note;
             if not endfile(init_file) then
                 readline(init_file, text_line);
-                case(mode) is
-                    when "hex" => hread(text_line, mem_contents(i));
-                    when "bin" => bread(text_line, mem_contents(i)); 
+                case(hex_mode) is
+                    when '1' => hread(text_line, mem_contents(i));
+                    when '0' => bread(text_line, mem_contents(i)); 
                     when others => hread(text_line, mem_contents(i));
                 end case;
             end if;
@@ -128,7 +128,7 @@ package body joe_common_pkg is
     end function;
 
     --! Initialise an 8-bit wide RAM from the contents of a file containing 32bit wide data
-    impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; mode : string := "hex") return t_slv8_arr is
+    impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; hex_mode : std_logic := '1') return t_slv8_arr is
         file init_file : text; -- open read_mode is filepath;
         variable text_line : line;
         variable mem_contents : t_slv8_arr( 0 to depth-1) := (others => (others => '0'));
@@ -141,9 +141,9 @@ package body joe_common_pkg is
         end if;
         for i in 0 to depth-1 loop
             readline(init_file, text_line);
-            case(mode) is
-                when "hex" => hread(text_line, line_contents);
-                when "bin" => bread(text_line, line_contents); 
+            case(hex_mode) is
+                when '1' => hread(text_line, line_contents);
+                when '0' => bread(text_line, line_contents); 
                 when others => hread(text_line, line_contents);
             end case;
             mem_contents(i) := line_contents( 8*(byte_index+1)-1 downto 8*(byte_index));

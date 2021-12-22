@@ -72,7 +72,7 @@ begin
             when "0010" => rsp_rdata_out <= extend_slv(wb_miso_in.rdat(15 downto 8), new_len => 32, sign_ext => not cmd_unsigned_saved);
             when "0100" => rsp_rdata_out <= extend_slv(wb_miso_in.rdat(23 downto 16), new_len => 32, sign_ext => not cmd_unsigned_saved);
             when "1000" => rsp_rdata_out <= extend_slv(wb_miso_in.rdat(31 downto 24), new_len => 32, sign_ext => not cmd_unsigned_saved);
-            when others => rsp_rdata_out <= wb_miso_in.rdat;
+            when others => rsp_rdata_out <= wb_miso_in.rdat;    -- generate misaligned error?
         end case;
     end process;
 

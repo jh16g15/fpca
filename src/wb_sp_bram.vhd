@@ -31,26 +31,10 @@ end entity;
 
 architecture rtl of wb_sp_bram is
     constant C_RAM_DEPTH_WORDS : integer := 2 ** G_MEM_ADR_W;
-    signal dbg_mem                 : t_slv32_arr(0 to C_RAM_DEPTH_WORDS - 1);
 
-    type t_mem_arr is array(3 downto 0) of t_slv8_arr(0 to C_RAM_DEPTH_WORDS - 1);
+    signal mem32 : t_slv32_arr(0 to C_RAM_DEPTH_WORDS - 1) := init_mem32(G_INIT_FILE, C_RAM_DEPTH_WORDS);
 
-    signal mem_arr : t_mem_arr := (
-        3 => init_mem32_bytes(G_INIT_FILE, C_RAM_DEPTH_WORDS, 3),
-        2 => init_mem32_bytes(G_INIT_FILE, C_RAM_DEPTH_WORDS, 2),
-        1 => init_mem32_bytes(G_INIT_FILE, C_RAM_DEPTH_WORDS, 1),
-        0 => init_mem32_bytes(G_INIT_FILE, C_RAM_DEPTH_WORDS, 0)
-    );
 begin
-    --! Assemble the individual byte memories into one for easier waveform viewing
-    dbg_proc : process(all) is
-    begin
-        for i in 0 to C_RAM_DEPTH_WORDS-1 loop
-            dbg_mem(i) <= (mem_arr(3)(i), mem_arr(2)(i), mem_arr(1)(i), mem_arr(0)(i));
-        end loop;
-    end process;
-
-
     -- this slave can always respond to requests, so no stalling is required
     wb_miso_out.stall <= '0';
 
@@ -69,6 +53,7 @@ begin
             end if;
         end if;
     end process;
+
     -- wishbone slave logic
     wb_proc : process (wb_clk) is
     begin
@@ -79,13 +64,13 @@ begin
                 -- assume CYC asserted by master for STB to be high
                 if wb_mosi_in.stb = '1' and wb_miso_out.stall = '0' then
                     for i in 0 to 3 loop
-                        if wb_mosi_in.sel(i) then   -- if tgis byte is selected
+                        if wb_mosi_in.sel(i) then -- if this byte is selected
                             if wb_mosi_in.we = '1' then
                                 -- synchronous write logic
-                                mem_arr(i)(slv2uint(wb_mosi_in.adr(G_MEM_ADR_W + 2 - 1 downto 2))) <= wb_mosi_in.wdat(8 * (i + 1) - 1 downto 8 * i); -- write byte
+                                mem32(slv2uint(wb_mosi_in.adr(G_MEM_ADR_W + 2 - 1 downto 2)))(8 * (i + 1) - 1 downto 8 * i) <= wb_mosi_in.wdat(8 * (i + 1) - 1 downto 8 * i); -- write byte
                             else
                                 -- synchronous read logic
-                                wb_miso_out.rdat(8 * (i + 1) - 1 downto 8 * i) <= mem_arr(i)(slv2uint(wb_mosi_in.adr(G_MEM_ADR_W + 2 - 1 downto 2)));   -- read byte
+                                wb_miso_out.rdat(8 * (i + 1) - 1 downto 8 * i) <= mem32(slv2uint(wb_mosi_in.adr(G_MEM_ADR_W + 2 - 1 downto 2)))(8 * (i + 1) - 1 downto 8 * i); -- read byte
                             end if;
                         end if;
                     end loop;
