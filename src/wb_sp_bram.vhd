@@ -14,9 +14,12 @@ use work.joe_common_pkg.all;
 --!
 --! Each GOWIN BRAM is 2Kbytes (512x32 (no true dual-port), 1024x16, 2048x8)
 --!
+--! This module uses a minimum of 4 BRAMS, with which we can go up to 2048 32-bit words
+--! G_MEM_DEPTH_WORDS=8096 words requires 8 BRAMs
+--!
 entity wb_sp_bram is
     generic (
-        G_MEM_ADR_W : integer := 9; -- 512 words, should use 1 BRAM
+        G_MEM_DEPTH_WORDS : integer := 512; --! Must be a power of 2
         G_INIT_FILE : string  := "" -- relative path?
     );
     port (
@@ -30,10 +33,20 @@ entity wb_sp_bram is
 end entity;
 
 architecture rtl of wb_sp_bram is
-    constant C_RAM_DEPTH_WORDS : integer := 2 ** G_MEM_ADR_W;
 
-    signal mem32 : t_slv32_arr(0 to C_RAM_DEPTH_WORDS - 1) := init_mem32(G_INIT_FILE, C_RAM_DEPTH_WORDS);
+    constant C_WORD_ADR_W : integer := clog2(G_MEM_DEPTH_WORDS);
 
+    -- slice off the word address from the Wishbone BYTE address 
+    -- (even though addresses should be 32-bit aligned and thus [1:0]=b"00" anyway)
+    constant C_WORD_ADR_H : integer := C_WORD_ADR_W+2-1;
+    constant C_WORD_ADR_L : integer := 2;
+
+    signal mem32 : t_slv32_arr(0 to G_MEM_DEPTH_WORDS - 1) := init_mem32(G_INIT_FILE, G_MEM_DEPTH_WORDS);
+
+    --GOWIN
+    attribute syn_ramstyle : string;
+    attribute syn_ramstyle of mem32 : signal is "block_ram";
+    
 begin
     -- this slave can always respond to requests, so no stalling is required
     wb_miso_out.stall <= '0';
@@ -67,10 +80,10 @@ begin
                         if wb_mosi_in.sel(i) then -- if this byte is selected
                             if wb_mosi_in.we = '1' then
                                 -- synchronous write logic
-                                mem32(slv2uint(wb_mosi_in.adr(G_MEM_ADR_W + 2 - 1 downto 2)))(8 * (i + 1) - 1 downto 8 * i) <= wb_mosi_in.wdat(8 * (i + 1) - 1 downto 8 * i); -- write byte
+                                mem32(slv2uint(wb_mosi_in.adr(C_WORD_ADR_H downto C_WORD_ADR_L)))(8 * (i + 1) - 1 downto 8 * i) <= wb_mosi_in.wdat(8 * (i + 1) - 1 downto 8 * i); -- write byte
                             else
                                 -- synchronous read logic
-                                wb_miso_out.rdat(8 * (i + 1) - 1 downto 8 * i) <= mem32(slv2uint(wb_mosi_in.adr(G_MEM_ADR_W + 2 - 1 downto 2)))(8 * (i + 1) - 1 downto 8 * i); -- read byte
+                                wb_miso_out.rdat(8 * (i + 1) - 1 downto 8 * i) <= mem32(slv2uint(wb_mosi_in.adr(C_WORD_ADR_H downto C_WORD_ADR_L)))(8 * (i + 1) - 1 downto 8 * i); -- read byte
                             end if;
                         end if;
                     end loop;

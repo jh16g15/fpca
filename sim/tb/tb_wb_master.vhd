@@ -78,7 +78,7 @@ begin
 
     wb_sp_bram_inst : entity work.wb_sp_bram
         generic map(
-            G_MEM_ADR_W => 8,
+            G_MEM_DEPTH_WORDS => 256,
             G_INIT_FILE => ""
         )
         port map(
