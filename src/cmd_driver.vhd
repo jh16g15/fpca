@@ -1,7 +1,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
+-- synthesis translate_off
+library vunit_lib;
+context vunit_lib.vunit_context;
+-- synthesis translate_on
 use work.wb_pkg.all;
 use work.joe_common_pkg.all;
 entity cmd_driver is
@@ -12,12 +15,13 @@ entity cmd_driver is
         done  : out std_logic;
 
         -- command bus
-        cmd_addr_out  : out std_logic_vector(C_WB_ADDR_W - 1 downto 0);
-        cmd_wdata_out : out std_logic_vector(C_WB_DATA_W - 1 downto 0);
-        cmd_sel_out   : out std_logic_vector(C_WB_SEL_W - 1 downto 0); --! positions of read/write data
-        cmd_we_out    : out std_logic;
-        cmd_req_out   : out std_logic;
-        cmd_stall_in  : in std_logic;
+        cmd_addr_out          : out std_logic_vector(C_WB_ADDR_W - 1 downto 0);
+        cmd_wdata_out         : out std_logic_vector(C_WB_DATA_W - 1 downto 0);
+        cmd_sel_out           : out std_logic_vector(C_WB_SEL_W - 1 downto 0); --! positions of read/write data
+        cmd_we_out            : out std_logic;
+        cmd_req_out           : out std_logic;
+        cmd_unsigned_flag_out : out std_logic; --! 1 for 0-ext, 0 for sign-ext
+        cmd_stall_in          : in std_logic;
 
         -- response bus
         rsp_rdata_in : in std_logic_vector(C_WB_DATA_W - 1 downto 0);
@@ -31,10 +35,14 @@ end entity cmd_driver;
 architecture rtl of cmd_driver is
     constant C_NUM_CMDS : integer := 20;
 
-    constant CMD_H : integer := 71; constant CMD_L : integer := 68;
-    constant SIZ_H : integer := 67; constant SIZ_L : integer := 64;
-    constant ADR_H : integer := 63; constant ADR_L : integer := 32;
-    constant DAT_H : integer := 31; constant DAT_L : integer := 0;
+    constant CMD_H : integer := 71;
+    constant CMD_L : integer := 68;
+    constant SIZ_H : integer := 67;
+    constant SIZ_L : integer := 64;
+    constant ADR_H : integer := 63;
+    constant ADR_L : integer := 32;
+    constant DAT_H : integer := 31;
+    constant DAT_L : integer := 0;
 
     -- R/W, ADDR, DATA
     type t_cmd_mem is array(0 to C_NUM_CMDS - 1) of std_logic_vector(71 downto 0);
@@ -63,7 +71,18 @@ architecture rtl of cmd_driver is
         mem(6) := R & WORD & x"0000_0004" & x"1111_1111";
         mem(7) := R & WORD & x"0000_0008" & x"2222_2222";
         mem(8) := R & WORD & x"0000_000C" & x"3333_3333";
-        mem(9) := RL & WORD & x"0000_0010" & x"4444_4444";
+        mem(9) := R & WORD & x"0000_0010" & x"4444_4444";
+        -- Try Reading/Writing different widths
+        mem(10) := W & UHALF & x"0000_0008" & x"0000_C0DE"; -- Store Halfword (Lower)
+        mem(11) := W & UHALF & x"0000_000A" & x"0000_C001"; -- Store Halfword (Upper)
+        mem(12) := R & WORD & x"0000_0008" & x"C001_C0DE";  -- Check word written correctly
+        mem(13) := W & UBYTE & x"0000_0014" & x"0000_0088"; -- Store byte ()
+        mem(14) := R & UBYTE & x"0000_0014" & x"0000_0088"; -- load byte (unsigned)
+        mem(15) := R & SBYTE & x"0000_0014" & x"FFFF_FF88"; -- load byte (signed)
+        mem(16) := W & UBYTE & x"0000_0021" & x"0000_0085"; -- Store byte (not aligned)
+        mem(17) := R & UBYTE & x"0000_0021" & x"0000_0085"; -- load byte (unsigned)
+        mem(18) := R & SBYTE & x"0000_0021" & x"FFFF_FF85"; -- load byte (signed)
+        mem(19) := RL & WORD & x"0000_0020" & x"0000_8500"; -- read word - check just that byte written
         return mem;
     end function;
 
@@ -71,16 +90,22 @@ architecture rtl of cmd_driver is
     signal index    : integer   := 0;
     signal cmd_done : std_logic;
     signal rsp_done : std_logic;
+    -- synthesis translate_off
+    constant cmd_logger : logger_t := get_logger("cmd");
+    constant rsp_logger : logger_t := get_logger("rsp");
+    -- synthesis translate_on
 begin
 
     done <= rsp_done;
 
     process (clk)
-        variable wen  : std_logic;
-        variable last : std_logic;
-        variable addr : std_logic_vector(31 downto 0);
-        variable data : std_logic_vector(31 downto 0);
-        variable size : std_logic_vector(3 downto 0);
+        variable wen           : std_logic;
+        variable last          : std_logic;
+        variable addr          : std_logic_vector(31 downto 0);
+        variable data          : std_logic_vector(31 downto 0);
+        variable size          : std_logic_vector(3 downto 0);
+        variable transfer_size : t_transfer_size;
+        variable unsigned_ext  : std_logic;
 
         variable exp_rdat : std_logic_vector(31 downto 0);
 
@@ -105,9 +130,20 @@ begin
                     addr := cmd_mem(index)(ADR_H downto ADR_L);
                     data := cmd_mem(index)(DAT_H downto DAT_L);
 
-                    cmd_req_out  <= '1';
-                    cmd_addr_out <= addr;
+                    unsigned_ext := size(size'left - 1); -- bit 2
 
+                    case(size(1 downto 0)) is
+                        when b"00"  => transfer_size  := b8;
+                        when b"01"  => transfer_size  := b16;
+                        when b"10"  => transfer_size  := b32;
+                        when others => transfer_size := b32;
+                    end case;
+                    -- synthesis translate_off
+                    info(cmd_logger, "CMD " & to_string(cmd_count) & " Index=" & to_string(index) & " Size=" & to_string(size) & ", " & to_string(transfer_size) & " unsigned?: " & to_string(unsigned_ext));
+                    -- synthesis translate_on
+                    cmd_req_out           <= '1';
+                    cmd_addr_out          <= addr;
+                    cmd_unsigned_flag_out <= unsigned_ext;
                     cmd_count := cmd_count + 1;
 
                     if wen = '1' then
@@ -118,7 +154,10 @@ begin
                         cmd_we_out    <= '0';
                     end if;
 
-                    wb_byte_addr_to_word(addr, b32, word_addr, byte_sel);
+                    wb_byte_addr_to_byte_sel(addr, transfer_size, word_addr, byte_sel);
+                    -- synthesis translate_off
+                    info(cmd_logger, "addr:" & to_hstring(addr) & " size:" & to_string(transfer_size) & " word addr:" & to_hstring(word_addr) & " byte_sel:" & to_hstring(byte_sel));
+                    -- synthesis translate_on
                     cmd_sel_out <= byte_sel;
                     if index = C_NUM_CMDS - 1 then
                         cmd_done <= '1'; -- stop sending commands
@@ -134,13 +173,17 @@ begin
 
                 -- response handling
                 if rsp_valid_in = '1' then
-                    report("Received Response num= " & to_string(rsp_count));
-                    report("Original CMD         = " & to_hstring(cmd_mem(rsp_count)));
+                    -- synthesis translate_off
+                    info(rsp_logger, "Received Response num= " & to_string(rsp_count) & " Original CMD         = " & to_hstring(cmd_mem(rsp_count)));
+                    -- synthesis translate_on
                     exp_rdat := cmd_mem(rsp_count)(DAT_H downto DAT_L);
-
+                    -- synthesis translate_off
                     assert rsp_err = '0' report "RESPONSE ERROR!" severity G_SEVERITY;
+                    -- synthesis translate_on
                     if cmd_mem(rsp_count)(CMD_L) = '0' then -- if was a read
-                        assert rsp_rdata_in = exp_rdat report "RDATA MISMATCH ERROR! Received: " & to_hstring(rsp_rdata_in) & " Expected: " & to_hstring(exp_rdat) severity G_SEVERITY;
+                        -- synthesis translate_off
+                        check_equal(rsp_rdata_in, exp_rdat, "RDATA got: " & to_hstring(rsp_rdata_in) & " Exp: " & to_hstring(exp_rdat), warning);
+                        -- synthesis translate_on
                     end if;
 
                     rsp_count := rsp_count + 1;
