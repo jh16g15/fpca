@@ -42,7 +42,7 @@ package wb_pkg is
 
     constant C_WB_MISO_INIT : t_wb_miso := (
         rdat => (others => '0'),
-        stall => '0',
+        stall => '1',
         ack   => '0',
         err   => '0',
         rty   => '0'
