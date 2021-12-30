@@ -8,7 +8,7 @@ use work.joe_common_pkg.all;
 --!
 entity wb_interconnect is
     generic (
-        G_NUM_SLAVES : integer := 16 -- max 16
+        G_NUM_SLAVES : integer := 16 -- max 16, 256 MBytes address space per slave
         -- Select the width of segment used for address decoding
         -- G_ADR_MAP_H : integer := 31;
         -- G_ADR_MAP_L: integer := 28
@@ -56,28 +56,18 @@ begin
     -- For unused address segments, comment out and they will automatically respond with ERR
     -- TODO: Use G_NUM_SLAVES to parameterise this
     addr_decode : process (all)
+        variable int_slave : integer range 0 to C_MAX_SLAVES-1;
     begin
         -- default to all 0's, then override 1 bit
         slave_sel <= (others => '0');
-        case(adr_decode) is
-            when x"0" => slave_sel(0) <= '1';
-            when x"1" => slave_sel(1) <= '1';
-            -- when x"2" => slave_sel(2) <= '1';
-            -- when x"3" => slave_sel(3) <= '1';
-            -- when x"4" => slave_sel(4) <= '1';
-            -- when x"5" => slave_sel(5) <= '1';
-            -- when x"6" => slave_sel(6) <= '1';
-            -- when x"7" => slave_sel(7) <= '1';
-            -- when x"8" => slave_sel(8) <= '1';
-            -- when x"9" => slave_sel(9) <= '1';
-            -- when x"A" => slave_sel(10) <= '1';
-            -- when x"B" => slave_sel(11) <= '1';
-            -- when x"C" => slave_sel(12) <= '1';
-            -- when x"D" => slave_sel(13) <= '1';
-            -- when x"E" => slave_sel(14) <= '1';
-            -- when x"F" => slave_sel(15) <= '1';
-            when others => null;
-        end case;
+        
+        int_slave := slv2uint(adr_decode);
+        for i in 0 to G_NUM_SLAVES-1 loop
+            if int_slave = i then
+                slave_sel(i) <= '1';
+            end if;
+        end loop;
+
     end process addr_decode;
 
     slave_stb : for i in 0 to G_NUM_SLAVES - 1 generate
