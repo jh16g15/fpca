@@ -30,6 +30,11 @@ package wb_pkg is
         rty   : std_logic;                                  --! Slave RETRY response (not implemented)
     end record;
 
+    type t_wb_mosi_arr is array (integer range <>) of t_wb_mosi;
+    type t_wb_miso_arr is array (integer range <>) of t_wb_miso;
+        
+
+
     constant C_WB_MOSI_INIT : t_wb_mosi := (
         adr => (others => '0'),
         wdat => (others => '0'),

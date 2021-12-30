@@ -38,6 +38,9 @@ package joe_common_pkg is
 
     --! Initialise an 8-bit wide RAM from the contents of a file containing 32bit wide data
     impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; hex_mode : std_logic := '1') return t_slv8_arr;
+
+    function test_bit(in_vec : std_logic_vector; i : integer) return boolean;    
+
 end package;
 
 package body joe_common_pkg is
@@ -149,6 +152,11 @@ package body joe_common_pkg is
             mem_contents(i) := line_contents( 8*(byte_index+1)-1 downto 8*(byte_index));
         end loop;
         return mem_contents;
+    end function;
+
+    function test_bit(in_vec : std_logic_vector; i : integer) return boolean is
+    begin 
+        return (in_vec(i) = '1');   -- True if '1'
     end function;
 
 end package body;
