@@ -37,6 +37,7 @@ end entity;
 
 architecture rtl of cpu_alu is
 
+  signal alu_opcode_err : std_logic;
 begin
 
   alu_comb : process (all) is
@@ -45,6 +46,7 @@ begin
     alu_out <= x"DEADBEEF";
     branch_en <= '0';
     branch_target_out <= x"DEADBEEF";
+    alu_opcode_err <= '0';
     opcode_case : case(opcode) is
       when OPCODE_LUI => -- alu_out = Imm
         alu_out <= imm;
@@ -95,7 +97,7 @@ begin
           when OP_SRL_FUNC3   => alu_out <= std_logic_vector(shift_right(unsigned(rs1), slv2uint(imm(4 downto 0)))) when funct7(5) = '0' else std_logic_vector(shift_right(signed(rs1), slv2uint(imm(4 downto 0))));
           when others => report "Invalid FUNC3 for OP-IMM" severity Failure;
         end case;
-      when others => report "Invalid Opcode" severity Failure;
+      when others => alu_opcode_err <= '1';
     end case opcode_case;
   end process alu_comb;
 
