@@ -32,9 +32,11 @@ src_dir = Path(__file__).resolve().parents[1] / "src"
 
 VU.add_library("lib")
 VU.add_source_files(sim_dir / "tb" / "*.vhd", "lib")
-VU.add_source_files(sim_dir / "tb_helpers" "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(sim_dir / "tb_helpers" / "*.vhd", "lib")
+
 VU.add_source_files(src_dir / "*.vhd", "lib")
-VU.add_source_files(src_dir / "riscv_cpu" / "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(src_dir / "cpu" / "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(src_dir / "soc" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "wishbone" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "packages" / "*.vhd", "lib", allow_empty=True)
 
