@@ -61,6 +61,9 @@ package wb_pkg is
     function wb_pack_miso(rdat : std_logic_vector; stall, ack, err, rty : std_logic) return t_wb_miso;
     function wb_pack_miso(rdat : std_logic_vector; stall, ack : std_logic) return t_wb_miso;
 
+    --! Converts the RISC-V func3 field into the corresponding wishbone transfer size 
+    function wb_get_transfer_size(func3 : std_logic_vector) return t_transfer_size;
+
     --! Converts a Byte Address (with a transaction size in Bytes) to a 32-bit aligned Wishbone Address 
     --! and the appropriate SEL signals
     procedure wb_byte_addr_to_byte_sel(byte_addr : in std_logic_vector; transfer_size : in t_transfer_size := b32; wb_addr : out std_logic_vector; wb_sel : out std_logic_vector);
@@ -89,6 +92,19 @@ package body wb_pkg is
     function wb_pack_miso (rdat : std_logic_vector; stall, ack : std_logic) return t_wb_miso is
     begin
         return (rdat => rdat, stall => stall, ack => ack, err => C_WB_MISO_INIT.err, rty => C_WB_MISO_INIT.rty);
+    end function;
+
+    -- move to riscv_pkg?
+    function wb_get_transfer_size(func3 : std_logic_vector) return t_transfer_size is
+        variable transfer_size : t_transfer_size;
+    begin
+        case(func3(1 downto 0)) is
+            when b"00"  => transfer_size  := b8;
+            when b"01"  => transfer_size  := b16;
+            when b"10"  => transfer_size  := b32;
+            when others => transfer_size := b32;
+        end case;
+        return transfer_size;
     end function;
 
     --! Converts a Byte Address (with a transaction size in Bytes) to a 32-bit aligned Wishbone Address 
