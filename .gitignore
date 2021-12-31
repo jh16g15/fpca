@@ -1,9 +1,9 @@
 impl/
-src/instantiation_templates/
+hdl/src/instantiation_templates/
 workspace.code-workspace
-sim/vunit_out
+hdl/sim/vunit_out
 software/test2
 software/work
 software/test
-sim/teroshdl_out.xml
-sim/teroshdl_export.json
+hdl/sim/teroshdl_out.xml
+hdl/sim/teroshdl_export.json

@@ -27,13 +27,16 @@ VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08"])
 # print(f"1:{os.listdir(Path(__file__).resolve().parents[1])}")
 # print(f"2:{os.listdir(Path(__file__).resolve().parents[2])}")
 
-sim_dir = Path(__file__).parent / "tb"
+sim_dir = Path(__file__).parent
 src_dir = Path(__file__).resolve().parents[1] / "src"
 
 VU.add_library("lib")
-VU.add_source_files(sim_dir / "*.vhd", "lib")
+VU.add_source_files(sim_dir / "tb" / "*.vhd", "lib")
+VU.add_source_files(sim_dir / "tb_helpers" "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "*.vhd", "lib")
-VU.add_source_files(src_dir / "packages" / "*.vhd", "lib")
+VU.add_source_files(src_dir / "riscv_cpu" / "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(src_dir / "wishbone" / "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(src_dir / "packages" / "*.vhd", "lib", allow_empty=True)
 
 
 
