@@ -19,14 +19,14 @@ architecture rtl of tb_cpu_decode is
     constant CLK_PERIOD : time := 10 ns;
     signal reset : std_logic := '1';
 
-    signal instr_in     : std_logic_vector(INSTR_ADDR_W-1 downto 0); 
+    signal instr_in     : std_logic_vector(INSTR_W-1 downto 0); 
     signal rs1_addr_out : std_logic_vector(REG_ADDR_W-1 downto 0);  
     signal rs2_addr_out : std_logic_vector(REG_ADDR_W-1 downto 0);  
     signal rd_addr_out  : std_logic_vector(REG_ADDR_W-1 downto 0); 
-    signal imm_out      : std_logic_vector(IMM_ADDR_W-1 downto 0);   
-    signal opcode_out   : std_logic_vector(OPCODE_ADDR_W-1 downto 0); 
-    signal funct7_out   : std_logic_vector(FUNCT7_ADDR_W-1 downto 0); 
-    signal funct3_out   : std_logic_vector(FUNCT3_ADDR_W-1 downto 0); 
+    signal imm_out      : std_logic_vector(IMM_W-1 downto 0);   
+    signal opcode_out   : std_logic_vector(OPCODE_W-1 downto 0); 
+    signal funct7_out   : std_logic_vector(FUNCT7_W-1 downto 0); 
+    signal funct3_out   : std_logic_vector(FUNCT3_W-1 downto 0); 
 
    
 begin
