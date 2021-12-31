@@ -117,7 +117,7 @@ package body joe_common_pkg is
             file_open(init_file, filepath, read_mode);
         end if;
         for i in 0 to depth-1 loop
-            report "reading line " & to_string(i) severity note;
+            -- report "reading line " & to_string(i) severity note;
             if not endfile(init_file) then
                 readline(init_file, text_line);
                 case(hex_mode) is
