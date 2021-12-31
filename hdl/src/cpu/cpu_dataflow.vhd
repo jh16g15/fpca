@@ -67,9 +67,14 @@ begin
     unsigned_flag <= func3_in(2);
 
     process (all)
+        variable   var_wb_addr : std_logic_vector(31 downto 0);
+        variable   var_wb_sel : std_logic_vector(3 downto 0);
     begin
         -- calculate the Wishbone Select lines
-        wb_byte_addr_to_byte_sel(alu_output_in, size, wb_addr, wb_sel);
+        wb_byte_addr_to_byte_sel(alu_output_in, size, var_wb_addr, var_wb_sel);
+        wb_addr <= var_wb_addr;
+        wb_sel <= var_wb_sel;
+
         -- calculate the WDATA to send
         mem_wdata <= wb_align_store_data(rs2_data_in, wb_sel);
 
