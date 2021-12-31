@@ -14,7 +14,7 @@ entity cpu_instr_fetch is
         branch_addr_in : in std_logic_vector(31 downto 0);
         branch_en_in   : in std_logic;
         pc_out         : out std_logic_vector(31 downto 0);
-        next_pc_out    : out std_logic_vector(31 downto 0); -- PC+4
+        ret_addr_out   : out std_logic_vector(31 downto 0); -- PC+4, used to save Return Address
 
         fetch_req_in    : in std_logic;
         instr_valid_out : out std_logic;
@@ -37,9 +37,7 @@ architecture rtl of cpu_instr_fetch is
 begin
 
     -- combinational
-    -- next_pc     <= pc + to_unsigned(4, 32);
-    pc_out      <= fetch_addr;
-    next_pc_out <= std_logic_vector(next_pc);
+    ret_addr_out <= std_logic_vector(unsigned(pc_out) + to_unsigned(4, 32));
 
     -- branch select
     next_pc    <= pc + to_unsigned(4, 32) when branch_en_in = '0' else unsigned(branch_addr_in) + to_unsigned(4, 32);
@@ -54,13 +52,16 @@ begin
                 if fetch_req_in = '1' and fetch_busy_out = '0' then
                     pc <= next_pc;
 
+                    pc_out <= fetch_addr; -- address currently being fetched
                 end if;
             end if;
         end if;
     end process;
 
     -- wishbone master to fetch instructions
-    -- We could use a simpler 32b only master as well
+    -- We could use a simpler 32b only master as well, or a direct connection 
+    -- that only takes 1 cycle to fetch an instruction from BRAM for improved 
+    -- CPU performance
 
     wb_master_inst : entity work.wb_master
         port map(

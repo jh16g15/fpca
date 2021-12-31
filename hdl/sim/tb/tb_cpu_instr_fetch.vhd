@@ -25,7 +25,7 @@ architecture bench of tb_cpu_instr_fetch is
     signal branch_addr_in  : std_logic_vector(31 downto 0);
     signal branch_en_in    : std_logic;
     signal pc_out          : std_logic_vector(31 downto 0);
-    signal next_pc_out     : std_logic_vector(31 downto 0);
+    signal ret_addr_out    : std_logic_vector(31 downto 0);
     signal fetch_req_in    : std_logic;
     signal instr_valid_out : std_logic;
     signal instr_out       : std_logic_vector(31 downto 0);
@@ -68,7 +68,7 @@ begin
             branch_addr_in  => branch_addr_in,
             branch_en_in    => branch_en_in,
             pc_out          => pc_out,
-            next_pc_out     => next_pc_out,
+            ret_addr_out     => ret_addr_out,
             fetch_req_in    => fetch_req_in,
             instr_valid_out => instr_valid_out,
             instr_out       => instr_out,
