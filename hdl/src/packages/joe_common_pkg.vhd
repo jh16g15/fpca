@@ -37,7 +37,7 @@ package joe_common_pkg is
     impure function init_mem32(filepath : string; depth: integer := 512; hex_mode : std_logic := '1') return t_slv32_arr;
 
     --! Initialise an 8-bit wide RAM from the contents of a file containing 32bit wide data
-    impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; hex_mode : std_logic := '1') return t_slv8_arr;
+    -- impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; hex_mode : std_logic := '1') return t_slv8_arr;
 
     function test_bit(in_vec : std_logic_vector; i : integer) return boolean;    
 
@@ -117,8 +117,8 @@ package body joe_common_pkg is
             file_open(init_file, filepath, read_mode);
         end if;
         for i in 0 to depth-1 loop
-            -- report "reading line " & to_string(i) severity note;
             if not endfile(init_file) then
+                -- report "reading line " & to_string(i+1) severity note;
                 readline(init_file, text_line);
                 case(hex_mode) is
                     when '1' => hread(text_line, mem_contents(i));
@@ -131,28 +131,28 @@ package body joe_common_pkg is
     end function;
 
     --! Initialise an 8-bit wide RAM from the contents of a file containing 32bit wide data
-    impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; hex_mode : std_logic := '1') return t_slv8_arr is
-        file init_file : text; -- open read_mode is filepath;
-        variable text_line : line;
-        variable mem_contents : t_slv8_arr( 0 to depth-1) := (others => (others => '0'));
-        variable line_contents : std_logic_vector(31 downto 0);
-    begin
-        if filepath = "" then
-            return mem_contents;
-        else
-            file_open(init_file, filepath, read_mode);
-        end if;
-        for i in 0 to depth-1 loop
-            readline(init_file, text_line);
-            case(hex_mode) is
-                when '1' => hread(text_line, line_contents);
-                when '0' => bread(text_line, line_contents); 
-                when others => hread(text_line, line_contents);
-            end case;
-            mem_contents(i) := line_contents( 8*(byte_index+1)-1 downto 8*(byte_index));
-        end loop;
-        return mem_contents;
-    end function;
+    -- impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; hex_mode : std_logic := '1') return t_slv8_arr is
+    --     file init_file : text; -- open read_mode is filepath;
+    --     variable text_line : line;
+    --     variable mem_contents : t_slv8_arr( 0 to depth-1) := (others => (others => '0'));
+    --     variable line_contents : std_logic_vector(31 downto 0);
+    -- begin
+    --     if filepath = "" then
+    --         return mem_contents;
+    --     else
+    --         file_open(init_file, filepath, read_mode);
+    --     end if;
+    --     for i in 0 to depth-1 loop
+    --         readline(init_file, text_line);
+    --         case(hex_mode) is
+    --             when '1' => hread(text_line, line_contents);
+    --             when '0' => bread(text_line, line_contents); 
+    --             when others => hread(text_line, line_contents);
+    --         end case;
+    --         mem_contents(i) := line_contents( 8*(byte_index+1)-1 downto 8*(byte_index));
+    --     end loop;
+    --     return mem_contents;
+    -- end function;
 
     function test_bit(in_vec : std_logic_vector; i : integer) return boolean is
     begin 
