@@ -36,7 +36,7 @@ architecture rtl of cpu_control is
     -- we probably won't need all of these
     type t_state is (INIT, WAIT_FOR_FETCH, DECODE_EXECUTE, WAIT_FOR_MEM, ERROR);
 
-    signal state : t_state := WAIT_FOR_FETCH;
+    signal state : t_state := INIT;
 begin
 
     process (clk)
