@@ -56,14 +56,14 @@ end cpu_regs;
 architecture Behavioral of cpu_regs is
 
     -- set up our memory 
-    type reg_bank is array (31 downto 0) of std_logic_vector(31 downto 0);
+    type t_reg_bank is array (31 downto 0) of std_logic_vector(31 downto 0);
 
     -- duplicate to get dual port, instead of triple port
-    signal registers_0 : reg_bank;
+    signal registers_0 : t_reg_bank;
 
-    signal addra : integer;
-    signal addrb : integer;
-    signal addrw : integer;
+    signal addra : integer range 0 to 31;
+    signal addrb : integer range 0 to 31;
+    signal addrw : integer range 0 to 31;
 
 begin
 
