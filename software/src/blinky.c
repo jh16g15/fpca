@@ -8,8 +8,14 @@
 
 #define DELAY 10000
 
+// set up the Stack Pointer to x0000_1000
+// x0000_1FFF is technically the top of our memory, but 
+// we need a way of loading FFF without causing a subtraction
+asm("lui sp, 0x00001");
+//asm("addi sp, zero, 0xFFF");  
+
 // function declarations
-void main(void);
+// void main(void);
 // void delay(int dly);
 
 // make sure this is at address x0000_0000
@@ -21,8 +27,8 @@ void main(void){
         // delay(DELAY);
         GPIO_LED = 0;
         // delay(DELAY);
-        count++;
-        Q_SSEG = count;
+        // count++;
+        // Q_SSEG = count;
     }
 }
 
