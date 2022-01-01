@@ -22,6 +22,7 @@ package riscv_instructions_pkg is
 
 
   type t_encoding is (R_type, I_type, S_type, B_type, U_type, J_type);
+  type t_dbg_decode is (ERR, LUI, AUIPC, JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU, LOAD, STORE, ADD_SUB, SLT, SLTU, XORR, ORR, ANDR, SLLR, SR_LA, ADDI, SLTI, SLTUI, XORI, ORI, ANDI, SLLI, SRLAI );
 
   -- Instruction Encodings
   
