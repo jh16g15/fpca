@@ -162,7 +162,6 @@ begin
             write_load_in     => write_load,
             write_alu_in      => write_alu,
             write_ret_addr_in => write_ret_addr,
-            -- uses_writeback_in  => uses_writeback,
             write_reg_data_out => write_reg_data,
             mem_req_in         => mem_req,
             mem_busy_out       => mem_busy,
