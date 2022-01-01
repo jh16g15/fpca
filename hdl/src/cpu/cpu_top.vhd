@@ -101,7 +101,6 @@ begin
     cpu_decode_inst : entity work.cpu_decode
         port map(
             instr_in => current_instr,
-            instr_valid_in => instr_valid,
             rs1_addr_out => rs1_addr,
             rs2_addr_out => rs2_addr,
             rd_addr_out  => rd_addr,

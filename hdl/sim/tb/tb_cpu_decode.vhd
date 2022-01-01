@@ -20,7 +20,6 @@ architecture rtl of tb_cpu_decode is
     signal reset : std_logic := '1';
 
     signal instr_in     : std_logic_vector(INSTR_W-1 downto 0); 
-    signal instr_valid_in : std_logic := '1';
     signal rs1_addr_out : std_logic_vector(REG_ADDR_W-1 downto 0);  
     signal rs2_addr_out : std_logic_vector(REG_ADDR_W-1 downto 0);  
     signal rd_addr_out  : std_logic_vector(REG_ADDR_W-1 downto 0); 
@@ -38,7 +37,6 @@ begin
     u_cpu_decode : entity work.cpu_decode
     Port map (
         instr_in => instr_in,
-        instr_valid_in => instr_valid_in, 
         rs1_addr_out => rs1_addr_out,
         rs2_addr_out => rs2_addr_out,
         rd_addr_out => rd_addr_out,
