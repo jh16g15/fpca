@@ -43,6 +43,8 @@ architecture rtl of wb_sp_bram is
 
     signal mem32 : t_slv32_arr(0 to G_MEM_DEPTH_WORDS - 1) := init_mem32(G_INIT_FILE, G_MEM_DEPTH_WORDS);
 
+    signal dbg_word_addr : std_logic_vector(C_WORD_ADR_W-1 downto 0);
+
     --GOWIN
     attribute syn_ramstyle : string;
     attribute syn_ramstyle of mem32 : signal is "block_ram";
@@ -54,6 +56,8 @@ begin
     --! unsupported
     wb_miso_out.err <= '0';
     wb_miso_out.rty <= '0';
+
+    dbg_word_addr <= wb_mosi_in.adr(C_WORD_ADR_H downto C_WORD_ADR_L);
 
     --! Add our 1 cycle wait state for reads
     wb_ack_proc : process (wb_clk, wb_reset) is
