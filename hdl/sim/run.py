@@ -39,6 +39,9 @@ VU.add_source_files(src_dir / "cpu" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "soc" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "wishbone" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "packages" / "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(src_dir / "peripherals" / "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(src_dir / "peripherals" / "common" / "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(src_dir / "peripherals" / "uart" / "*.vhd", "lib", allow_empty=True)
 
 
 
