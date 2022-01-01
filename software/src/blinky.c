@@ -8,21 +8,13 @@
 
 #define DELAY 10000
 
-asm("lui t0, 0xC001C");   // load coolcode into t0
-asm("addi t0, t0, 0x0DE");   // load coolcode into t0
-asm("sw t0, 256(zero)");  // save t0 to x100 (256)
-asm("lw t1, 256(zero)");  // load t1 from x100
 // set up the Stack Pointer to x0000_1000
-// x0000_1FFF is technically the top of our memory, but
-// we need a way of loading FFF without causing a subtraction
-asm("lui sp, 0x00001");
-//asm("addi sp, zero, 0xFFF");  
+asm("li sp, 0x00001FFF");
 
 // function declarations
 // void main(void);
 // void delay(int dly);
 
-// make sure this is at address x0000_0000
 void main(void){
     int count = 0;
     while (1)
