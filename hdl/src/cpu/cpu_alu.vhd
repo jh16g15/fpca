@@ -38,8 +38,9 @@ entity cpu_alu is
 end entity;
 
 architecture rtl of cpu_alu is
-
     signal alu_func3_err : std_logic;
+    signal dbg_op_type   : t_dbg_decode;
+
 begin
     -- only output error when ALU in use
     alu_func3_err_out <= alu_func3_err and alu_en_in;
@@ -103,6 +104,51 @@ begin
             end case;
             when others => alu_func3_err <= '1';
         end case opcode_case;
+
+        --- for Simulations
+        dbg_case : case(opcode) is
+            when OPCODE_LUI    => dbg_op_type   <= LUI;
+            when OPCODE_AUIPC  => dbg_op_type <= AUIPC;
+            when OPCODE_JAL    => dbg_op_type   <= JAL;
+            when OPCODE_JALR   => dbg_op_type  <= JALR;
+            when OPCODE_BRANCH =>
+            case(funct3) is
+                when BRANCH_BEQ_FUNC3  => dbg_op_type  <= BEQ;
+                when BRANCH_BNE_FUNC3  => dbg_op_type  <= BNE;
+                when BRANCH_BLT_FUNC3  => dbg_op_type  <= BLT;
+                when BRANCH_BGE_FUNC3  => dbg_op_type  <= BGE;
+                when BRANCH_BLTU_FUNC3 => dbg_op_type <= BLTU;
+                when BRANCH_BGEU_FUNC3 => dbg_op_type <= BGEU;
+                when others            => dbg_op_type            <= ERR;
+            end case;
+            when OPCODE_LOAD  => dbg_op_type  <= LOAD;
+            when OPCODE_STORE => dbg_op_type <= STORE;
+            when OPCODE_OP    => -- register-register arithmetic 
+            case(funct3) is
+                when OP_ADD_FUNC3  => dbg_op_type  <= ADD_SUB;
+                when OP_SLT_FUNC3  => dbg_op_type  <= SLT;
+                when OP_SLTU_FUNC3 => dbg_op_type <= SLTU;
+                when OP_XOR_FUNC3  => dbg_op_type  <= XORR;
+                when OP_OR_FUNC3   => dbg_op_type   <= ORR;
+                when OP_AND_FUNC3  => dbg_op_type  <= ANDR;
+                when OP_SLL_FUNC3  => dbg_op_type  <= SLLR;
+                when OP_SRL_FUNC3  => dbg_op_type  <= SR_LA;
+                when others        => dbg_op_type        <= ERR;
+            end case;
+            when OPCODE_OP_IMM => --register-immmediate arithmetic 
+            case(funct3) is
+                when OP_ADD_FUNC3  => dbg_op_type  <= ADDI;
+                when OP_SLT_FUNC3  => dbg_op_type  <= SLTI;
+                when OP_SLTU_FUNC3 => dbg_op_type <= SLTUI;
+                when OP_XOR_FUNC3  => dbg_op_type  <= XORI;
+                when OP_OR_FUNC3   => dbg_op_type   <= ORI;
+                when OP_AND_FUNC3  => dbg_op_type  <= ANDI;
+                when OP_SLL_FUNC3  => dbg_op_type  <= SLLI;
+                when OP_SRL_FUNC3  => dbg_op_type  <= SRLAI;
+                when others        => dbg_op_type        <= ERR;
+            end case;
+            when others => dbg_op_type <= ERR;
+        end case dbg_case;
     end process alu_comb;
 
 end architecture;
