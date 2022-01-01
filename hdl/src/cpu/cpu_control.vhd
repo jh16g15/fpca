@@ -16,7 +16,11 @@ entity cpu_control is
         fetch_req_out  : out std_logic;
         fetch_busy_in  : in std_logic;
         fetch_err_in   : in std_logic;
+        
         instr_valid_in : in std_logic;
+        rdat_instr_in : in std_logic_vector(31 downto 0);
+        current_instr_out : out std_logic_vector(31 downto 0);
+
         -- Decode
         opcode_err_in      : in std_logic;
         uses_mem_access_in : in std_logic;
@@ -78,6 +82,7 @@ begin
                             if instr_valid_in = '1' then
                                 state      <= EXECUTE;
                                 alu_en_out <= '1';
+                                current_instr_out <= rdat_instr_in; -- update curently executing instruction
                             end if;
                             if fetch_err_in = '1' then
                                 state        <= ERROR;

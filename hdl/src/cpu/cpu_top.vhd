@@ -42,7 +42,8 @@ architecture rtl of cpu_top is
     signal fetch_busy    : std_logic;
     signal fetch_err     : std_logic;
     signal instr_valid   : std_logic;
-    signal current_instr : std_logic_vector(31 downto 0);
+    signal rdat_instr    : std_logic_vector(31 downto 0); --! raw data from InstrFetch WB bus
+    signal current_instr : std_logic_vector(31 downto 0); --! Saved when raw_instr valid
 
     signal rs1_addr     : std_logic_vector(REG_ADDR_W - 1 downto 0);
     signal rs2_addr     : std_logic_vector(REG_ADDR_W - 1 downto 0);
@@ -90,7 +91,7 @@ begin
             ret_addr_out    => ret_addr,
             fetch_req_in    => fetch_req,
             instr_valid_out => instr_valid,
-            instr_out       => current_instr,
+            instr_out       => rdat_instr,
             fetch_err_out   => fetch_err,
             fetch_busy_out  => fetch_busy,
             if_wb_mosi_out  => if_wb_mosi_out,
@@ -99,12 +100,12 @@ begin
 
     cpu_decode_inst : entity work.cpu_decode
         port map(
-            instr_in       => current_instr,
+            instr_in => current_instr,
             instr_valid_in => instr_valid,
-            rs1_addr_out   => rs1_addr,
-            rs2_addr_out   => rs2_addr,
-            rd_addr_out    => rd_addr,
-            imm_out        => imm_extended,
+            rs1_addr_out => rs1_addr,
+            rs2_addr_out => rs2_addr,
+            rd_addr_out  => rd_addr,
+            imm_out      => imm_extended,
             -- replace with individual control signals to ALU
             opcode_out          => current_opcode,
             funct7_out          => current_func7,
@@ -181,6 +182,8 @@ begin
             fetch_busy_in      => fetch_busy,
             fetch_err_in       => fetch_err,
             instr_valid_in     => instr_valid,
+            rdat_instr_in      => rdat_instr,
+            current_instr_out  => current_instr,
             opcode_err_in      => opcode_err,
             alu_en_out         => alu_en,
             alu_err_in         => alu_func3_err,
