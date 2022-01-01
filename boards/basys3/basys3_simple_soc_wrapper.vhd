@@ -15,7 +15,13 @@ entity basys3_simple_soc_wrapper is
         btnD : in std_logic;
 
         sw : in std_logic_vector(15 downto 0);
-        led : out std_logic_vector(15 downto 0)
+        led : out std_logic_vector(15 downto 0);
+        
+        seg : out std_logic_vector(6 downto 0);
+        dp : out std_logic;
+        an : out std_logic_vector(3 downto 0)
+        
+        
 
     );
 end entity basys3_simple_soc_wrapper;
@@ -34,6 +40,8 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal clk_div_counter : unsigned(21 downto 0) := (others => '0');
     signal slow_clk : std_logic;
     
+    signal sseg_ca : std_logic_vector(7 downto 0);
+    signal sseg_an : std_logic_vector(3 downto 0);
         
 begin
 
@@ -55,6 +63,11 @@ begin
     
     gpio_sw(31 downto 16) <= (others => '0');  
     gpio_sw(15 downto 0) <= sw;
+    
+    seg <= sseg_ca(6 downto 0);
+    dp <= sseg_ca(7);
+    
+    an <= sseg_an;
 
     simple_soc_inst : entity work.simple_soc
         generic map(
@@ -65,7 +78,9 @@ begin
             reset        => reset,
             gpio_led_out => gpio_led,
             gpio_btn_in  => gpio_btn,
-            gpio_sw_in   => gpio_sw
+            gpio_sw_in   => gpio_sw,
+            sseg_ca_out => sseg_ca,
+            sseg_an_out => sseg_an            
         );
 
 end architecture;
