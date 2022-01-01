@@ -50,6 +50,7 @@ architecture rtl of cpu_top is
     signal imm_extended : std_logic_vector(31 downto 0);
 
     -- decoded control signals
+    signal opcode_err      : std_logic;
     signal uses_writeback  : std_logic;
     signal write_load      : std_logic;
     signal write_alu       : std_logic;
@@ -60,16 +61,18 @@ architecture rtl of cpu_top is
     signal current_func7   : std_logic_vector(FUNCT7_W - 1 downto 0);
     signal current_func3   : std_logic_vector(FUNCT3_W - 1 downto 0);
 
-    signal rs1_data : std_logic_vector(31 downto 0);
-    signal rs2_data : std_logic_vector(31 downto 0);
-
-    signal alu_output : std_logic_vector(31 downto 0);
+    signal rs1_data      : std_logic_vector(31 downto 0);
+    signal rs2_data      : std_logic_vector(31 downto 0);
+    signal alu_en        : std_logic;
+    signal alu_output    : std_logic_vector(31 downto 0);
+    signal alu_func3_err : std_logic;
 
     signal write_reg_data : std_logic_vector(31 downto 0);
     signal write_reg_we   : std_logic;
 
     signal mem_req  : std_logic;
     signal mem_busy : std_logic;
+    signal mem_err  : std_logic;
     signal mem_done : std_logic;
 
 begin
@@ -97,6 +100,7 @@ begin
     cpu_decode_inst : entity work.cpu_decode
         port map(
             instr_in     => current_instr,
+            instr_valid_in => instr_valid,
             rs1_addr_out => rs1_addr,
             rs2_addr_out => rs2_addr,
             rd_addr_out  => rd_addr,
@@ -110,7 +114,8 @@ begin
             write_alu_out       => write_alu,
             write_ret_addr_out  => write_ret_addr,
             uses_mem_access_out => uses_mem_access,
-            store_enable_out    => store_enable
+            store_enable_out    => store_enable,
+            opcode_err_out      => opcode_err
         );
 
     cpu_regs_inst : entity work.cpu_regs
@@ -129,6 +134,7 @@ begin
     cpu_alu_inst : entity work.cpu_alu
         port map(
             clk               => clk,
+            alu_en_in         => alu_en,
             pc                => current_pc,
             rs1               => rs1_data,
             rs2               => rs2_data,
@@ -138,7 +144,8 @@ begin
             branch_target_out => branch_addr, -- could be modified by an error during MEM access
             opcode            => current_opcode,
             funct7            => current_func7,
-            funct3            => current_func3
+            funct3            => current_func3,
+            alu_func3_err_out => alu_func3_err
         );
 
     cpu_dataflow_inst : entity work.cpu_dataflow
@@ -160,6 +167,7 @@ begin
             write_reg_we_out   => write_reg_we,
             mem_req_in         => mem_req,
             mem_busy_out       => mem_busy,
+            mem_err_out        => mem_err,
             mem_done_out       => mem_done,
             mem_we_in          => store_enable,
             func3_in           => current_func3,
@@ -172,11 +180,15 @@ begin
             reset              => reset,
             fetch_req_out      => fetch_req,
             fetch_busy_in      => fetch_busy,
+            fetch_err_in       => fetch_err,
             instr_valid_in     => instr_valid,
-            decode_err_in      => '0',
+            opcode_err_in      => opcode_err,
+            alu_en_out         => alu_en,
+            alu_err_in         => alu_func3_err,
             uses_mem_access_in => uses_mem_access,
             mem_req_out        => mem_req,
             mem_busy_in        => mem_busy,
+            mem_err_in         => mem_err,
             mem_done_in        => mem_done,
             extern_halt_in     => extern_halt_in
         );

@@ -35,6 +35,7 @@ entity cpu_dataflow is
         mem_req_in   : in std_logic;
         mem_busy_out : out std_logic;
         mem_done_out : out std_logic;
+        mem_err_out : out std_logic;
 
         -- memory control signals (from decoder)
         mem_we_in : in std_logic;                    --! select 0=load, 1=store 
@@ -59,6 +60,8 @@ architecture rtl of cpu_dataflow is
     signal mem_wdata : std_logic_vector(31 downto 0);
     signal mem_rdata : std_logic_vector(31 downto 0);
 begin
+    mem_err_out <= mem_err; -- from WB master
+
     -- for future pipelining/error handling
     branch_target_out <= branch_target_in;
     branch_en_out <= branch_en_in;

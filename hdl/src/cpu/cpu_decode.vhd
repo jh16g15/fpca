@@ -17,7 +17,8 @@ entity cpu_decode is
     -- )
     port (
 
-        instr_in : in std_logic_vector(31 downto 0);
+        instr_in       : in std_logic_vector(31 downto 0);
+        instr_valid_in : in std_logic;
 
         -- Register Addresses
         rs1_addr_out : out std_logic_vector(4 downto 0); -- R, I, S, B
@@ -39,7 +40,8 @@ entity cpu_decode is
         write_ret_addr_out : out std_logic;
 
         uses_mem_access_out : out std_logic;
-        store_enable_out    : out std_logic
+        store_enable_out    : out std_logic;
+        opcode_err_out      : out std_logic
 
     );
 end entity;
@@ -52,8 +54,9 @@ architecture rtl of cpu_decode is
     signal imm32    : std_logic_vector(31 downto 0);
 
 begin
-    opcode     <= instr_in(6 downto 0);
-    opcode_out <= opcode;
+    opcode         <= instr_in(6 downto 0);
+    opcode_out     <= opcode;
+    opcode_err_out <= opcode_err and instr_valid_in; -- only report error if input was valid
 
     -- not always used as these, but if we need them they are here
     rs1_addr_out <= instr_in(19 downto 15);
