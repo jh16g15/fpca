@@ -10,15 +10,22 @@ use work.joe_common_pkg.all;
 
 entity simple_soc is
     generic (
-        G_MEM_INIT_FILE : string := "../../software/build/blinky.hex"
+        G_MEM_INIT_FILE : string := "../../software/build/blinky.hex";
+        G_SOC_FREQ : integer := 100_000_000
     );
     port (
         clk   : in std_logic;
         reset : in std_logic;
 
+        -- GPIO
         gpio_led_out : out std_logic_vector(31 downto 0);
         gpio_btn_in  : in std_logic_vector(31 downto 0);
-        gpio_sw_in   : in std_logic_vector(31 downto 0)
+        gpio_sw_in   : in std_logic_vector(31 downto 0);
+
+        -- Quad Seven Seg
+        sseg_ca_out : out std_logic_vector(7 downto 0);
+        sseg_an_out : out std_logic_vector(3 downto 0)
+
 
     );
 end entity simple_soc;
@@ -29,7 +36,7 @@ architecture rtl of simple_soc is
     constant G_NUM_SLAVES : integer := 2;
 
     -- for GPIO register bank
-    constant G_NUM_RW_REGS : integer := 1;
+    constant G_NUM_RW_REGS : integer := 2;
     constant G_NUM_RO_REGS : integer := 2;
 
     signal if_wb_mosi         : t_wb_mosi;
@@ -44,6 +51,9 @@ architecture rtl of simple_soc is
 
     signal rw_regs_out : t_slv32_arr(G_NUM_RW_REGS - 1 downto 0);
     signal ro_regs_in  : t_slv32_arr(G_NUM_RO_REGS - 1 downto 0);
+
+    -- Seven Segment Display controller
+    signal sseg_display_data : std_logic_vector(15 downto 0);
 
 begin
 
@@ -121,5 +131,20 @@ begin
     gpio_led_out  <= rw_regs_out(0);
     ro_regs_in(0) <= gpio_btn_in;
     ro_regs_in(1) <= gpio_sw_in;
+    
+    
+    sseg_display_data  <= rw_regs_out(1)(15 downto 0);
+
+    quad_seven_seg_driver_inst : entity work.quad_seven_seg_driver
+  generic map (
+    G_REFCLK_FREQ => G_SOC_FREQ
+  )
+  port map (
+    clk => clk,
+    display_data_in => sseg_display_data,
+    sseg_ca => sseg_ca_out,
+    sseg_an => sseg_an_out
+  );
+
 
 end architecture;

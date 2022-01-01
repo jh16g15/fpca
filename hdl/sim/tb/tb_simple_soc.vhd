@@ -23,9 +23,11 @@ architecture bench of tb_simple_soc is
     signal gpio_led_out : std_logic_vector(31 downto 0);
     signal gpio_btn_in  : std_logic_vector(31 downto 0);
     signal gpio_sw_in   : std_logic_vector(31 downto 0);
+    signal sseg_ca_out   : std_logic_vector(7 downto 0);
+    signal sseg_an_out   : std_logic_vector(3 downto 0);
 
 begin
-
+    -- DUT
     simple_soc_inst : entity work.simple_soc
         generic map(
             G_MEM_INIT_FILE => G_MEM_INIT_FILE
@@ -35,7 +37,9 @@ begin
             reset        => reset,
             gpio_led_out => gpio_led_out,
             gpio_btn_in  => gpio_btn_in,
-            gpio_sw_in   => gpio_sw_in
+            gpio_sw_in   => gpio_sw_in,
+            sseg_ca_out => sseg_ca_out,
+            sseg_an_out => sseg_an_out
         );
 
     main : process
