@@ -14,30 +14,35 @@ entity cpu_control is
         -- control signals
         -- Instruction Fetch
         fetch_req_out  : out std_logic;
-        fetch_busy_in : in std_logic;
-        fetch_err_in : in std_logic;
+        fetch_busy_in  : in std_logic;
+        fetch_err_in   : in std_logic;
         instr_valid_in : in std_logic;
         -- Decode
-        opcode_err_in : in std_logic;
+        opcode_err_in      : in std_logic;
         uses_mem_access_in : in std_logic;
+        uses_writeback_in  : in std_logic;
+
         -- Execute ALU
         alu_en_out : out std_logic;
         alu_err_in : in std_logic;
         -- Execute Mem
         mem_req_out : out std_logic;
         mem_busy_in : in std_logic;
-        mem_err_in : in std_logic;
+        mem_err_in  : in std_logic;
         mem_done_in : in std_logic;
 
         -- Writeback
-        cpu_err_out : out std_logic;
+        write_reg_we_out : out std_logic;
+
+        -- Misc
+        cpu_err_out    : out std_logic;
         extern_halt_in : in std_logic := '0'
     );
 end entity cpu_control;
 
 architecture rtl of cpu_control is
     -- we probably won't need all of these
-    type t_state is (INIT, FETCH, EXECUTE, MEM, ERROR);
+    type t_state is (INIT, FETCH, EXECUTE, MEM, WRITEBACK, ERROR);
 
     signal state : t_state := INIT;
 
@@ -49,15 +54,17 @@ begin
     begin
         if rising_edge(clk) then
             if reset = '1' then
-                state <= INIT;
-                error_status <= NONE;
-                cpu_err_out <= '0';
-                alu_en_out <= '0';
+                state            <= INIT;
+                error_status     <= NONE;
+                cpu_err_out      <= '0';
+                alu_en_out       <= '0';
+                write_reg_we_out <= '0';
             else
                 if extern_halt_in = '0' then -- If we are not halted (by an external debugger etc)                    
                     -- defaults
-                    cpu_err_out <= '0';
-                    alu_en_out <= '0';
+                    cpu_err_out      <= '0';
+                    alu_en_out       <= '0';
+                    write_reg_we_out <= '0';
                     case state is
                         when INIT =>
                             fetch_req_out <= '1';
@@ -69,11 +76,11 @@ begin
                             end if;
 
                             if instr_valid_in = '1' then
-                                state <= EXECUTE;
+                                state      <= EXECUTE;
                                 alu_en_out <= '1';
                             end if;
                             if fetch_err_in = '1' then
-                                state <= ERROR;
+                                state        <= ERROR;
                                 error_status <= FETCH_ERR;
                             end if;
                             -- combinational stuff happens here elsewhere in the CPU
@@ -81,16 +88,21 @@ begin
                             if uses_mem_access_in = '1' then
                                 state       <= MEM;
                                 mem_req_out <= '1';
-                            else 
-                                state         <= FETCH;
-                                fetch_req_out <= '1';
+                            else
+                                if uses_writeback_in = '1' then
+                                    state            <= WRITEBACK;
+                                    write_reg_we_out <= '1';
+                                else
+                                    state         <= FETCH;
+                                    fetch_req_out <= '1';
+                                end if;
                             end if;
-                            if alu_err_in = '1' then 
-                                state <= ERROR;
+                            if alu_err_in = '1' then
+                                state        <= ERROR;
                                 error_status <= ALU_ERR;
                             end if;
-                            if opcode_err_in = '1' then 
-                                state <= ERROR;
+                            if opcode_err_in = '1' then
+                                state        <= ERROR;
                                 error_status <= OPCODE_ERR;
                             end if;
                         when MEM =>
@@ -98,15 +110,24 @@ begin
                                 mem_req_out <= '0';
                             end if;
                             if mem_done_in = '1' then
-                                state         <= FETCH;
-                                fetch_req_out <= '1';
+                                if uses_writeback_in = '1' then
+                                    state            <= WRITEBACK;
+                                    write_reg_we_out <= '1';
+                                else
+                                    state         <= FETCH;
+                                    fetch_req_out <= '1';
+                                end if;
                             end if;
                             if mem_err_in = '1' then
-                                state <= FETCH;
+                                state        <= ERROR;
                                 error_status <= MEM_ERR;
                             end if;
+                        when WRITEBACK =>
+                            state         <= FETCH;
+                            fetch_req_out <= '1';
                         when ERROR =>
                             cpu_err_out <= '1';
+                            fetch_req_out <= '0';
                         when others =>
                             state <= ERROR;
                     end case;

@@ -26,10 +26,10 @@ entity cpu_dataflow is
         write_load_in     : in std_logic;
         write_alu_in      : in std_logic;
         write_ret_addr_in : in std_logic;
-        uses_writeback_in : in std_logic;
-
         write_reg_data_out : out std_logic_vector(31 downto 0); --! Writeback Data
-        write_reg_we_out   : out std_logic;
+        
+        -- uses_writeback_in : in std_logic;
+        -- write_reg_we_out   : out std_logic;  -- moved to cpu_control
 
         -- MEM access status/control signals (from cpu_control)
         mem_req_in   : in std_logic;
@@ -66,8 +66,9 @@ begin
     branch_target_out <= branch_target_in;
     branch_en_out <= branch_en_in;
 
+    -- moved to cpu_control state machine
     -- gate register writeback enable based on the MEM RDATA VALID signal
-    write_reg_we_out <= mem_done_out when write_load_in = '1' else uses_writeback_in;
+    -- write_reg_we_out <= mem_done_out when write_load_in = '1' else uses_writeback_in;
 
     -- decode the LOAD/STORE funct3 field
     size          <= wb_get_transfer_size(func3_in); -- b8, b16, b32

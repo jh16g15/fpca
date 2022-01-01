@@ -17,7 +17,7 @@ entity cpu_top is
         clk            : in std_logic;
         reset          : in std_logic;
         extern_halt_in : in std_logic;
-
+        cpu_err_out    : out std_logic;
         -- Instruction Fetch Wishbone Master
         if_wb_mosi_out : out t_wb_mosi;
         if_wb_miso_in  : in t_wb_miso;
@@ -99,12 +99,12 @@ begin
 
     cpu_decode_inst : entity work.cpu_decode
         port map(
-            instr_in     => current_instr,
+            instr_in       => current_instr,
             instr_valid_in => instr_valid,
-            rs1_addr_out => rs1_addr,
-            rs2_addr_out => rs2_addr,
-            rd_addr_out  => rd_addr,
-            imm_out      => imm_extended,
+            rs1_addr_out   => rs1_addr,
+            rs2_addr_out   => rs2_addr,
+            rd_addr_out    => rd_addr,
+            imm_out        => imm_extended,
             -- replace with individual control signals to ALU
             opcode_out          => current_opcode,
             funct7_out          => current_func7,
@@ -150,21 +150,20 @@ begin
 
     cpu_dataflow_inst : entity work.cpu_dataflow
         port map(
-            clk                => clk,
-            reset              => reset,
-            alu_output_in      => alu_output,
-            ret_addr_in        => ret_addr,
-            rs2_data_in        => rs2_data,
-            branch_en_in       => branch_en,
-            branch_en_out      => branch_en_final,
-            branch_target_in   => branch_addr,
-            branch_target_out  => branch_target_final,
-            write_load_in      => write_load,
-            write_alu_in       => write_alu,
-            write_ret_addr_in  => write_ret_addr,
-            uses_writeback_in  => uses_writeback,
+            clk               => clk,
+            reset             => reset,
+            alu_output_in     => alu_output,
+            ret_addr_in       => ret_addr,
+            rs2_data_in       => rs2_data,
+            branch_en_in      => branch_en,
+            branch_en_out     => branch_en_final,
+            branch_target_in  => branch_addr,
+            branch_target_out => branch_target_final,
+            write_load_in     => write_load,
+            write_alu_in      => write_alu,
+            write_ret_addr_in => write_ret_addr,
+            -- uses_writeback_in  => uses_writeback,
             write_reg_data_out => write_reg_data,
-            write_reg_we_out   => write_reg_we,
             mem_req_in         => mem_req,
             mem_busy_out       => mem_busy,
             mem_err_out        => mem_err,
@@ -186,10 +185,13 @@ begin
             alu_en_out         => alu_en,
             alu_err_in         => alu_func3_err,
             uses_mem_access_in => uses_mem_access,
+            uses_writeback_in  => uses_writeback,
             mem_req_out        => mem_req,
             mem_busy_in        => mem_busy,
             mem_err_in         => mem_err,
             mem_done_in        => mem_done,
+            write_reg_we_out   => write_reg_we,
+            cpu_err_out        => cpu_err_out,
             extern_halt_in     => extern_halt_in
         );
 end architecture;
