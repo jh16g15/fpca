@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
-[*] Sat Jan  1 23:22:17 2022
+[*] Sat Jan  1 23:43:03 2022
 [*]
 [dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.tb_simple_soc.test_alive_92843172391226e05a9a3be9e000cf52662e8142/ghdl/wave.ghw"
-[dumpfile_mtime] "Sat Jan  1 23:05:25 2022"
-[dumpfile_size] 448226
+[dumpfile_mtime] "Sat Jan  1 23:28:39 2022"
+[dumpfile_size] 409913
 [savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_simple_soc.gtkw"
-[timestart] 0
+[timestart] 331100000
 [size] 2560 1377
-[pos] -217 -217
-*-26.000000 457600000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -269 -269
+*-25.000000 496600000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.tb_simple_soc.
 [treeopen] top.tb_simple_soc.simple_soc_inst.
@@ -89,8 +89,6 @@ top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.if_wb_miso_i
 #{top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[31:0]} top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[31] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[30] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[29] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[28] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[27] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[26] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[25] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[24] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[23] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[22] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[21] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[20] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[19] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[18] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[17] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[16] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[15] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[14] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[13] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[12] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[11] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[10] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[9] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[8] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[7] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[6] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[5] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[4] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[3] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[2] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[1] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.current_instr[0]
 @200
 -CPU Decoder
-@29
-top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_valid_in
 @22
 #{top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[31:0]} top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[31] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[30] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[29] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[28] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[27] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[26] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[25] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[24] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[23] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[22] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[21] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[20] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[19] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[18] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[17] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[16] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[15] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[14] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[13] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[12] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[11] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[10] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[9] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[8] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[7] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[6] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[5] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[4] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[3] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[2] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[1] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_decode_inst.instr_in[0]
 @420
