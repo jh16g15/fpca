@@ -2,7 +2,8 @@
 LINKER_SCRIPT="test.ld"
 
 # -c for compile-only, no linkng
-GCC_ARGS="-g -O0 -march=rv32i -mabi=ilp32 -nostartfiles -nostdlib -nodefaultlibs -c"
+GCC_OPT="-O0"
+GCC_ARGS="-g -march=rv32i -mabi=ilp32 -nostartfiles -nostdlib -nodefaultlibs -c"
 
 
 GCC_INPUT="src/blinky.c"
@@ -14,7 +15,7 @@ echo "Cleaning build/"
 rm -rf build/*
 
 echo "Building Test Software..."
-riscv32-unknown-elf-gcc $GCC_ARGS $GCC_INPUT -o $GCC_OUTPUT
+riscv32-unknown-elf-gcc $GCC_OPT $GCC_ARGS $GCC_INPUT -o $GCC_OUTPUT
 riscv32-unknown-elf-objdump -d -S $GCC_OUTPUT
 
 echo "Creating HEX file..."
