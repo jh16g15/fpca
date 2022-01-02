@@ -37,7 +37,11 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal reset : std_logic;
     
     -- div by 2**24, or about 8 million ish    
-    signal clk_div_counter : unsigned(21 downto 0) := (others => '0');
+    -- 21 for simple blinky
+    -- 29 for blinky + counting 7 seg
+    
+    -- div by 2 for 50MHz (should meet timing)
+    signal clk_div_counter : unsigned(0 downto 0) := (others => '0');
     signal slow_clk : std_logic;
     
     signal sseg_ca : std_logic_vector(7 downto 0);
@@ -71,10 +75,12 @@ begin
 
     simple_soc_inst : entity work.simple_soc
         generic map(
-            G_MEM_INIT_FILE => G_MEM_INIT_FILE
+            G_MEM_INIT_FILE => G_MEM_INIT_FILE,
+            G_SOC_FREQ => 50_000_000
         )
         port map(
             clk          => slow_clk,
+--            clk          => clk,
             reset        => reset,
             gpio_led_out => gpio_led,
             gpio_btn_in  => gpio_btn,
