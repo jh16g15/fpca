@@ -7,42 +7,31 @@
 #define GPIO_SW     (*((volatile unsigned long *) 0x10000104 ))
 
 // #define DELAY 10000000  // 10 million
-#define DELAY 10  // 10 million
+#define DELAY 10  // 10 
 
 
 // function declarations
-// void delay(int dly);
-int return_thing(void);
+void delay(int dly);
 
+// with functions
 void main(void){
-    Q_SSEG = return_thing();
+    int count = 0;
+    while (1)
+    {
+        GPIO_LED = 1;
+        delay(DELAY);
+        GPIO_LED = 0;
+        delay(DELAY);
+        count = count + 1;
+        Q_SSEG = count;
+    }
 }
 
-int return_thing(void) {
-    return 21;
+// TODO: characterise this delay
+void delay(int dly){    
+    int i = 0;
+    while (i < dly){
+        i++;
+    }
 }
-
-//// with functions
-// void main(void){
-//     int count = 0;
-//     while (1)
-//     {
-//         GPIO_LED = 1;
-//         delay(DELAY);
-//         GPIO_LED = 0;
-//         delay(DELAY);
-//         count = count + 1;
-//         Q_SSEG = count;
-//     }
-// }
-
-
-// // TODO: characterise this delay
-// void delay(int dly){
-//     asm("");
-//     int i = 0;
-//     while (i < dly){
-//         i++;
-//     }
-// }
 
