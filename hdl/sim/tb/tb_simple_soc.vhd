@@ -55,7 +55,7 @@ begin
 
                 gpio_btn_in <= x"0000_0000";
                 gpio_sw_in  <= x"0000_0000";
-                wait for 1000 * clk_period;
+                wait for 10000 * clk_period;
 
                 test_runner_cleanup(runner);
             end if;
