@@ -114,7 +114,7 @@ begin
             store_enable_out    <= '1';
             when OPCODE_JAL | OPCODE_JALR =>
             uses_writeback_out <= '1';
-            write_ret_addr_out <= '0';
+            write_ret_addr_out <= '1';
             when OPCODE_BRANCH => null;
             when OPCODE_SYSTEM => null;
             when others        => null;

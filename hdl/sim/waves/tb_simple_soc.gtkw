@@ -1,19 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
-[*] Sat Jan  1 23:43:03 2022
+[*] Mon Jan  3 19:04:59 2022
 [*]
 [dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.tb_simple_soc.test_alive_92843172391226e05a9a3be9e000cf52662e8142/ghdl/wave.ghw"
-[dumpfile_mtime] "Sat Jan  1 23:28:39 2022"
-[dumpfile_size] 409913
+[dumpfile_mtime] "Mon Jan  3 18:43:25 2022"
+[dumpfile_size] 481120
 [savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_simple_soc.gtkw"
-[timestart] 331100000
+[timestart] 392710000
 [size] 2560 1377
-[pos] -269 -269
-*-25.000000 496600000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -165 -165
+*-24.000000 433390000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.tb_simple_soc.
 [treeopen] top.tb_simple_soc.simple_soc_inst.
 [treeopen] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.
+[treeopen] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.
 [treeopen] top.tb_simple_soc.simple_soc_inst.wb_gpio_regs_inst.
 [treeopen] top.tb_simple_soc.simple_soc_inst.wb_interconnect_inst.wb_master_miso_out.
 [treeopen] top.tb_simple_soc.simple_soc_inst.wb_interconnect_inst.wb_slave_mosi_arr_out.
@@ -65,7 +66,10 @@ top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_control_inst.mem_busy_in
 top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_control_inst.mem_done_in
 @200
 -CPU Instruction Fetch
+@28
+top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_en_in
 @22
+#{top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[31:0]} top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[31] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[30] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[29] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[28] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[27] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[26] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[25] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[24] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[23] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[22] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[21] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[20] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[19] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[18] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[17] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[16] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[15] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[14] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[13] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[12] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[11] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[10] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[9] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[8] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[7] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[6] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[5] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[4] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[3] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[2] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[1] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_addr_in[0]
 #{top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[31:0]} top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[31] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[30] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[29] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[28] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[27] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[26] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[25] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[24] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[23] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[22] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[21] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[20] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[19] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[18] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[17] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[16] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[15] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[14] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[13] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[12] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[11] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[10] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[9] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[8] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[7] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[6] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[5] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[4] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[3] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[2] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[1] top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_addr[0]
 @28
 top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.if_wb_mosi_out.cyc
@@ -188,7 +192,9 @@ top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_alu_inst.dbg_op_type
 @28
 top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.write_load_in
 top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.write_alu_in
+@29
 top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.write_ret_addr_in
+@28
 top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.branch_en_in
 top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.branch_en_out
 top.tb_simple_soc.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.mem_req_in
