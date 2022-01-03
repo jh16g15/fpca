@@ -1,4 +1,6 @@
 
+#define SIM
+
 // 32 bit references
 // IE: get the contents (deference) of this 32 bit memory address
 #define GPIO_LED    (*((volatile unsigned long *) 0x10000000 ))
@@ -6,8 +8,12 @@
 #define GPIO_BTN    (*((volatile unsigned long *) 0x10000100 ))
 #define GPIO_SW     (*((volatile unsigned long *) 0x10000104 ))
 
-// #define DELAY 10000000  // 10 million
-#define DELAY 10  // 10 
+#ifdef SIM
+    #define DELAY 10  // 10 
+#endif
+#ifndef SIM
+    #define DELAY 10000000  // 10 million
+#endif
 
 
 // function declarations
