@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
-[*] Mon Jan  3 19:04:59 2022
+[*] Mon Jan  3 23:40:31 2022
 [*]
 [dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.tb_simple_soc.test_alive_92843172391226e05a9a3be9e000cf52662e8142/ghdl/wave.ghw"
-[dumpfile_mtime] "Mon Jan  3 18:43:25 2022"
-[dumpfile_size] 481120
+[dumpfile_mtime] "Mon Jan  3 23:35:21 2022"
+[dumpfile_size] 1347335
 [savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_simple_soc.gtkw"
-[timestart] 392710000
+[timestart] 426800000
 [size] 2560 1377
-[pos] -165 -165
-*-24.000000 433390000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -191 -191
+*-26.000000 611000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.tb_simple_soc.
 [treeopen] top.tb_simple_soc.simple_soc_inst.

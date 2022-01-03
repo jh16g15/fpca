@@ -50,19 +50,19 @@ begin
         -- defaults
         alu_out           <= x"DEADBEEF";
         branch_en         <= '0';
-        branch_target_out <= x"DEADBEEF";
+        branch_target_out <= x"DEADC0DE";
         alu_func3_err     <= '0';
         opcode_case : case(opcode) is
             when OPCODE_LUI => -- alu_out = Imm
             alu_out <= imm;
             when OPCODE_AUIPC => -- PC+Imm
             alu_out <= u_add(pc, imm);
-            when OPCODE_JAL => -- PC+Imm, handle in Branch Target Adder
+            when OPCODE_JAL => -- target = PC + Imm
             branch_en         <= '1';
             branch_target_out <= u_add(pc, imm);
-            when OPCODE_JALR => -- RS1 + Imm,  then send result to branch target adder
+            when OPCODE_JALR => -- target = RS1 + Imm
             branch_en         <= '1';
-            branch_target_out <= u_add(u_add(rs1, imm), pc); -- ordering?
+            branch_target_out <= u_add(rs1, imm);
             when OPCODE_BRANCH =>
             branch_target_out <= u_add(pc, imm); -- all branch targets the same
             case(funct3) is

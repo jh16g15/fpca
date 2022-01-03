@@ -14,8 +14,6 @@
 // void delay(int dly);
 int return_thing(void);
 
-
-
 void main(void){
     Q_SSEG = return_thing();
 }
