@@ -9,34 +9,22 @@
 // #define DELAY 10000000  // 10 million
 #define DELAY 10  // 10 million
 
-// set up the Stack Pointer to x0000_1FFC (32-bit aligned)
-asm("li sp, 0x00001FFC");
 
 // function declarations
 // void delay(int dly);
+int return_thing(void);
 
-// // without functions
+
+
 void main(void){
-    int count = 0x1000;
-    volatile int tmp = 0;
-    int i = 0;
-    while (1)
-    {
-        GPIO_LED = 1;
-        for (i = 0; i < 10; ++i){
-            tmp = i;
-        }
-        GPIO_LED = 0;
-        count = count + 1;
-        Q_SSEG = count;
-        for (i = 0; i < 10; i++){
-            tmp = i;
-        }
-    }
+    Q_SSEG = return_thing();
 }
 
+int return_thing(void) {
+    return 21;
+}
 
-
+//// with functions
 // void main(void){
 //     int count = 0;
 //     while (1)
