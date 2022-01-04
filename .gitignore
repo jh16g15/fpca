@@ -7,3 +7,4 @@ software/work
 software/test
 hdl/sim/teroshdl_out.xml
 hdl/sim/teroshdl_export.json
+fpca.gen

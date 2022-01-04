@@ -32,6 +32,7 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal gpio_sw           : std_logic_vector(31 downto 0);
     signal gpio_btn          : std_logic_vector(31 downto 0);
 
+    signal ext_reset : std_logic;
     signal reset : std_logic;
 
     signal clk50      : std_logic;
@@ -54,12 +55,14 @@ begin
     pll_inst : clk_wiz_0
     port map(
         clk_out50 => clk50,
-        reset     => reset,
+        reset     => ext_reset,
         locked    => pll_locked,
         clk_in1   => clk
     );
 
-    reset <= btnC;
+    ext_reset <= btnC;
+    reset <= ext_reset or (not pll_locked);
+    
     led   <= gpio_led(15 downto 0);
 
     gpio_btn(31 downto 4) <= (others => '0');
