@@ -3,8 +3,8 @@ LINKER_SCRIPT="riscv32-fpca.ld"
 
 GCC_OPT="-O0"
 # from https://twilco.github.io/riscv-from-scratch/2019/04/27/riscv-from-scratch-2.html
-GCC_ARGS="-g -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections -nostartfiles -nostdlib -nodefaultlibs"      # no other libraries
-# GCC_ARGS="-g -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections -nostartfiles "    # allow stdlib and defaultlibs (for soft mult/div etc)
+# GCC_ARGS="-g -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections -nostartfiles -nostdlib -nodefaultlibs"      # no other libraries
+GCC_ARGS="-g -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections -nostartfiles "    # allow stdlib and defaultlibs (for soft mult/div etc)
 LD_ARGS="-Wl,-T,$LINKER_SCRIPT"
 
 
