@@ -10,8 +10,9 @@ use work.joe_common_pkg.all;
 
 entity simple_soc is
     generic (
-        G_MEM_INIT_FILE : string := "../../software/build/blinky.hex";
-        G_SOC_FREQ : integer := 100_000_000
+        G_MEM_INIT_FILE : string  := "../../software/build/blinky.hex";
+        G_SOC_FREQ      : integer := 100_000_000;
+        G_DEFAULT_BAUD  : integer := 9600
     );
     port (
         clk   : in std_logic;
@@ -24,8 +25,11 @@ entity simple_soc is
 
         -- Quad Seven Seg
         sseg_ca_out : out std_logic_vector(7 downto 0);
-        sseg_an_out : out std_logic_vector(3 downto 0)
+        sseg_an_out : out std_logic_vector(3 downto 0);
 
+        -- UART
+        uart_tx_out : out std_logic;
+        uart_rx_in  : in std_logic
 
     );
 end entity simple_soc;
@@ -33,7 +37,7 @@ end entity simple_soc;
 architecture rtl of simple_soc is
     constant G_PC_RESET_ADDR : unsigned(31 downto 0) := x"0000_0000";
 
-    constant G_NUM_SLAVES : integer := 2;
+    constant G_NUM_SLAVES : integer := 3;
 
     -- for GPIO register bank
     constant G_NUM_RW_REGS : integer := 2;
@@ -113,7 +117,7 @@ begin
     --! GPIO Register Bank
     --! x1000_0000 to x1FFF_FFFF
     --! RW registers are 0x000, 0x004 up to 0x0FC
-    --! RO registers are 0x100, 0x104 up to 0x1FC 
+    --! RO registers are 0x100, 0x104 up to 0x1FC
     wb_gpio_regs_inst : entity work.wb_regs
         generic map(
             G_NUM_RW_REGS => G_NUM_RW_REGS,
@@ -128,23 +132,32 @@ begin
             ro_regs_in  => ro_regs_in
         );
     -- Map GPIO registers to peripherals
-    gpio_led_out  <= rw_regs_out(0);
-    ro_regs_in(0) <= gpio_btn_in;
-    ro_regs_in(1) <= gpio_sw_in;
-    
-    
-    sseg_display_data  <= rw_regs_out(1)(15 downto 0);
+    gpio_led_out      <= rw_regs_out(0);
+    ro_regs_in(0)     <= gpio_btn_in;
+    ro_regs_in(1)     <= gpio_sw_in;
+    sseg_display_data <= rw_regs_out(1)(15 downto 0);
 
+    wb_uart_simple_inst : entity work.wb_uart_simple
+        generic map(
+            DEFAULT_BAUD => G_DEFAULT_BAUD,
+            REFCLK_FREQ  => G_SOC_FREQ
+        )
+        port map(
+            wb_clk      => clk,
+            wb_reset    => reset,
+            wb_mosi_in  => wb_slave_mosi_arr(2),
+            wb_miso_out => wb_slave_miso_arr(2),
+            uart_tx_out => uart_tx_out,
+            uart_rx_in  => uart_rx_in
+        );
     quad_seven_seg_driver_inst : entity work.quad_seven_seg_driver
-  generic map (
-    G_REFCLK_FREQ => G_SOC_FREQ
-  )
-  port map (
-    clk => clk,
-    display_data_in => sseg_display_data,
-    sseg_ca => sseg_ca_out,
-    sseg_an => sseg_an_out
-  );
-
-
+        generic map(
+            G_REFCLK_FREQ => G_SOC_FREQ
+        )
+        port map(
+            clk             => clk,
+            display_data_in => sseg_display_data,
+            sseg_ca         => sseg_ca_out,
+            sseg_an         => sseg_an_out
+        );
 end architecture;

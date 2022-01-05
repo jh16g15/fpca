@@ -19,7 +19,10 @@ entity basys3_simple_soc_wrapper is
 
         seg : out std_logic_vector(6 downto 0);
         dp  : out std_logic;
-        an  : out std_logic_vector(3 downto 0)
+        an  : out std_logic_vector(3 downto 0);
+        
+        RsTx : out std_logic;
+        RsRx : in std_logic
 
     );
 end entity basys3_simple_soc_wrapper;
@@ -88,7 +91,10 @@ begin
             gpio_btn_in  => gpio_btn,
             gpio_sw_in   => gpio_sw,
             sseg_ca_out  => sseg_ca,
-            sseg_an_out  => sseg_an
+            sseg_an_out  => sseg_an,
+            uart_tx_out  => RsTx,
+            uart_rx_in   => RsRx
+            
         );
 
 end architecture;
