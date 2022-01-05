@@ -13,12 +13,12 @@ entity cpu_control is
 
         -- control signals
         -- Instruction Fetch
-        fetch_req_out  : out std_logic;
-        fetch_busy_in  : in std_logic;
-        fetch_err_in   : in std_logic;
-        
-        instr_valid_in : in std_logic;
-        rdat_instr_in : in std_logic_vector(31 downto 0);
+        fetch_req_out : out std_logic;
+        fetch_busy_in : in std_logic;
+        fetch_err_in  : in std_logic;
+
+        instr_valid_in    : in std_logic;
+        rdat_instr_in     : in std_logic_vector(31 downto 0);
         current_instr_out : out std_logic_vector(31 downto 0);
 
         -- Decode
@@ -30,10 +30,11 @@ entity cpu_control is
         alu_en_out : out std_logic;
         alu_err_in : in std_logic;
         -- Execute Mem
-        mem_req_out : out std_logic;
-        mem_busy_in : in std_logic;
-        mem_err_in  : in std_logic;
-        mem_done_in : in std_logic;
+        addr_align_err_in : in std_logic;
+        mem_req_out       : out std_logic;
+        mem_busy_in       : in std_logic;
+        mem_err_in        : in std_logic;
+        mem_done_in       : in std_logic;
 
         -- Writeback
         write_reg_we_out : out std_logic;
@@ -50,7 +51,7 @@ architecture rtl of cpu_control is
 
     signal state : t_state := INIT;
 
-    type t_error is (NONE, FETCH_ERR, OPCODE_ERR, ALU_ERR, MEM_ERR);
+    type t_error is (NONE, FETCH_ERR, OPCODE_ERR, ALU_ERR, MEM_ERR, MISALIGN_ERR);
     signal error_status : t_error := NONE;
 begin
 
@@ -64,7 +65,7 @@ begin
                 alu_en_out       <= '0';
                 write_reg_we_out <= '0';
             else
-                if extern_halt_in = '0' then -- If we are not halted (by an external debugger etc)                    
+                if extern_halt_in = '0' then -- If we are not halted (by an external debugger etc)
                     -- defaults
                     cpu_err_out      <= '0';
                     alu_en_out       <= '0';
@@ -80,8 +81,8 @@ begin
                             end if;
 
                             if instr_valid_in = '1' then
-                                state      <= EXECUTE;
-                                alu_en_out <= '1';
+                                state             <= EXECUTE;
+                                alu_en_out        <= '1';
                                 current_instr_out <= rdat_instr_in; -- update curently executing instruction
                             end if;
                             if fetch_err_in = '1' then
@@ -123,6 +124,10 @@ begin
                                     fetch_req_out <= '1';
                                 end if;
                             end if;
+                            if addr_align_err_in = '1' then
+                                state        <= ERROR;
+                                error_status <= MISALIGN_ERR;
+                            end if;
                             if mem_err_in = '1' then
                                 state        <= ERROR;
                                 error_status <= MEM_ERR;
@@ -131,7 +136,7 @@ begin
                             state         <= FETCH;
                             fetch_req_out <= '1';
                         when ERROR =>
-                            cpu_err_out <= '1';
+                            cpu_err_out   <= '1';
                             fetch_req_out <= '0';
                         when others =>
                             state <= ERROR;

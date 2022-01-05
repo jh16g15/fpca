@@ -106,6 +106,7 @@ begin
         variable size          : std_logic_vector(3 downto 0);
         variable transfer_size : t_transfer_size;
         variable unsigned_ext  : std_logic;
+        variable align_err  : std_logic;
 
         variable exp_rdat : std_logic_vector(31 downto 0);
 
@@ -154,7 +155,7 @@ begin
                         cmd_we_out    <= '0';
                     end if;
 
-                    wb_byte_addr_to_byte_sel(addr, transfer_size, word_addr, byte_sel);
+                    wb_byte_addr_to_byte_sel(addr, transfer_size, word_addr, byte_sel, align_err);
                     -- synthesis translate_off
                     info(cmd_logger, "addr:" & to_hstring(addr) & " size:" & to_string(transfer_size) & " word addr:" & to_hstring(word_addr) & " byte_sel:" & to_hstring(byte_sel));
                     -- synthesis translate_on

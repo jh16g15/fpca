@@ -14,14 +14,14 @@ package wb_pkg is
     type t_wb_mosi is record
         adr  : std_logic_vector(C_WB_ADDR_W - 1 downto 0); --! Target Address of Wishbone transaction
         wdat : std_logic_vector(C_WB_DATA_W - 1 downto 0); --! Master -> Slave data transfer
-        we   : std_logic;                                  --! Write Enable 
+        we   : std_logic;                                  --! Write Enable
         sel  : std_logic_vector(C_WB_SEL_W - 1 downto 0);  --! Which wdat/rdat bytes are valid
         stb  : std_logic;                                  --! Strobe for adr/wdat valid
         cyc  : std_logic;                                  --! Bus Cycle in progress
-        lock : std_logic;                                  --! Uninterruptible transfer - Do not transfer to another bus master until LOCK=0 or CYC=0 
+        lock : std_logic;                                  --! Uninterruptible transfer - Do not transfer to another bus master until LOCK=0 or CYC=0
     end record;
 
-    --! Core Wishbone signals - Slave to Master 
+    --! Core Wishbone signals - Slave to Master
     type t_wb_miso is record
         rdat  : std_logic_vector(C_WB_DATA_W - 1 downto 0); --! Slave -> Master data transfer
         stall : std_logic;                                  --! Slave not ready to accept transfer
@@ -32,8 +32,6 @@ package wb_pkg is
 
     type t_wb_mosi_arr is array (integer range <>) of t_wb_mosi;
     type t_wb_miso_arr is array (integer range <>) of t_wb_miso;
-        
-
 
     constant C_WB_MOSI_INIT : t_wb_mosi := (
         adr => (others => '0'),
@@ -61,14 +59,14 @@ package wb_pkg is
     function wb_pack_miso(rdat : std_logic_vector; stall, ack, err, rty : std_logic) return t_wb_miso;
     function wb_pack_miso(rdat : std_logic_vector; stall, ack : std_logic) return t_wb_miso;
 
-    --! Converts the RISC-V func3 field into the corresponding wishbone transfer size 
+    --! Converts the RISC-V func3 field into the corresponding wishbone transfer size
     function wb_get_transfer_size(func3 : std_logic_vector) return t_transfer_size;
 
-    --! Converts a Byte Address (with a transaction size in Bytes) to a 32-bit aligned Wishbone Address 
+    --! Converts a Byte Address (with a transaction size in Bytes) to a 32-bit aligned Wishbone Address
     --! and the appropriate SEL signals
-    procedure wb_byte_addr_to_byte_sel(byte_addr : in std_logic_vector; transfer_size : in t_transfer_size := b32; wb_addr : out std_logic_vector; wb_sel : out std_logic_vector);
+    procedure wb_byte_addr_to_byte_sel(byte_addr : in std_logic_vector; transfer_size : in t_transfer_size := b32; wb_addr : out std_logic_vector; wb_sel : out std_logic_vector; align_err : out std_logic);
 
-    --! Align the valid part of the 32 bit input data to the wishbone 32 bit data bus 
+    --! Align the valid part of the 32 bit input data to the wishbone 32 bit data bus
     function wb_align_store_data(wdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0)) return std_logic_vector;
 end package;
 
@@ -96,7 +94,7 @@ package body wb_pkg is
 
     -- move to riscv_pkg?
     function wb_get_transfer_size(func3 : std_logic_vector) return t_transfer_size is
-        variable transfer_size : t_transfer_size;
+        variable transfer_size              : t_transfer_size;
     begin
         case(func3(1 downto 0)) is
             when b"00"  => transfer_size  := b8;
@@ -107,11 +105,12 @@ package body wb_pkg is
         return transfer_size;
     end function;
 
-    --! Converts a Byte Address (with a transaction size in Bytes) to a 32-bit aligned Wishbone Address 
-    --! and the appropriate SEL signals
-    procedure wb_byte_addr_to_byte_sel(byte_addr : in std_logic_vector; transfer_size : in t_transfer_size := b32; wb_addr : out std_logic_vector; wb_sel : out std_logic_vector) is
+    --! Converts a Byte Address (with a transaction size in Bytes) to a 32-bit aligned Wishbone Address
+    --! and the appropriate SEL signals. Returns an ALIGN_ERR if the access is misaligned
+    procedure wb_byte_addr_to_byte_sel(byte_addr : in std_logic_vector; transfer_size : in t_transfer_size := b32; wb_addr : out std_logic_vector; wb_sel : out std_logic_vector; align_err : out std_logic) is
         variable byte_portion : std_logic_vector (1 downto 0);
     begin
+        align_err := '0'; -- default
         -- make 32 bit aligned by setting bottom two bits to 0
         wb_addr(1 downto 0)              := b"00";
         wb_addr(byte_addr'left downto 2) := byte_addr(byte_addr'left downto 2);
@@ -125,25 +124,29 @@ package body wb_pkg is
                 when b16    => wb_sel    := b"0011";
                 when b32    => wb_sel    := b"1111";
                 when others => wb_sel := b"0000";
+                    align_err             := '1';
                 end case;
             when b"01" => -- only byte access permitted
                 case(transfer_size) is
                 when b8     => wb_sel     := b"0010";
                 when others => wb_sel := b"0000";
+                    align_err             := '1';
                 end case;
             when b"10" => -- 16 bit alighned, BYTE and 2BYTES permitted
                 case(transfer_size) is
                 when b8     => wb_sel     := b"0100";
                 when b16    => wb_sel    := b"1100";
                 when others => wb_sel := b"0000";
+                    align_err             := '1';
                 end case;
             when b"11" => -- only byte access permitted
                 case(transfer_size) is
                 when b8     => wb_sel     := b"1000";
                 when others => wb_sel := b"0000";
+                    align_err             := '1';
                 end case;
             when others =>
-                null;
+                align_err := '1';
         end case;
     end procedure;
 

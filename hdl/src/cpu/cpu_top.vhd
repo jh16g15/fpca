@@ -1,5 +1,5 @@
 --! Top level module of the FPCA CPU (RV32I)
---! Instantiates all of the other 
+--! Instantiates all of the other
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -71,6 +71,7 @@ architecture rtl of cpu_top is
     signal write_reg_data : std_logic_vector(31 downto 0);
     signal write_reg_we   : std_logic;
 
+    signal addr_align_err : std_logic;
     signal mem_req  : std_logic;
     signal mem_busy : std_logic;
     signal mem_err  : std_logic;
@@ -163,6 +164,7 @@ begin
             write_alu_in      => write_alu,
             write_ret_addr_in => write_ret_addr,
             write_reg_data_out => write_reg_data,
+            addr_align_err_out => addr_align_err,
             mem_req_in         => mem_req,
             mem_busy_out       => mem_busy,
             mem_err_out        => mem_err,
@@ -187,6 +189,7 @@ begin
             alu_err_in         => alu_func3_err,
             uses_mem_access_in => uses_mem_access,
             uses_writeback_in  => uses_writeback,
+            addr_align_err_in => addr_align_err,
             mem_req_out        => mem_req,
             mem_busy_in        => mem_busy,
             mem_err_in         => mem_err,
