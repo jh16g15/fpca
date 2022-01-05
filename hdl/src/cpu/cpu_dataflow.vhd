@@ -34,7 +34,7 @@ entity cpu_dataflow is
         mem_err_out : out std_logic;
 
         -- memory control signals (from decoder)
-        mem_we_in : in std_logic;                    --! select 0=load, 1=store 
+        mem_we_in : in std_logic;                    --! select 0=load, 1=store
         func3_in  : in std_logic_vector(2 downto 0); --! contains Signed/Unsigned and Width info
 
         -- out to wishbone bus
@@ -55,6 +55,7 @@ architecture rtl of cpu_dataflow is
 
     signal mem_wdata : std_logic_vector(31 downto 0);
     signal mem_rdata : std_logic_vector(31 downto 0);
+    signal mem_rdata_reg : std_logic_vector(31 downto 0);
 begin
     mem_err_out <= mem_err; -- from WB master
 
@@ -80,7 +81,7 @@ begin
 
         -- writeback_mux
         if write_load_in = '1' then
-            write_reg_data_out <= mem_rdata;
+            write_reg_data_out <= mem_rdata_reg;
         elsif write_ret_addr_in = '1' then
             write_reg_data_out <= ret_addr_in;
         else -- write ALU result
@@ -106,4 +107,15 @@ begin
             rsp_valid_out        => mem_done_out,
             rsp_err_out          => mem_err
         );
+
+        --! Register our memory rdata as its only valid for
+        --! one cycle, and we need it for the writeback state
+        process (clk)
+        begin
+            if rising_edge(clk) then
+                if mem_done_out = '1' then
+                    mem_rdata_reg <= mem_rdata;
+                end if;
+            end if;
+        end process;
 end architecture;
