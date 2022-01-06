@@ -27,8 +27,10 @@ entity cpu_control is
         uses_writeback_in  : in std_logic;
 
         -- Execute ALU
-        alu_en_out : out std_logic;
-        alu_err_in : in std_logic;
+        alu_en_out        : out std_logic;
+        alu_err_in        : in std_logic;
+        branch_en_alu_in  : in std_logic;
+        branch_en_reg_out : out std_logic; -- registered from ALU EXECUTE step
         -- Execute Mem
         addr_align_err_in : in std_logic;
         mem_req_out       : out std_logic;
@@ -48,7 +50,7 @@ end entity cpu_control;
 architecture rtl of cpu_control is
 
     -- we probably won't need all of these
-    type t_state is (INIT, FETCH, EXECUTE, MEM, WRITEBACK, ERROR);
+    type t_state is (RESET_s, INIT, FETCH, EXECUTE, MEM, WRITEBACK, ERROR);
 
     signal state : t_state := INIT;
 
@@ -64,11 +66,15 @@ begin
     begin
         if rising_edge(clk) then
             if reset = '1' then
-                state            <= INIT;
-                error_status     <= NONE;
-                cpu_err_out      <= '0';
-                alu_en_out       <= '0';
-                write_reg_we_out <= '0';
+                state             <= RESET_s;
+                error_status      <= NONE;
+                cpu_err_out       <= '0';
+                alu_en_out        <= '0';
+                write_reg_we_out  <= '0';
+                fetch_req_out     <= '0';
+                mem_req_out       <= '0';
+                write_reg_we_out  <= '0';
+                branch_en_reg_out <= '0';
             else
                 if extern_halt_in = '0' then -- If we are not halted (by an external debugger etc)
                     -- defaults
@@ -76,6 +82,8 @@ begin
                     alu_en_out       <= '0';
                     write_reg_we_out <= '0';
                     case state is
+                        when RESET_s =>
+                            state <= INIT;
                         when INIT =>
                             fetch_req_out <= '1';
                             state         <= FETCH;
@@ -83,6 +91,7 @@ begin
                         when FETCH =>
                             if fetch_busy_in = '0' then
                                 fetch_req_out <= '0';
+                                branch_en_reg_out <= '0'; --clear the branch enable now request is accepted
                             end if;
 
                             if instr_valid_in = '1' then
@@ -96,6 +105,9 @@ begin
                             end if;
                             -- combinational stuff happens here elsewhere in the CPU
                         when EXECUTE =>
+                            -- save the BRANCH_EN result from the ALU
+                            branch_en_reg_out <= branch_en_alu_in;
+
                             if uses_mem_access_in = '1' then
                                 state       <= MEM;
                                 mem_req_out <= '1';

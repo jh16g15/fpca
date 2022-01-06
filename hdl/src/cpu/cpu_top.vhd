@@ -33,6 +33,7 @@ architecture rtl of cpu_top is
     signal branch_addr         : std_logic_vector(31 downto 0);
     signal branch_target_final : std_logic_vector(31 downto 0);
     signal branch_en           : std_logic;
+    signal branch_en_reg       : std_logic;
     signal branch_en_final     : std_logic;
 
     signal current_pc : std_logic_vector(31 downto 0);
@@ -149,7 +150,7 @@ begin
             rs2               => rs2_data,
             imm               => imm_extended,
             alu_out           => alu_output,
-            branch_en         => branch_en,   -- could be modified by an error during MEM access
+            branch_en_out     => branch_en,   -- could be modified by an error during MEM access
             branch_target_out => branch_addr, -- could be modified by an error during MEM access
             opcode            => current_opcode,
             funct7            => current_func7,
@@ -164,7 +165,7 @@ begin
             alu_output_in      => alu_output,
             ret_addr_in        => ret_addr,
             rs2_data_in        => rs2_data,
-            branch_en_in       => branch_en,
+            branch_en_in       => branch_en_reg,
             branch_en_out      => branch_en_final,
             branch_target_in   => branch_addr,
             branch_target_out  => branch_target_final,
@@ -195,6 +196,8 @@ begin
             opcode_err_in      => opcode_err,
             alu_en_out         => alu_en,
             alu_err_in         => alu_func3_err,
+            branch_en_alu_in   => branch_en,
+            branch_en_reg_out  => branch_en_reg,
             uses_mem_access_in => uses_mem_access,
             uses_writeback_in  => uses_writeback,
             addr_align_err_in  => addr_align_err,

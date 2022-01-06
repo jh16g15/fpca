@@ -41,8 +41,8 @@ begin
 
     -- branch select
     -- force to ignore branching if Reset asserted
-    next_pc    <= pc + to_unsigned(4, 32) when (branch_en_in = '0' or reset = '1') else unsigned(branch_addr_in) + to_unsigned(4, 32);
-    fetch_addr <= std_logic_vector(pc) when (branch_en_in = '0' or reset = '1') else branch_addr_in;
+    next_pc    <= pc + to_unsigned(4, 32) when branch_en_in = '0' else unsigned(branch_addr_in) + to_unsigned(4, 32);
+    fetch_addr <= std_logic_vector(pc) when branch_en_in = '0' else branch_addr_in;
 
     main_proc : process (clk, reset) is
     begin

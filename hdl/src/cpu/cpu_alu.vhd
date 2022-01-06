@@ -22,9 +22,9 @@ entity cpu_alu is
         rs2 : in std_logic_vector(31 downto 0);
         imm : in std_logic_vector(31 downto 0); -- pre sign-extended in decode
 
-        -- data outputs 
+        -- data outputs
         alu_out           : out std_logic_vector(31 downto 0);
-        branch_en         : out std_logic;
+        branch_en_out     : out std_logic;
         branch_target_out : out std_logic_vector(31 downto 0);
 
         -- control signals from instruction decode
@@ -40,10 +40,13 @@ end entity;
 architecture rtl of cpu_alu is
     signal alu_func3_err : std_logic;
     signal dbg_op_type   : t_dbg_decode;
+    signal branch_en     : std_logic;
 
 begin
     -- only output error when ALU in use
     alu_func3_err_out <= alu_func3_err and alu_en_in;
+
+    branch_en_out <= branch_en;
 
     alu_comb : process (all) is
     begin
@@ -78,7 +81,7 @@ begin
             alu_out <= u_add(rs1, imm);
             when OPCODE_STORE => -- address to write to = rs1+imm
             alu_out <= u_add(rs1, imm);
-            when OPCODE_OP => -- register-register arithmetic 
+            when OPCODE_OP => -- register-register arithmetic
             case(funct3) is
                 when OP_ADD_FUNC3  => alu_out  <= s_add(rs1, rs2) when (funct7(5) = '0') else s_sub(rs1, rs2);
                 when OP_SLT_FUNC3  => alu_out  <= x"0000_0001" when signed(rs1) < signed(rs2) else x"0000_0000";
@@ -90,7 +93,7 @@ begin
                 when OP_SRL_FUNC3  => alu_out  <= std_logic_vector(shift_right(unsigned(rs1), slv2uint(rs2(4 downto 0)))) when funct7(5) = '0' else std_logic_vector(shift_right(signed(rs1), slv2uint(rs2(4 downto 0))));
                 when others        => alu_func3_err  <= '1'; -- report "Invalid FUNC3 for OP" severity Failure;
             end case;
-            when OPCODE_OP_IMM => --register-immmediate arithmetic 
+            when OPCODE_OP_IMM => --register-immmediate arithmetic
             case(funct3) is
                 when OP_ADD_FUNC3  => alu_out  <= s_add(rs1, imm);
                 when OP_SLT_FUNC3  => alu_out  <= x"0000_0001" when signed(rs1) < signed(imm) else x"0000_0000";
@@ -123,7 +126,7 @@ begin
             end case;
             when OPCODE_LOAD  => dbg_op_type  <= LOAD;
             when OPCODE_STORE => dbg_op_type <= STORE;
-            when OPCODE_OP    => -- register-register arithmetic 
+            when OPCODE_OP    => -- register-register arithmetic
             case(funct3) is
                 when OP_ADD_FUNC3  => dbg_op_type  <= ADD_SUB;
                 when OP_SLT_FUNC3  => dbg_op_type  <= SLT;
@@ -135,7 +138,7 @@ begin
                 when OP_SRL_FUNC3  => dbg_op_type  <= SR_LA;
                 when others        => dbg_op_type        <= ERR;
             end case;
-            when OPCODE_OP_IMM => --register-immmediate arithmetic 
+            when OPCODE_OP_IMM => --register-immmediate arithmetic
             case(funct3) is
                 when OP_ADD_FUNC3  => dbg_op_type  <= ADDI;
                 when OP_SLT_FUNC3  => dbg_op_type  <= SLTI;
