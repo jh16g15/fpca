@@ -81,8 +81,9 @@ begin
         wb_addr <= var_wb_addr;
         wb_sel  <= var_wb_sel;
         addr_align_err <= var_addr_align_error and mem_req_in; -- mask with mem_req_in
-        -- calculate the WDATA to send
-        mem_wdata <= wb_align_store_data(rs2_data_in, wb_sel);
+        -- calculate the WDATA to send (wb_master will align it based on SEL input)
+        mem_wdata <= rs2_data_in;
+
 
         -- writeback_mux
         if write_load_in = '1' then
