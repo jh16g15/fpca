@@ -61,6 +61,7 @@ begin
             if reset_in = '1' then
                 uart_tx_ready_out   <= '0';
                 uart_tx <= '1'; -- hold UART line high
+                state <= RESET;
             else
                 case(state) is
                     when RESET =>
