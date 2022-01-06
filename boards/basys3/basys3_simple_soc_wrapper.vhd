@@ -22,7 +22,9 @@ entity basys3_simple_soc_wrapper is
         an  : out std_logic_vector(3 downto 0);
         
         RsTx : out std_logic;
-        RsRx : in std_logic
+        RsRx : in std_logic;
+        -- mirrored UART_TX for a logic analyser
+        JB : out std_logic_vector(0 downto 0) 
 
     );
 end entity basys3_simple_soc_wrapper;
@@ -42,6 +44,9 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal pll_locked : std_logic;
     signal sseg_ca    : std_logic_vector(7 downto 0);
     signal sseg_an    : std_logic_vector(3 downto 0);
+
+    signal uart_tx : std_logic;
+    signal uart_rx : std_logic;
 
     component clk_wiz_0 is
         port (
@@ -96,5 +101,10 @@ begin
             uart_rx_in   => RsRx
             
         );
+        -- UART TX OUT
+        RsTx <= uart_tx;
+        JB(0) <= uart_tx;
+        -- UART RX IN
+        uart_rx <= RsRx;
 
 end architecture;
