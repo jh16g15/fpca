@@ -40,8 +40,9 @@ begin
     ret_addr_out <= std_logic_vector(unsigned(pc_out) + to_unsigned(4, 32));
 
     -- branch select
-    next_pc    <= pc + to_unsigned(4, 32) when branch_en_in = '0' else unsigned(branch_addr_in) + to_unsigned(4, 32);
-    fetch_addr <= std_logic_vector(pc) when branch_en_in = '0' else branch_addr_in;
+    -- force to ignore branching if Reset asserted
+    next_pc    <= pc + to_unsigned(4, 32) when (branch_en_in = '0' or reset = '1') else unsigned(branch_addr_in) + to_unsigned(4, 32);
+    fetch_addr <= std_logic_vector(pc) when (branch_en_in = '0' or reset = '1') else branch_addr_in;
 
     main_proc : process (clk, reset) is
     begin
@@ -59,8 +60,8 @@ begin
     end process;
 
     -- wishbone master to fetch instructions
-    -- We could use a simpler 32b only master as well, or a direct connection 
-    -- that only takes 1 cycle to fetch an instruction from BRAM for improved 
+    -- We could use a simpler 32b only master as well, or a direct connection
+    -- that only takes 1 cycle to fetch an instruction from BRAM for improved
     -- CPU performance
 
     wb_master_inst : entity work.wb_master
