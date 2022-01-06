@@ -59,11 +59,11 @@ architecture rtl of basys3_simple_soc_wrapper is
 
 begin
 
-    -- 100MHz to 50MHz
+    -- 100MHz to 50MHz free running
     pll_inst : clk_wiz_0
     port map(
         clk_out50 => clk50,
-        reset     => ext_reset,
+        reset     => '0',
         locked    => pll_locked,
         clk_in1   => clk
     );
