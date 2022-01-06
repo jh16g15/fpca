@@ -72,10 +72,10 @@ architecture rtl of cpu_top is
     signal write_reg_we   : std_logic;
 
     signal addr_align_err : std_logic;
-    signal mem_req  : std_logic;
-    signal mem_busy : std_logic;
-    signal mem_err  : std_logic;
-    signal mem_done : std_logic;
+    signal mem_req        : std_logic;
+    signal mem_busy       : std_logic;
+    signal mem_err        : std_logic;
+    signal mem_done       : std_logic;
 
 begin
 
@@ -101,7 +101,7 @@ begin
 
     cpu_decode_inst : entity work.cpu_decode
         port map(
-            instr_in => current_instr,
+            instr_in     => current_instr,
             rs1_addr_out => rs1_addr,
             rs2_addr_out => rs2_addr,
             rd_addr_out  => rd_addr,
@@ -151,18 +151,18 @@ begin
 
     cpu_dataflow_inst : entity work.cpu_dataflow
         port map(
-            clk               => clk,
-            reset             => reset,
-            alu_output_in     => alu_output,
-            ret_addr_in       => ret_addr,
-            rs2_data_in       => rs2_data,
-            branch_en_in      => branch_en,
-            branch_en_out     => branch_en_final,
-            branch_target_in  => branch_addr,
-            branch_target_out => branch_target_final,
-            write_load_in     => write_load,
-            write_alu_in      => write_alu,
-            write_ret_addr_in => write_ret_addr,
+            clk                => clk,
+            reset              => reset,
+            alu_output_in      => alu_output,
+            ret_addr_in        => ret_addr,
+            rs2_data_in        => rs2_data,
+            branch_en_in       => branch_en,
+            branch_en_out      => branch_en_final,
+            branch_target_in   => branch_addr,
+            branch_target_out  => branch_target_final,
+            write_load_in      => write_load,
+            write_alu_in       => write_alu,
+            write_ret_addr_in  => write_ret_addr,
             write_reg_data_out => write_reg_data,
             addr_align_err_out => addr_align_err,
             mem_req_in         => mem_req,
@@ -189,7 +189,7 @@ begin
             alu_err_in         => alu_func3_err,
             uses_mem_access_in => uses_mem_access,
             uses_writeback_in  => uses_writeback,
-            addr_align_err_in => addr_align_err,
+            addr_align_err_in  => addr_align_err,
             mem_req_out        => mem_req,
             mem_busy_in        => mem_busy,
             mem_err_in         => mem_err,

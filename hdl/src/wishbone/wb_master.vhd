@@ -5,11 +5,11 @@ use ieee.numeric_std.all;
 use work.joe_common_pkg.all;
 use work.wb_pkg.all; -- 32 bit port, 8 bit granularity
 
---! A simple wishbone master that can read and write to a 32-bit Wishbone bus, in bytesize 
---! chunks 
+--! A simple wishbone master that can read and write to a 32-bit Wishbone bus, in bytesize
+--! chunks
 --!
 --! Supports Single Transactions only (B4 pipelined)
---! 
+--!
 --! Warning! Misaligned memory accesses will fail invisibly! (FIXME)
 entity wb_master is
     port (
