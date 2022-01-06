@@ -46,6 +46,7 @@ entity cpu_control is
 end entity cpu_control;
 
 architecture rtl of cpu_control is
+
     -- we probably won't need all of these
     type t_state is (INIT, FETCH, EXECUTE, MEM, WRITEBACK, ERROR);
 
@@ -53,6 +54,10 @@ architecture rtl of cpu_control is
 
     type t_error is (NONE, FETCH_ERR, OPCODE_ERR, ALU_ERR, MEM_ERR, MISALIGN_ERR);
     signal error_status : t_error := NONE;
+
+    attribute mark_debug                 : boolean;
+    attribute mark_debug of state        : signal is true;
+    attribute mark_debug of error_status : signal is true;
 begin
 
     process (clk)

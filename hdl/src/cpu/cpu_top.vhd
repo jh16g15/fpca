@@ -77,6 +77,14 @@ architecture rtl of cpu_top is
     signal mem_err        : std_logic;
     signal mem_done       : std_logic;
 
+    attribute mark_debug                   : boolean;
+    attribute mark_debug of current_pc     : signal is true;
+    attribute mark_debug of current_instr  : signal is true;
+    attribute mark_debug of addr_align_err : signal is true;
+    attribute mark_debug of alu_func3_err  : signal is true;
+    attribute mark_debug of opcode_err     : signal is true;
+    attribute mark_debug of mem_err        : signal is true;
+
 begin
 
     cpu_instr_fetch_inst : entity work.cpu_instr_fetch

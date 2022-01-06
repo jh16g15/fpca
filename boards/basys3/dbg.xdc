@@ -1,0 +1,46 @@
+create_debug_core u_ila_0 ila
+set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
+set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
+set_property C_ADV_TRIGGER false [get_debug_cores u_ila_0]
+set_property C_DATA_DEPTH 1024 [get_debug_cores u_ila_0]
+set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
+set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
+set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
+set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
+set_property port_width 1 [get_debug_ports u_ila_0/clk]
+connect_debug_port u_ila_0/clk [get_nets [list pll_inst/inst/clk_out50]]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
+set_property port_width 3 [get_debug_ports u_ila_0/probe0]
+connect_debug_port u_ila_0/probe0 [get_nets [list {simple_soc_inst/cpu_top_inst/cpu_control_inst/error_status[0]} {simple_soc_inst/cpu_top_inst/cpu_control_inst/error_status[1]} {simple_soc_inst/cpu_top_inst/cpu_control_inst/error_status[2]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
+set_property port_width 3 [get_debug_ports u_ila_0/probe1]
+connect_debug_port u_ila_0/probe1 [get_nets [list {simple_soc_inst/cpu_top_inst/cpu_control_inst/state[0]} {simple_soc_inst/cpu_top_inst/cpu_control_inst/state[1]} {simple_soc_inst/cpu_top_inst/cpu_control_inst/state[2]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
+set_property port_width 32 [get_debug_ports u_ila_0/probe2]
+connect_debug_port u_ila_0/probe2 [get_nets [list {simple_soc_inst/cpu_top_inst/current_pc[0]} {simple_soc_inst/cpu_top_inst/current_pc[1]} {simple_soc_inst/cpu_top_inst/current_pc[2]} {simple_soc_inst/cpu_top_inst/current_pc[3]} {simple_soc_inst/cpu_top_inst/current_pc[4]} {simple_soc_inst/cpu_top_inst/current_pc[5]} {simple_soc_inst/cpu_top_inst/current_pc[6]} {simple_soc_inst/cpu_top_inst/current_pc[7]} {simple_soc_inst/cpu_top_inst/current_pc[8]} {simple_soc_inst/cpu_top_inst/current_pc[9]} {simple_soc_inst/cpu_top_inst/current_pc[10]} {simple_soc_inst/cpu_top_inst/current_pc[11]} {simple_soc_inst/cpu_top_inst/current_pc[12]} {simple_soc_inst/cpu_top_inst/current_pc[13]} {simple_soc_inst/cpu_top_inst/current_pc[14]} {simple_soc_inst/cpu_top_inst/current_pc[15]} {simple_soc_inst/cpu_top_inst/current_pc[16]} {simple_soc_inst/cpu_top_inst/current_pc[17]} {simple_soc_inst/cpu_top_inst/current_pc[18]} {simple_soc_inst/cpu_top_inst/current_pc[19]} {simple_soc_inst/cpu_top_inst/current_pc[20]} {simple_soc_inst/cpu_top_inst/current_pc[21]} {simple_soc_inst/cpu_top_inst/current_pc[22]} {simple_soc_inst/cpu_top_inst/current_pc[23]} {simple_soc_inst/cpu_top_inst/current_pc[24]} {simple_soc_inst/cpu_top_inst/current_pc[25]} {simple_soc_inst/cpu_top_inst/current_pc[26]} {simple_soc_inst/cpu_top_inst/current_pc[27]} {simple_soc_inst/cpu_top_inst/current_pc[28]} {simple_soc_inst/cpu_top_inst/current_pc[29]} {simple_soc_inst/cpu_top_inst/current_pc[30]} {simple_soc_inst/cpu_top_inst/current_pc[31]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
+set_property port_width 32 [get_debug_ports u_ila_0/probe3]
+connect_debug_port u_ila_0/probe3 [get_nets [list {simple_soc_inst/cpu_top_inst/current_instr[0]} {simple_soc_inst/cpu_top_inst/current_instr[1]} {simple_soc_inst/cpu_top_inst/current_instr[2]} {simple_soc_inst/cpu_top_inst/current_instr[3]} {simple_soc_inst/cpu_top_inst/current_instr[4]} {simple_soc_inst/cpu_top_inst/current_instr[5]} {simple_soc_inst/cpu_top_inst/current_instr[6]} {simple_soc_inst/cpu_top_inst/current_instr[7]} {simple_soc_inst/cpu_top_inst/current_instr[8]} {simple_soc_inst/cpu_top_inst/current_instr[9]} {simple_soc_inst/cpu_top_inst/current_instr[10]} {simple_soc_inst/cpu_top_inst/current_instr[11]} {simple_soc_inst/cpu_top_inst/current_instr[12]} {simple_soc_inst/cpu_top_inst/current_instr[13]} {simple_soc_inst/cpu_top_inst/current_instr[14]} {simple_soc_inst/cpu_top_inst/current_instr[15]} {simple_soc_inst/cpu_top_inst/current_instr[16]} {simple_soc_inst/cpu_top_inst/current_instr[17]} {simple_soc_inst/cpu_top_inst/current_instr[18]} {simple_soc_inst/cpu_top_inst/current_instr[19]} {simple_soc_inst/cpu_top_inst/current_instr[20]} {simple_soc_inst/cpu_top_inst/current_instr[21]} {simple_soc_inst/cpu_top_inst/current_instr[22]} {simple_soc_inst/cpu_top_inst/current_instr[23]} {simple_soc_inst/cpu_top_inst/current_instr[24]} {simple_soc_inst/cpu_top_inst/current_instr[25]} {simple_soc_inst/cpu_top_inst/current_instr[26]} {simple_soc_inst/cpu_top_inst/current_instr[27]} {simple_soc_inst/cpu_top_inst/current_instr[28]} {simple_soc_inst/cpu_top_inst/current_instr[29]} {simple_soc_inst/cpu_top_inst/current_instr[30]} {simple_soc_inst/cpu_top_inst/current_instr[31]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
+set_property port_width 1 [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list simple_soc_inst/cpu_top_inst/addr_align_err]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
+set_property port_width 1 [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list simple_soc_inst/cpu_top_inst/alu_func3_err]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
+set_property port_width 1 [get_debug_ports u_ila_0/probe6]
+connect_debug_port u_ila_0/probe6 [get_nets [list simple_soc_inst/cpu_top_inst/mem_err]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
+set_property port_width 1 [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list simple_soc_inst/cpu_top_inst/opcode_err]]
+set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
+set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
+set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
+connect_debug_port dbg_hub/clk [get_nets clk50]

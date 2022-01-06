@@ -63,34 +63,44 @@ void main(void){
     //     _CLR_BIT(GPIO_LED, i);
     // }
 
-    int input_mode = 0;
-    int display_mode = 0;
+    // int input_mode = 0;
+    // int display_mode = 0;
     int tx_byte = 0;
-    int div_setting;
+    // int div_setting;
+
+    int count = 0;
     while (1)
     {
+
+        // put_byte(0xFF);
+        // put_byte(0x00);
+        // put_byte(0x55);
+        // put_byte(0xAA);
+
         putc('H');
-        while(1){}
         putc('e');
         putc('l');
         putc('l');
         putc('o');
         putc('\n');
+
+        count = count + 1;
+        Q_SSEG = count;
+        // while(1){}
         // for (int i = 0; i < 256; i++)
         // {
         //     put_byte(i);
         // }
-
     }
 }
 
-int get_bit(int reg, int bitnum){
-    if (reg & _BV(bitnum) == 0) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
+// int get_bit(int reg, int bitnum){
+//     if (reg & _BV(bitnum) == 0) {
+//         return 0;
+//     } else {
+//         return 1;
+//     }
+// }
 
 void putc(char c){
     // wait for UART to go idle
