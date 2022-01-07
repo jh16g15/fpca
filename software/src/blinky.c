@@ -54,63 +54,45 @@ void put_byte(int c); // so we can avoid casting
 void main(void)
 {
 
-    // test some bit manip functions
-    // for (int i = 0; i < 32;i++){
-    //     delay_ms(100);
-    //     _SET_BIT(GPIO_LED, i);
-    // }
-    // for (int i = 0; i < 32;i++){
-    //     delay_ms(100);
-    //     _CLR_BIT(GPIO_LED, i);
-    // }
-
-    // int input_mode = 0;
-    // int display_mode = 0;
     int tx_byte = 0;
     // int div_setting;
 
     int count = 0;
+    puts("\r\n");
+    puts("The FPCA has booted!");
 
-    // puts("The FPCA has booted!");
-
-    puts("Hi");
 
     while (1)
     {
+        // test the buttons are being filled correctly
+        GPIO_LED = GPIO_BTN;
 
-        // put_byte(0xFF);
-        // put_byte(0x00);
-        // put_byte(0x55);
-        // put_byte(0xAA);
-
-        // putc('H');
-        // putc('e');
-        // putc('l');
-        // putc('l');
-        // putc('o');
-        // putc('\n');
-
-        // puts("The FPCA has booted!");
-        while (1)
+        if (get_bit(GPIO_BTN, BTN_L))
         {
-            count = count + 1;
-            Q_SSEG = count;
+            puts("Left Button Pressed");
         }
-        // while(1){}
-        // for (int i = 0; i < 256; i++)
-        // {
-        //     put_byte(i);
-        // }
+        if (get_bit(GPIO_BTN, BTN_R))
+        {
+            puts("Right Button Pressed");
+        }
+        if (get_bit(GPIO_BTN, BTN_U))
+        {
+            puts("Up Button Pressed");
+        }
+        if (get_bit(GPIO_BTN, BTN_D))
+        {
+            puts("Down Button Pressed");
+        }
+
+        count = count + 1;
+        Q_SSEG = count;
     }
 }
 
-// int get_bit(int reg, int bitnum){
-//     if (reg & _BV(bitnum) == 0) {
-//         return 0;
-//     } else {
-//         return 1;
-//     }
-// }
+int get_bit(int reg, int bitnum)
+{
+    return (reg >> bitnum) & 0x1;
+}
 
 // prints a string to the UART, followed by a newline \n
 void puts(char *s)
@@ -128,24 +110,24 @@ void puts(char *s)
 void putc(char c)
 {
     // wait for UART to go idle
-    GPIO_LED = 1;
+    // GPIO_LED = 1;
     while (UART_TX_IDLE == 0)
     {
     }
     UART_TX_BYTE = c;
-    GPIO_LED = 0;
+    // GPIO_LED = 0;
 }
 
 // only the lowest byte is valid here
 void put_byte(int b)
 {
     // wait for UART to go idle
-    GPIO_LED = 2;
+    // GPIO_LED = 2;
     while (UART_TX_IDLE == 0)
     {
     }
     UART_TX_BYTE = b;
-    GPIO_LED = 0;
+    // GPIO_LED = 0;
 }
 
 #ifdef SIM

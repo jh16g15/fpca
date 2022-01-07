@@ -20,11 +20,11 @@ entity basys3_simple_soc_wrapper is
         seg : out std_logic_vector(6 downto 0);
         dp  : out std_logic;
         an  : out std_logic_vector(3 downto 0);
-        
+
         RsTx : out std_logic;
         RsRx : in std_logic;
         -- mirrored UART_TX for a logic analyser
-        JB : out std_logic_vector(0 downto 0) 
+        JB : out std_logic_vector(0 downto 0)
 
     );
 end entity basys3_simple_soc_wrapper;
@@ -36,6 +36,9 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal gpio_led          : std_logic_vector(31 downto 0);
     signal gpio_sw           : std_logic_vector(31 downto 0);
     signal gpio_btn          : std_logic_vector(31 downto 0);
+
+    signal btn_raw : std_logic_vector( 4 downto 0);
+    signal btn_debounced : std_logic_vector( 4 downto 0);
 
     signal ext_reset : std_logic;
     signal reset : std_logic;
@@ -68,16 +71,41 @@ begin
         clk_in1   => clk
     );
 
-    ext_reset <= btnC;
+    ext_reset <= btn_debounced(4);  -- Centre
     reset <= ext_reset or (not pll_locked);
-    
+
     led   <= gpio_led(15 downto 0);
 
     gpio_btn(31 downto 4) <= (others => '0');
-    gpio_btn(3 downto 0)  <= (btnU, btnL, btnR, btnD);
+
+    btn_raw <= (btnC, btnU, btnL, btnR, btnD);
+    gen_btn_debounce : for i in 4 downto 0 generate
+        debounce_inst : entity work.debounce
+        generic map (
+          REFCLK_FREQ => 50_000_000
+        )
+        port map (
+          clk => clk50,
+          val_in => btn_raw(i),
+          val_out => btn_debounced(i)
+        );
+    end generate;
+    gpio_btn(3 downto 0)  <= btn_debounced(3 downto 0);
+
 
     gpio_sw(31 downto 16) <= (others => '0');
-    gpio_sw(15 downto 0)  <= sw;
+    -- gpio_sw(15 downto 0)  <= sw;
+    gen_sw_debounce : for i in 15 downto 0 generate
+        debounce_inst : entity work.debounce
+        generic map (
+          REFCLK_FREQ => 50_000_000
+        )
+        port map (
+          clk => clk50,
+          val_in => sw(i),
+          val_out => gpio_sw(i)
+        );
+    end generate;
 
     seg <= sseg_ca(6 downto 0);
     dp  <= sseg_ca(7);
@@ -99,7 +127,7 @@ begin
             sseg_an_out  => sseg_an,
             uart_tx_out  => RsTx,
             uart_rx_in   => RsRx
-            
+
         );
         -- UART TX OUT
         RsTx <= uart_tx;
