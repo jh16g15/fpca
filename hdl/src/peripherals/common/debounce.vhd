@@ -29,10 +29,11 @@ begin
             if in_prev = not val_in then
                 count <= DB_COUNT_THRES;
             else
-                count <= count - 1;
-            end if;
-            if count = 0 then
-                val_out <= in_prev;
+                if count = 0 then
+                    val_out <= in_prev;
+                else
+                    count <= count - 1;
+                end if;
             end if;
 
         end if;

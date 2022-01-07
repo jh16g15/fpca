@@ -1,0 +1,29 @@
+[*]
+[*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
+[*] Fri Jan  7 20:51:27 2022
+[*]
+[dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.tb_debounce.test_alive_79233978850a858a364592d42b83e0a5094d4372/ghdl/wave.ghw"
+[dumpfile_mtime] "Fri Jan  7 20:47:00 2022"
+[dumpfile_size] 2864520
+[savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_debounce.gtkw"
+[timestart] 1499907500000
+[size] 1653 600
+[pos] -2111 -152
+*-25.000000 1499987600000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.tb_debounce.
+[sst_width] 214
+[signals_width] 86
+[sst_expanded] 1
+[sst_vpaned_height] 320
+@28
+top.tb_debounce.clk
+top.tb_debounce.val_in
+@29
+top.tb_debounce.val_out
+@28
+top.tb_debounce.debounce_inst.in_prev
+@420
+top.tb_debounce.debounce_inst.count
+[pattern_trace] 1
+[pattern_trace] 0
