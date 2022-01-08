@@ -138,6 +138,16 @@ begin
             check_equal(tb_checker, uart_rxd_byte, byte);
         end procedure;
 
+        procedure set_baud_rate(new_baud : integer) is
+            variable new_div : integer;
+            variable new_div_vec : std_logic_vector(31 downto 0);
+        begin
+            info(tb_logger, "Changing baud rate to " & to_string(new_baud) );
+            new_div := REFCLK_FREQ / new_baud;
+            new_div_vec := uint2slv(new_div);
+            write_bus(net, bus_handle, UART_DIVISOR_ADDR, new_div_vec);
+        end procedure;
+
     begin
         test_runner_setup(runner, runner_cfg);
 
@@ -159,6 +169,9 @@ begin
             if run("test_alive") then
                 info("Hello world test_alive");
 
+                set_baud_rate(DEFAULT_BAUD);
+                test_uart_single(x"FF");
+                set_baud_rate(115200);
                 test_uart_single(x"FF");
                 test_uart_single(x"00");
                 test_uart_single(x"55");
