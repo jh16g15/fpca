@@ -9,13 +9,14 @@ OUTPUT_ARCH(riscv)
 MEMORY
 {
   /* Joe: FPCA memory layout, 8K using 4 GOWUIN BRAMs (could go up to 16K if needed)
-          Read/Write/eXecute 
+          Read/Write/eXecute
 
           We may need a section that is Allocatable if we want to use the heap.
    */
   RAM (rwx) : ORIGIN = 0x0, LENGTH = 8K
 }
 ENTRY(_start)
+/* locations of std libraries*/
 SEARCH_DIR("/home/joehi/riscv32/riscv32-unknown-elf/lib");
 SECTIONS
 {
