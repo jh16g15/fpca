@@ -10,7 +10,7 @@ use work.joe_common_pkg.all;
 
 entity simple_soc is
     generic (
-        G_MEM_INIT_FILE : string  := "../../software/build/blinky.hex";
+        G_MEM_INIT_FILE : string  := "../../software/hex/main.hex";
         G_SOC_FREQ      : integer := 100_000_000;
         G_DEFAULT_BAUD  : integer := 9600
     );
