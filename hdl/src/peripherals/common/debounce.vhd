@@ -31,7 +31,6 @@ architecture rtl of debounce is
 --    constant DB_COUNT_THRES : unsigned(31 downto 0) := DEBOUNCE_PERIOD_MS * (REFCLK_FREQ / 1000);
     signal count            : unsigned(31 downto 0) := DB_COUNT_THRES;
     signal in_prev          : std_logic;
-
 begin
 
     process (clk)
