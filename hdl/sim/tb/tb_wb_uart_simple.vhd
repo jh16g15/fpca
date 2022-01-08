@@ -15,10 +15,10 @@ end;
 
 architecture bench of tb_wb_uart_simple is
     -- Clock period
-    constant clk_period : time := 10 ns;
+    constant clk_period : time := 20 ns;
     -- Generics
     constant DEFAULT_BAUD : integer := 9600;
-    constant REFCLK_FREQ  : integer := 100_000_000;
+    constant REFCLK_FREQ  : integer := 50_000_000;
 
     -- Ports
     signal wb_clk      : std_logic;
@@ -37,6 +37,11 @@ architecture bench of tb_wb_uart_simple is
     constant strobe_high_probability : real := 0.5; -- what does this do?
 
 begin
+
+    -- loopback mode
+    uart_rx_in <= uart_tx_out after 302 ns;
+
+
 
     wb_uart_simple_inst : entity work.wb_uart_simple
         generic map(
@@ -76,8 +81,14 @@ begin
         constant UART_BYTE_TRANSMIT_ADDR : std_logic_vector(31 downto 0) := x"0000_0000";
         constant UART_TX_STATUS_ADDR     : std_logic_vector(31 downto 0) := x"0000_0004";
         constant UART_DIVISOR_ADDR       : std_logic_vector(31 downto 0) := x"0000_0008";
+        constant UART_BYTE_RECEIVE_ADDR  : std_logic_vector(31 downto 0) := x"0000_000C";
+        constant UART_RX_STATUS_ADDR     : std_logic_vector(31 downto 0) := x"0000_0010";
 
-        variable uart_tx_idle : std_logic;
+        variable uart_tx_idle  : std_logic;
+        variable uart_rx_valid : std_logic;
+
+        variable uart_byte_to_tx : std_logic_vector(7 downto 0);
+        variable uart_rxd_byte : std_logic_vector(7 downto 0);
 
         procedure wait_for_uart_tx_idle is
         begin
@@ -88,14 +99,43 @@ begin
                 read_bus(net, bus_handle, UART_TX_STATUS_ADDR, tmp_rdata);
                 uart_tx_idle := tmp_rdata(0);
             end loop;
-            info(tb_logger, "UART now idle");
+            info(tb_logger, "UART TX now idle");
         end procedure;
 
-        procedure uart_send_byte(byte : std_logic_vector(7 downto 0)) is
+        procedure wait_for_uart_rx_valid is
         begin
-            tmp_wdata := x"0000_00" & byte;
+            uart_rx_valid := '0';
+            info(master_logger, "Polling from UART RX Status until RX_VALID ");
+            -- wait until RX VALID
+            while uart_rx_valid = '0' loop
+                read_bus(net, bus_handle, UART_RX_STATUS_ADDR, tmp_rdata);
+                uart_rx_valid := tmp_rdata(0);
+            end loop;
+            info(tb_logger, "UART RX now valid");
+        end procedure;
+
+        procedure uart_send_byte(byte_in : std_logic_vector(7 downto 0)) is
+        begin
+            tmp_wdata := x"0000_00" & byte_in;
             info(master_logger, "Writing " & to_hstring(tmp_wdata) & " to UART BYTE TX " & to_hstring(UART_BYTE_TRANSMIT_ADDR));
             write_bus(net, bus_handle, UART_BYTE_TRANSMIT_ADDR, tmp_wdata);
+        end procedure;
+
+        procedure uart_get_byte(byte_out : out std_logic_vector(7 downto 0)) is
+        begin
+            read_bus(net, bus_handle, UART_BYTE_RECEIVE_ADDR, tmp_rdata);
+            info(master_logger, "Read " & to_hstring(tmp_rdata) & " from UART BYTE RX " & to_hstring(UART_BYTE_RECEIVE_ADDR));
+            byte_out := tmp_rdata(7 downto 0);
+        end procedure;
+
+        -- write a single byte to the UART Tx, and check it appears on the RX
+        procedure test_uart_single(byte : std_logic_vector(7 downto 0) ) is
+        begin
+            wait_for_uart_tx_idle;
+            uart_send_byte(byte);
+            wait_for_uart_rx_valid;
+            uart_get_byte(uart_rxd_byte);
+            check_equal(tb_checker, uart_rxd_byte, byte);
         end procedure;
 
     begin
@@ -112,24 +152,47 @@ begin
         set_stop_level(failure);
 
         wb_reset <= '1';
-        wait for 15 ns;
+        wait for 500 ns;
         wb_reset <= '0';
 
         while test_suite loop
             if run("test_alive") then
                 info("Hello world test_alive");
 
-                wait_for_uart_tx_idle;
-                uart_send_byte(x"FF");
+                test_uart_single(x"FF");
+                test_uart_single(x"00");
+                test_uart_single(x"55");
+                test_uart_single(x"AA");
 
-                wait_for_uart_tx_idle;
-                uart_send_byte(x"00");
 
-                wait_for_uart_tx_idle;
-                uart_send_byte(x"55");
 
-                wait_for_uart_tx_idle;
-                uart_send_byte(x"AA");
+                -- uart_byte_to_tx := x"FF";
+                -- wait_for_uart_tx_idle;
+                -- uart_send_byte(uart_byte_to_tx);
+                -- wait_for_uart_rx_valid;
+                -- uart_get_byte(uart_rxd_byte);
+                -- check_equal(tb_checker, uart_rxd_byte, uart_byte_to_tx);
+
+                -- uart_byte_to_tx := x"00";
+                -- wait_for_uart_tx_idle;
+                -- uart_send_byte(uart_byte_to_tx);
+                -- wait_for_uart_rx_valid;
+                -- uart_get_byte(uart_rxd_byte);
+                -- check_equal(tb_checker, uart_rxd_byte, uart_byte_to_tx);
+
+                -- uart_byte_to_tx := x"55";
+                -- wait_for_uart_tx_idle;
+                -- uart_send_byte(uart_byte_to_tx);
+                -- wait_for_uart_rx_valid;
+                -- uart_get_byte(uart_rxd_byte);
+                -- check_equal(tb_checker, uart_rxd_byte, uart_byte_to_tx);
+
+                -- uart_byte_to_tx := x"AA";
+                -- wait_for_uart_tx_idle;
+                -- uart_send_byte(uart_byte_to_tx);
+                -- wait_for_uart_rx_valid;
+                -- uart_get_byte(uart_rxd_byte);
+                -- check_equal(tb_checker, uart_rxd_byte, uart_byte_to_tx);
 
                 wait_for_uart_tx_idle;
 
@@ -139,6 +202,8 @@ begin
             end if;
         end loop;
     end process main;
+
+    test_runner_watchdog(runner, 20 ms);
 
     clk_process : process
     begin
