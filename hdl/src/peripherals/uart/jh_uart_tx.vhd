@@ -15,7 +15,7 @@ entity jh_uart_tx is
 
         divisor_in : std_logic_vector(31 downto 0); --! clocks between bit periods
 
-        uart_tx : out std_logic; --! Output to physical pin
+        uart_tx_out : out std_logic; --! Output to physical pin
 
 
         -- AXI-S style interface
@@ -35,7 +35,7 @@ architecture Behavioral of jh_uart_tx is
     -- 0 parity bits
     -- 1 stop bit HIGH
     -- may need a wait statement here
-
+    signal uart_tx : std_logic;
 
     signal div_count : integer;
     signal divisor_int : integer;
@@ -48,6 +48,8 @@ architecture Behavioral of jh_uart_tx is
     signal bit_to_send : std_logic;
 
 begin
+
+    uart_tx_out <= uart_tx;
 
     divisor_int <= slv2uint(divisor_in);
 
