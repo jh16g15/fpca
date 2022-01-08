@@ -13,7 +13,7 @@ architecture bench of tb_simple_soc is
     constant clk_period : time := 5 ns;
     -- Generics
     -- constant G_MEM_INIT_FILE : string := "data/blinky.hex"; -- simulation
-    constant G_MEM_INIT_FILE : string := "../../software/build/blinky.hex"; -- from toolchain
+    constant G_MEM_INIT_FILE : string := "../../software/hex/main.hex"; -- from toolchain
 
     -- Ports
     signal clk          : std_logic;

@@ -32,7 +32,7 @@ end entity basys3_simple_soc_wrapper;
 architecture rtl of basys3_simple_soc_wrapper is
 
     -- run location: fpca/boards/basys3/fpca
-    constant G_MEM_INIT_FILE : string := "../../../software/build/blinky.hex"; -- from toolchain
+    constant G_MEM_INIT_FILE : string := "../../../software/hex/main.hex"; -- from toolchain
     signal gpio_led          : std_logic_vector(31 downto 0);
     signal gpio_sw           : std_logic_vector(31 downto 0);
     signal gpio_btn          : std_logic_vector(31 downto 0);
