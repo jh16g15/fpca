@@ -18,6 +18,7 @@ MEMORY
 ENTRY(_start)
 /* locations of std libraries*/
 SEARCH_DIR("/home/joehi/riscv32/riscv32-unknown-elf/lib");
+SEARCH_DIR("/home/joehi/riscv32/lib/gcc/riscv32-unknown-elf/11.1.0/");
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
