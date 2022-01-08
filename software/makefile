@@ -6,7 +6,15 @@
 # $?	Names of all prerequisites newer than the target
 # $^	Names of all prerequisites
 
-objects = build/main.o build/crt0.o	# build/blinky.o
+
+# we should really pass the std lib (libgcc.a) to the linker as a libray
+objects = \
+	build/main.o \
+	build/crt0.o \
+	build/uart.o \
+	build/utils.o \
+	# ~/riscv32/lib/gcc/riscv32-unknown-elf/11.1.0/libgcc.a
+
 
 
 CC=riscv32-unknown-elf-gcc
@@ -37,6 +45,7 @@ main : hex/main.hex
 asm : build/main.asm main
 
 all: main asm # hosted
+	@echo Made everything!
 
 # always treat this file as "out-of-date", so we always display the asm to the terminal
 .PHONY : build/main.asm
@@ -53,6 +62,7 @@ build/main.asm : build/main.elf
 	riscv32-unknown-elf-objdump -d -S $< > $@
 	riscv32-unknown-elf-objdump -d -S $<
 
+# This step links all the object files together
 build/main.elf : $(objects)
 	@echo Linking $^
 	$(LD) -o $@ $^ $(LDFLAGS_RV)
@@ -67,11 +77,11 @@ build/main.elf : $(objects)
 
 build/%.o : src/%.c
 	@echo building $@ from $<
-	$(CC) $(CFLAGS)  $< -o $@
+	$(CC) $(CFLAGS_RV)  $< -o $@
 
 build/%.o : src/%.s
 	@echo building $@ from $<
-	$(CC) $(CFLAGS)  $< -o $@
+	$(CC) $(CFLAGS_RV)  $< -o $@
 
 clean:
 	rm -rf build/*.*
