@@ -8,35 +8,35 @@
 
 
 # we should really pass the std lib (libgcc.a) to the linker as a libray
+# we need
 objects = \
-	build/main.o \
-	build/crt0.o \
-	build/uart.o \
-	build/utils.o \
-	# ~/riscv32/lib/gcc/riscv32-unknown-elf/11.1.0/libgcc.a
-
-
+build/main.o \
+build/crt0.o \
+build/uart.o \
+build/utils.o \
 
 CC=riscv32-unknown-elf-gcc
 LD=riscv32-unknown-elf-ld
 OBJDUMP=riscv32-unknown-elf-objdump
 ELF2HEX=riscv32-unknown-elf-elf2hex
+NM=riscv32-unknown-elf-nm
 
 COPT = -O0
 
 # compile only
 CFLAGS= -g -c $(COPT)
 
+# Change the RV extensions here:
 CFLAGS_RV = $(CFLAGS) -march=rv32i -mabi=ilp32 -ffreestanding
 
 # CC_PC=gcc
 # CFLAGS_PC= $(CFLAGS)
 
-LDFLAGS =
+LDFLAGS = -Map=build/output.map
 # LDFLAGS_RV = $(LDFLAGS) --gc-sections -nostartfiles -T riscv32-fpca.ld
 # we don't need -nostartfiles as a standalone linker invocation requires it to be provided explicitly
-# we also need the stdlib and defaultlibs to allow for soft-mult etc
-LDFLAGS_RV = $(LDFLAGS) --gc-sections  -T riscv32-fpca.ld
+# we need libgcc.a (-lgcc) for soft mult/div, as we aren't using RV32IM
+LDFLAGS_RV = $(LDFLAGS) -lgcc --gc-sections  -T riscv32-fpca.ld
 
 # as this is the first "recipe", executing "make" on its own will run this
 main : hex/main.hex
@@ -64,7 +64,7 @@ build/main.asm : build/main.elf
 
 # This step links all the object files together
 build/main.elf : $(objects)
-	@echo Linking $^
+	@echo Linking...
 	$(LD) -o $@ $^ $(LDFLAGS_RV)
 
 

@@ -1,8 +1,6 @@
 #include "uart.h"
 
 void set_baud(int rate){
-
-    UART_DIVISOR = REFCLK * rate;
     UART_DIVISOR = REFCLK / rate;
 }
 
