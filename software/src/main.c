@@ -1,5 +1,5 @@
 
-#define SIM
+//#define SIM
 
 #define BASYS3
 #define REFCLK 50000000
@@ -28,7 +28,7 @@
 
 #include "uart.h"
 #include "gpio.h"
-#include "delay.h"
+#include "utils.h"
 
 // function prototypes
 
@@ -40,9 +40,10 @@ void main(void)
     // int div_setting;
 
     int count = 0;
-    puts("\r\n");
-    puts("The FPCA has booted!");
+    uart_puts("\r\n");
+    uart_puts("The FPCA has booted!");
 
+    set_baud(9600);
 
     while (1)
     {
@@ -51,19 +52,19 @@ void main(void)
 
         if (get_bit(GPIO_BTN, BTN_L))
         {
-            puts("Left Button Pressed");
+            uart_puts("Left Button Pressed");
         }
         if (get_bit(GPIO_BTN, BTN_R))
         {
-            puts("Right Button Pressed");
+            uart_puts("Right Button Pressed");
         }
         if (get_bit(GPIO_BTN, BTN_U))
         {
-            puts("Up Button Pressed");
+            uart_puts("Up Button Pressed");
         }
         if (get_bit(GPIO_BTN, BTN_D))
         {
-            puts("Down Button Pressed");
+            uart_puts("Down Button Pressed");
         }
 
         count = count + 1;

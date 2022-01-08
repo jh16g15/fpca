@@ -1,7 +1,11 @@
-#ifndef _DELAY_H_
-#define _DELAY_H_
 
-void delay_ms(int dly_ms);
+#include "utils.h"
+
+int get_bit(int reg, int bitnum)
+{
+    return (reg >> bitnum) & 0x1;
+}
+
 
 #ifdef SIM
 void delay_ms(int dly)
@@ -27,5 +31,3 @@ void delay_ms(int dly_ms)
     }
 }
 #endif
-
-#endif // _DELAY_H_
