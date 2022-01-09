@@ -1,7 +1,31 @@
 #include "uart.h"
 
-void set_baud(int rate){
+#define UART_TX_BYTE (*((volatile unsigned long *)0x20000000))
+#define UART_TX_IDLE (*((volatile unsigned long *)0x20000004))
+#define UART_DIVISOR (*((volatile unsigned long *)0x20000008))
+#define UART_RX_BYTE (*((volatile unsigned long *)0x2000000C))
+#define UART_RX_VALID (*((volatile unsigned long *)0x20000010))
+
+// define in main.c
+#ifndef REFCLK
+#define REFCLK 50000000
+#endif
+
+int uart_tx_ready(void){
+    return UART_TX_IDLE;
+}
+int uart_rx_valid(void){
+    return UART_RX_VALID;
+}
+
+void uart_set_baud(int rate){
     UART_DIVISOR = REFCLK / rate;
+}
+
+// consider checking for frame errors
+char uart_get_char(void){
+    while(UART_RX_VALID == 0){}
+    return UART_RX_BYTE;
 }
 
 // prints a string to the UART, followed by a newline \n
@@ -11,26 +35,24 @@ void uart_puts(char *s)
     do
     {
         c = *s;  // character of string (contents of s mem)
-        uart_putc(c); // print this char
+        uart_put_char(c); // print this char
         s++;     // increment pointer to move through array
     } while (c != '\0');
-    uart_putc('\n');
+    uart_put_char('\n');
 }
 
 // prints a char to the UART
-void uart_putc(char c)
+void uart_put_char(char c)
 {
     // wait for UART to go idle
-    // GPIO_LED = 1;
     while (UART_TX_IDLE == 0)
     {
     }
     UART_TX_BYTE = c;
-    // GPIO_LED = 0;
 }
 
 // sends the lowest byte of an int to the UART
-void put_byte(int b)
+void uart_put_byte(int b)
 {
     // wait for UART to go idle
     // GPIO_LED = 2;
