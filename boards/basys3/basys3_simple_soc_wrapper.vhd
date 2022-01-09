@@ -125,8 +125,8 @@ begin
             gpio_sw_in   => gpio_sw,
             sseg_ca_out  => sseg_ca,
             sseg_an_out  => sseg_an,
-            uart_tx_out  => RsTx,
-            uart_rx_in   => RsRx
+            uart_tx_out  => uart_tx,
+            uart_rx_in   => uart_rx
 
         );
         -- UART TX OUT
