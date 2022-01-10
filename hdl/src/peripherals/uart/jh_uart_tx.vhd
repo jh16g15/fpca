@@ -37,8 +37,8 @@ architecture Behavioral of jh_uart_tx is
     -- may need a wait statement here
     signal uart_tx : std_logic;
 
-    signal div_count : integer;
-    signal divisor_int : integer;
+    signal div_count : unsigned(31 downto 0);
+    signal divisor_int : unsigned(31 downto 0);
 
     type t_state is (RESET, WAIT_FOR_VALID, START_BIT, TRANSMIT_DATA, STOP_BIT );
     signal state : t_state := RESET;
@@ -51,7 +51,7 @@ begin
 
     uart_tx_out <= uart_tx;
 
-    divisor_int <= slv2uint(divisor_in);
+    divisor_int <= unsigned(divisor_in);
 
     bit_to_send <= stored_byte(0); -- lsb first
 
@@ -68,7 +68,7 @@ begin
                 case(state) is
                     when RESET =>
                         uart_tx <= '1'; -- hold UART line high
-                        div_count <= 0;
+                        div_count <= divisor_int;-- -1
                         state <= WAIT_FOR_VALID;
                         uart_tx_ready_out <= '1';
                     when WAIT_FOR_VALID =>
@@ -78,15 +78,15 @@ begin
                             stored_byte(8 downto 1)  <= byte_to_transmit_in;
                             stored_byte(0) <= '0';  -- start bit
                             uart_tx_ready_out <= '0';
-                            div_count <= 0;
+                            div_count <= divisor_int;-- -1
                             bit_count <= 0;
                         end if;
                     when TRANSMIT_DATA =>
-                        div_count <= div_count + 1;
+                        div_count <= div_count - 1;
                         -- send next bit
-                        if(div_count = divisor_int-1) then
+                        if(div_count = 0) then
                             uart_tx <= bit_to_send; -- send LSB first
-                            div_count <= 0;
+                            div_count <= divisor_int; -- -1
                             bit_count <= bit_count + 1;
                             stored_byte <= '1' & stored_byte(9 downto 1);  -- shift right one bit
                             if bit_count = 9 then

@@ -42,11 +42,11 @@ architecture rtl of jh_uart_rx is
     -- 1 stop bit HIGH
     -- may need a wait statement here
 
-    signal div_count : integer;
+    signal div_count : unsigned(31 downto 0);
     -- clocks between new bits
-    signal divisor_int : integer;
+    signal divisor_int : unsigned(31 downto 0);    -- down_counter - do we want "-1" here?
 
-    signal sample_point : integer;
+    signal sample_point : unsigned(31 downto 0);
 
     type t_state is (RESET, WAIT_FOR_READY, WAIT_FOR_START_BIT, START_BIT, RECEIVE_DATA, STOP_BIT);
     signal state : t_state := RESET;
@@ -58,11 +58,11 @@ architecture rtl of jh_uart_rx is
     signal bit_count      : integer;
     signal rec_byte_shift : std_logic_vector(7 downto 0);
 begin
-    divisor_int <= slv2uint(divisor_in);
+    divisor_int <= unsigned(divisor_in);
 
     -- halfway through the bit period, take a sample
     -- constant SAMPLE_POINT : integer := (DIVISOR / 2) - 1;
-    sample_point <= slv2uint(divisor_in(31 downto 1)) - 1;
+    sample_point <= unsigned(divisor_in(31 downto 1)) - to_unsigned(1, 32);
     uart_rx_proc : process (refclk_in) is
     begin
         if rising_edge (refclk_in) then
@@ -83,12 +83,12 @@ begin
                     uart_rx_valid_out <= '0';
                 end if;
 
-                div_count     <= div_count + 1;
+                div_count     <= div_count - 1;
                 sample_strobe <= '0'; -- default
 
                 case(state) is
                     when RESET =>
-                    div_count     <= 0;
+                    div_count     <= divisor_int;
                     state         <= WAIT_FOR_START_BIT;
                     uart_rx_error <= '0'; -- clear error status
 
@@ -96,7 +96,7 @@ begin
                     -- TODO: Add "uart rx overflow error" check here by checking for next "start bit" trigger before old byte is accepted
                     when WAIT_FOR_START_BIT =>
                     if uart_rx_prev = '1' and uart_rx = '0' then -- if falling edge
-                        div_count <= 0;
+                        div_count <= divisor_int;
                         state     <= START_BIT;
                     end if;
 
@@ -109,9 +109,9 @@ begin
                             state         <= WAIT_FOR_START_BIT;
                         end if;
                     end if;
-                    if div_count = divisor_int then -- at end of bit_period
+                    if div_count = 0 then -- at end of bit_period
                         state          <= RECEIVE_DATA;
-                        div_count      <= 0;
+                        div_count      <= divisor_int;
                         bit_count      <= 0;
                         rec_byte_shift <= x"00";
                     end if;
@@ -123,12 +123,11 @@ begin
                         sample_strobe              <= '1';
                         rec_byte_shift(7 downto 0) <= uart_rx & rec_byte_shift(7 downto 1); -- LSB first, so shift rx into the top
                     end if;
-                    if div_count = divisor_int then -- at end of bit_period
+                    if div_count = 0 then -- at end of bit_period
                         bit_count <= bit_count + 1;
-                        div_count <= 0;
+                        div_count <= divisor_int;
                         if bit_count = 8 - 1 then -- if this is the end of the final data bit
-                            byte_received_out <= rec_byte_shift;
-                            uart_rx_valid_out <= '1';
+                            byte_received_out <= rec_byte_shift;    -- only assert the RX VALID after we check the stop bit for a framing error
                             state             <= STOP_BIT;
                         end if;
                     end if;
@@ -139,6 +138,7 @@ begin
                     -- sample at middle of bit_period, but then move to await next start bit anyway
                     if div_count = sample_point then
                         sample_strobe <= '1';
+                        uart_rx_valid_out <= '1'; -- now we know we'll be ready for another byte
                         if uart_rx = '0' then -- not a true stop bit, frame error
                             uart_rx_error <= '1';
                         end if;
