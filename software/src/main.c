@@ -35,14 +35,10 @@
 
 void main(void)
 {
-
-    int tx_byte = 0;
-    // int div_setting;
-
     int count = 0;
-    // uart_set_baud(115200);
+
     uart_set_baud(9600);
-    // uart_set_baud(115200);
+
 
     uart_puts("\r\n");
     uart_puts("The FPCA has booted!");
@@ -67,14 +63,14 @@ void main(void)
         if (get_bit(GPIO_BTN, BTN_R))
         {
             uart_puts("Right Button Pressed");
-            uart_puts("Setting Baud Rate to 19200");
-            uart_set_baud(19200);
+            uart_puts("Setting Baud Rate to 115200");
+            uart_set_baud(115200);
         }
         if (get_bit(GPIO_BTN, BTN_U))
         {
             uart_puts("Up Button Pressed");
-            uart_puts("Setting Baud Rate to 115200");
-            uart_set_baud(115200);
+            uart_puts("Setting Baud Rate to 921600");
+            uart_set_baud(921600);
         }
         if (get_bit(GPIO_BTN, BTN_D))
         {
