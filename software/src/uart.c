@@ -62,3 +62,22 @@ void uart_put_byte(int b)
     UART_TX_BYTE = b;
     // GPIO_LED = 0;
 }
+
+// Receive 32bit unsigned, LSByte first
+unsigned int uart_get_32u(void){
+    unsigned int ret;
+    ret = uart_get_char();
+    ret += uart_get_char() << 8;
+    ret += uart_get_char() << 16;
+    ret += uart_get_char() << 24;
+    return ret;
+}
+// Receive 32bit signed, LSByte first
+int uart_get_32i(void){
+    int ret;
+    ret = uart_get_char();
+    ret += uart_get_char() << 8;
+    ret += uart_get_char() << 16;
+    ret += uart_get_char() << 24;
+    return ret;
+}
