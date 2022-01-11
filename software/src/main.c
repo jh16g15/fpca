@@ -29,12 +29,19 @@
 #include "uart.h"
 #include "gpio.h"
 #include "utils.h"
+#include "bootloader.h"
 
 // function prototypes
 
 
 void main(void)
 {
+
+    // if SW15 set on reset, jump to the bootloader
+    if (get_bit(GPIO_SW, 15)) {
+        launch_fpca_bootloader();
+    }
+
     int count = 0;
 
     uart_set_baud(9600);
