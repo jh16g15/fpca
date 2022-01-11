@@ -14,6 +14,7 @@ build/main.o \
 build/crt0.o \
 build/uart.o \
 build/utils.o \
+build/bootloader.o \
 
 CC=riscv32-unknown-elf-gcc
 LD=riscv32-unknown-elf-ld
