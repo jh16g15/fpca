@@ -40,7 +40,7 @@ architecture rtl of simple_soc is
     constant G_NUM_SLAVES : integer := 3;
 
     -- for GPIO register bank
-    constant G_NUM_RW_REGS : integer := 2;
+    constant G_NUM_RW_REGS : integer := 4;
     constant G_NUM_RO_REGS : integer := 2;
 
     signal if_wb_mosi         : t_wb_mosi;
@@ -55,6 +55,10 @@ architecture rtl of simple_soc is
 
     signal rw_regs_out : t_slv32_arr(G_NUM_RW_REGS - 1 downto 0);
     signal ro_regs_in  : t_slv32_arr(G_NUM_RO_REGS - 1 downto 0);
+
+    attribute mark_debug : boolean;
+    attribute mark_debug of rw_regs_out : signal is true;
+    attribute mark_debug of ro_regs_in  : signal is true;
 
     -- Seven Segment Display controller
     signal sseg_display_data : std_logic_vector(15 downto 0);
