@@ -11,7 +11,8 @@ use work.joe_common_pkg.all;
 entity simple_soc is
     generic (
         G_MEM_INIT_FILE : string  := "../../software/hex/main.hex";
-        G_SOC_FREQ      : integer := 100_000_000;
+        G_BOOT_INIT_FILE : string  := "../../software/hex/boot.hex";
+        G_SOC_FREQ      : integer := 50_000_000;
         G_DEFAULT_BAUD  : integer := 9600
     );
     port (
@@ -37,7 +38,7 @@ end entity simple_soc;
 architecture rtl of simple_soc is
     constant G_PC_RESET_ADDR : unsigned(31 downto 0) := x"0000_0000";
 
-    constant G_NUM_SLAVES : integer := 3;
+    constant G_NUM_SLAVES : integer := 16; -- max 16
 
     -- for GPIO register bank
     constant G_NUM_RW_REGS : integer := 4;
@@ -164,4 +165,19 @@ begin
             sseg_ca         => sseg_ca_out,
             sseg_an         => sseg_an_out
         );
+
+
+    --! Bootloader memory
+    --! xF000_0000 to xFFFF_FFFF
+    bootloader_inst : entity work.wb_sp_bram
+    generic map(
+        G_MEM_DEPTH_WORDS => 64,
+        G_INIT_FILE       => G_BOOT_INIT_FILE
+    )
+    port map(
+        wb_clk      => clk,
+        wb_reset    => reset,
+        wb_mosi_in  => wb_slave_mosi_arr(15),
+        wb_miso_out => wb_slave_miso_arr(15)
+    );
 end architecture;

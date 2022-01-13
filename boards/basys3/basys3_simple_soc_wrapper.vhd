@@ -33,6 +33,7 @@ architecture rtl of basys3_simple_soc_wrapper is
 
     -- run location: fpca/boards/basys3/fpca
     constant G_MEM_INIT_FILE : string := "../../../software/hex/main.hex"; -- from toolchain
+    constant G_BOOT_INIT_FILE : string := "../../../software/hex/boot.hex"; -- from toolchain
     signal gpio_led          : std_logic_vector(31 downto 0);
     signal gpio_sw           : std_logic_vector(31 downto 0);
     signal gpio_btn          : std_logic_vector(31 downto 0);
@@ -115,6 +116,7 @@ begin
     simple_soc_inst : entity work.simple_soc
         generic map(
             G_MEM_INIT_FILE => G_MEM_INIT_FILE,
+            G_BOOT_INIT_FILE => G_BOOT_INIT_FILE,
             G_SOC_FREQ      => 50_000_000
         )
         port map(
