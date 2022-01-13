@@ -20,7 +20,7 @@ import os
 VU = VUnit.from_argv()
 VU.add_verification_components()
 
-VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08"])
+VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08", "-frelaxed-rules"])
 
 ## need to use "resolve()" to get abspath
 # print(f"0:{os.listdir(Path(__file__).resolve().parents[0])}")

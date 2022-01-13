@@ -9,14 +9,14 @@ use work.joe_common_pkg.all;
 --! Synchronous read, so adds 1 wait state.
 --!
 --! Supports a maximum of 64 RW and 64 RO registers (all 32-bit) - this is 128 registers or 512 bytes
---! 
+--!
 --! Addressing:
 --! RW registers are 0x000, 0x004 up to 0x0FC
---! RO registers are 0x100, 0x104 up to 0x1FC 
---! 
+--! RO registers are 0x100, 0x104 up to 0x1FC
+--!
 --! TODOs:
 --! - Support 16 bit and 8 bit transactions
---! - 
+--! -
 entity wb_regs is
     generic (
         G_NUM_RW_REGS : integer := 4;
@@ -47,7 +47,7 @@ architecture rtl of wb_regs is
     signal rw_regs : t_slv32_arr(G_NUM_RW_REGS - 1 downto 0);
     signal ro_regs : t_slv32_arr(G_NUM_RO_REGS - 1 downto 0);
 
-    -- wb output internal 
+    -- wb output internal
 
 begin
 
@@ -74,21 +74,25 @@ begin
                     -- always ACK this cycle (sync operation with 1 wait state)
                     wb_miso_out.ack <= '1';
 
-                    -- report("Received transaction with BANK_SEL bit (" & to_string(C_BANK_SEL_BIT_INDEX) & ") = " & to_string(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX)));
-                    -- report("Address Index = " & to_hstring(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX-1 downto 2)));
-                    if wb_mosi_in.we = '1' then
-                        -- write logic
-                        if (wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX) = '0') then                                     -- if addressing a RW register
-                            rw_regs(slv2uint(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX - 1 downto 2))) <= wb_mosi_in.wdat; -- write word
+                    byte_sel : for i in 0 to 3 loop
+                        if wb_mosi_in.sel(i) then
+                            -- report("Received transaction with BANK_SEL bit (" & to_string(C_BANK_SEL_BIT_INDEX) & ") = " & to_string(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX)));
+                            -- report("Address Index = " & to_hstring(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX-1 downto 2)));
+                            if wb_mosi_in.we = '1' then
+                                -- write logic
+                                if (wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX) = '0') then                                     -- if addressing a RW register
+                                    rw_regs(slv2uint(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX - 1 downto 2)))(8 * (i + 1) - 1 downto 8 * i) <= wb_mosi_in.wdat(8 * (i + 1) - 1 downto 8 * i); -- write word
+                                end if;
+                            else
+                                -- read logic
+                                if (wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX) = '0') then -- if addressing a RW register
+                                    wb_miso_out.rdat(8 * (i + 1) - 1 downto 8 * i) <= rw_regs(slv2uint(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX - 1 downto 2)))(8 * (i + 1) - 1 downto 8 * i);
+                                else
+                                    wb_miso_out.rdat(8 * (i + 1) - 1 downto 8 * i) <= ro_regs(slv2uint(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX - 1 downto 2)))(8 * (i + 1) - 1 downto 8 * i);
+                                end if;
+                            end if;
                         end if;
-                    else
-                        -- read logic
-                        if (wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX) = '0') then -- if addressing a RW register
-                            wb_miso_out.rdat <= rw_regs(slv2uint(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX - 1 downto 2)));
-                        else
-                            wb_miso_out.rdat <= ro_regs(slv2uint(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX - 1 downto 2)));
-                        end if;
-                    end if;
+                    end loop;
                 end if;
 
             end if;
