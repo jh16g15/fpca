@@ -46,22 +46,30 @@ LDFLAGS_RV = $(LDFLAGS) -lgcc --gc-sections  -T riscv32-fpca.ld
 main : hex/main.hex
 
 # alternative target to get the disassembly as well
-asm : build/main.asm main build/boot/boot.asm
+asm : build/main.asm main build/minimal_boot.asm
 
-all: main asm # hosted
+all: main boot asm # hosted
 	@echo Made everything!
 
 # always treat this file as "out-of-date", so we always display the asm to the terminal
 .PHONY : build/main.asm
 
-boot : hex/boot.hex build/minimal_boot.asm
+boot : hex/boot.hex
 
 hex/boot.hex : build/minimal_boot.o
 	@echo "Building boot.hex"
 	$(ELF2HEX) --bit-width 32 --input $< --output $@
 
 build/minimal_boot.asm : build/minimal_boot.o
+
+	@echo ""
+	@echo "******************** START $@ *********************"
+	@echo ""
 	riscv32-unknown-elf-objdump -d -S $<
+	riscv32-unknown-elf-objdump -d -S $< > $@
+	@echo ""
+	@echo "********************* END $@ **********************"
+	@echo ""
 
 build/minimal_boot.o : src/boot/minimal_boot.c src/boot/crt0-boot.s
 	$(CC) -g -Os -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections \
@@ -75,10 +83,14 @@ hex/main.hex : build/main.elf
 	$(ELF2HEX) --bit-width 32 --input $< --output $@
 
 build/main.asm : build/main.elf
-	@echo Build the hex for good measure
-
 	@# output to file and to terminal
+	@echo ""
+	@echo "******************** START $@ *********************"
+	@echo ""
 	riscv32-unknown-elf-objdump -d -S $< > $@
+	@echo ""
+	@echo "********************* END $@ **********************"
+	@echo ""
 	riscv32-unknown-elf-objdump -d -S $<
 
 # This step links all the object files together
