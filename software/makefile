@@ -16,6 +16,9 @@ build/uart.o \
 build/utils.o \
 build/bootloader.o \
 
+boot_objects = \
+build/minimal_boot.o
+
 CC=riscv32-unknown-elf-gcc
 LD=riscv32-unknown-elf-ld
 OBJDUMP=riscv32-unknown-elf-objdump
@@ -43,13 +46,28 @@ LDFLAGS_RV = $(LDFLAGS) -lgcc --gc-sections  -T riscv32-fpca.ld
 main : hex/main.hex
 
 # alternative target to get the disassembly as well
-asm : build/main.asm main
+asm : build/main.asm main build/boot/boot.asm
 
 all: main asm # hosted
 	@echo Made everything!
 
 # always treat this file as "out-of-date", so we always display the asm to the terminal
 .PHONY : build/main.asm
+
+boot : hex/boot.hex build/minimal_boot.asm
+
+hex/boot.hex : build/minimal_boot.o
+	@echo "Building boot.hex"
+	$(ELF2HEX) --bit-width 32 --input $< --output $@
+
+build/minimal_boot.asm : build/minimal_boot.o
+	riscv32-unknown-elf-objdump -d -S $<
+
+build/minimal_boot.o : src/boot/minimal_boot.c src/boot/crt0-boot.s
+	$(CC) -g -Os -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections \
+	-nostartfiles -nostdlib -nodefaultlibs -Wl,-T,riscv32-fpca-boot.ld $^ -o $@
+
+
 
 # This regenerates the hex/main.hex file, building the other files as necessary
 hex/main.hex : build/main.elf
@@ -83,6 +101,7 @@ build/%.o : src/%.c
 build/%.o : src/%.s
 	@echo building $@ from $<
 	$(CC) $(CFLAGS_RV)  $< -o $@
+
 
 clean:
 	rm -rf build/*.*
