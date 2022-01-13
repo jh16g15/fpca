@@ -37,7 +37,6 @@ void launch_fpca_bootloader(void)
     char *mem = (char*)start_address;  // char pointer so 1 byte increment
 
     RW2 = (unsigned long)mem;  // set the start address to RW2 (see on ILA)
-    RW3 = start_address;
     gotc = uart_get_char();
     if (gotc != STX)
     {
@@ -45,12 +44,10 @@ void launch_fpca_bootloader(void)
     }
     // store the subsequent bytes into memory one at a time, incrementing each time
     gotc = uart_get_char(); // get the first byte
-    RW0 = gotc;
     while (gotc != ETX) { // check for End Of Text
         *mem = gotc;    // store it to memory
         mem++;          // increase memory address by 1 byte
         gotc = uart_get_char(); // get next byte
-        RW0 = gotc;
     };
     uart_puts("ETX Received!");
     uart_puts("Bootloader Done, set SW15 back to 0 and reset!");
