@@ -39,7 +39,13 @@ void main(void)
 
     // if SW15 set on reset, jump to the bootloader
     if (get_bit(GPIO_SW, 15)) {
-        launch_fpca_bootloader();
+        // Jump to bootloader _start
+        asm(
+            "la t0,0xf0000000;"
+            "jr t0;"
+        );
+
+        // launch_fpca_bootloader();
     }
 
     int count = 0;
