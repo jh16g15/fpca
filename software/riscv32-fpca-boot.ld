@@ -24,8 +24,12 @@ SECTIONS
   /* Read-only sections, merged into text segment: */
   /* Joe: will this 0x10000 get in the way of having _start where we want? */
   PROVIDE (__executable_start = SEGMENT_START("text-segment", 0x10000)); . = SEGMENT_START("text-segment", 0x10000) + SIZEOF_HEADERS;
-  /* Joe: set our Stack Top to be the top of our RAM  */
-  PROVIDE(__stack_top = ORIGIN(RAM) + LENGTH(RAM));
+  /* Joe: set our Stack Top to be the top of our Main Memory RAM (8K)
+          As the bootloader doesn't need the stack, it doesn't matter
+          too much where this goes
+  */
+  PROVIDE(__stack_top = 0x00002000);
+  /* PROVIDE(__stack_top = ORIGIN(RAM) + LENGTH(RAM)); */
   /* end Joe */
   .interp         : { *(.interp) }
   .note.gnu.build-id  : { *(.note.gnu.build-id) }
