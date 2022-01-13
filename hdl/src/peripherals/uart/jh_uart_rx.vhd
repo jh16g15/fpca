@@ -26,6 +26,11 @@ entity jh_uart_rx is
         uart_rx_ready_in  : in std_logic; -- not sure we can use this (need FIFO)
         uart_rx_error     : out std_logic := '0'
     );
+    -- GHDL with VHDL-2008 requires port attributes to be up in the entity declaration
+    attribute mark_debug : boolean;
+    attribute mark_debug of uart_rx_valid_out : signal is true;
+    attribute mark_debug of byte_received_out  : signal is true;
+    attribute mark_debug of uart_rx_error  : signal is true;
 end jh_uart_rx;
 
 architecture rtl of jh_uart_rx is
@@ -58,10 +63,6 @@ architecture rtl of jh_uart_rx is
     signal bit_count      : integer;
     signal rec_byte_shift : std_logic_vector(7 downto 0);
 
-    attribute mark_debug : boolean;
-    attribute mark_debug of uart_rx_valid_out : signal is true;
-    attribute mark_debug of byte_received_out  : signal is true;
-    attribute mark_debug of uart_rx_error  : signal is true;
     attribute mark_debug of state  : signal is true;
 begin
     divisor_int <= unsigned(divisor_in);
