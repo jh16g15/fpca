@@ -24,6 +24,7 @@ LD=riscv32-unknown-elf-ld
 OBJDUMP=riscv32-unknown-elf-objdump
 ELF2HEX=riscv32-unknown-elf-elf2hex
 NM=riscv32-unknown-elf-nm
+ASCII_HEX_SWAP_ENDIAN=python3 endian_swap.py
 ASCII_HEX_TO_BIN=xxd -r -p
 
 COPT = -O0
@@ -60,7 +61,8 @@ boot : hex/boot.hex
 hex/boot.hex : build/minimal_boot.o
 	@echo "Building boot.hex"
 	$(ELF2HEX) --bit-width 32 --input $< --output $@
-	$(ASCII_HEX_TO_BIN) $@ hex/boot.bin
+	$(ASCII_HEX_SWAP_ENDIAN) hex/boot.hex build/boot.hexr
+	$(ASCII_HEX_TO_BIN) build/boot.hexr hex/boot.bin
 
 build/minimal_boot.asm : build/minimal_boot.o
 
@@ -83,7 +85,8 @@ build/minimal_boot.o : src/boot/minimal_boot.c src/boot/crt0-boot.s
 hex/main.hex : build/main.elf
 	@echo "Building main.hex"
 	$(ELF2HEX) --bit-width 32 --input $< --output $@
-	$(ASCII_HEX_TO_BIN) $@ hex/main.bin
+	$(ASCII_HEX_SWAP_ENDIAN) hex/main.hex build/main.hexr
+	$(ASCII_HEX_TO_BIN) build/main.hexr hex/main.bin
 
 
 build/main.asm : build/main.elf
