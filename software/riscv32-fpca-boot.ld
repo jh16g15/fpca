@@ -13,7 +13,7 @@ MEMORY
 
           We may need a section that is Allocatable if we want to use the heap.
    */
-  RAM (rwx) : ORIGIN = 0xf0000000, LENGTH = 256
+  RAM (rwx) : ORIGIN = 0xf0000000, LENGTH = 512
 }
 ENTRY(_start)
 /* locations of std libraries*/
@@ -28,8 +28,8 @@ SECTIONS
           As the bootloader doesn't need the stack, it doesn't matter
           too much where this goes
   */
-  PROVIDE(__stack_top = 0x00002000);
-  /* PROVIDE(__stack_top = ORIGIN(RAM) + LENGTH(RAM)); */
+  /* PROVIDE(__stack_top = 0x00002000); */
+  PROVIDE(__stack_top = ORIGIN(RAM) + LENGTH(RAM));
   /* end Joe */
   .interp         : { *(.interp) }
   .note.gnu.build-id  : { *(.note.gnu.build-id) }

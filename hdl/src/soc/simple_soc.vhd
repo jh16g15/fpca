@@ -171,7 +171,7 @@ begin
     --! xF000_0000 to xFFFF_FFFF
     bootloader_inst : entity work.wb_sp_bram
     generic map(
-        G_MEM_DEPTH_WORDS => 64,
+        G_MEM_DEPTH_WORDS => 128,
         G_INIT_FILE       => G_BOOT_INIT_FILE
     )
     port map(
