@@ -61,6 +61,7 @@ void main(void)
         mem++;          // increase memory address by 1 byte
         gotc = uart_get_char(); // get next byte
     };
+    uart_put_char(EOT);
     while(1){}; // do nothing and wait for reset
 
     //volatile asm("JALR 0(x0)"); // jump to __start
