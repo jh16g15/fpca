@@ -78,6 +78,16 @@ with serial.Serial(COM_ID, timeout = 5) as uart:
     # Write End TeXt
     print("Sending ETX...")
     uart.write(ETX)
+
+    print("Waiting for EOT confirmation...")
+    if (COM_ID != TEST_COM):
+        num_bytes_rcvd = uart.read_until(EOT)   # we probably want a timeout here, as it locks up the whole terminal!
+        print(f"Received {num_bytes_rcvd} bytes")
+        if (len(num_bytes_rcvd) == 0):
+            print ("no response from FPCA!")
+            sys.exit()
+        print("Received EOT!")
+
     print("Bootloader Ended, program Uploaded!")
     print("set SW15 to 0 and reset to start updated program")
 
