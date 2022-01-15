@@ -14,16 +14,9 @@ infile = sys.argv[1]
 outfile = sys.argv[2]
 
 
+# 32-bit endianness swap
 def swap_bytes(in_str):
-    # if len(in_str) != 8:
-    #     raise ValueError(f"Incorrect input string length, expected 8, got {len(in_str)}")
-    # outstr[0:2] = in_str[6:8]
-    # outstr[2:4] = in_str[4:6]
-    # outstr[4:6] = in_str[2:4]
-    # outstr[6:8] = in_str[0:2]
-    # return outstr
     return in_str[6:8] + in_str[4:6] + in_str[2:4] + in_str[0:2]
-
 
 
 test="10002117"
