@@ -6,7 +6,8 @@
 import sys
 import serial
 import array
-import binascii
+import time
+
 
 # ASCII hex file of the new program
 main_hex = "./hex/main.hex"
@@ -30,15 +31,25 @@ EOT = b'\x04'
 
 def send_bin_file(bin_file, uart):
     print(f"Opening {bin_file} binary...")
+    log_file = "log.txt"
     with open(bin_file, "rb") as f:
-        #get the length of the bin file
-        contents = bytearray(f.read())
-        lenfile = len(contents)
-        print(f"read {lenfile} bytes from {bin_file}...")
-        f.seek(0)   # return to the start of the file
-        for i in range(lenfile):
-            uart.write(f.read(1))
-        print(f"sent {lenfile} bytes!")
+        with open(log_file, "w") as log:
+            #get the length of the bin file
+            contents = bytearray(f.read())
+            lenfile = len(contents)
+            print(f"read {lenfile} bytes from {bin_file}...")
+            ten_percent = int(lenfile/10)
+            count = 0
+            f.seek(0)   # return to the start of the file
+            print("Sending: ")
+            for i in range(lenfile):
+                uart.write(f.read(1))
+                count = count + 1
+                if (count >= ten_percent):
+                    print(".", end="", flush=True)
+                    count = 0
+                time.sleep(0.05)
+            print(f"sent {lenfile} bytes!")
 
 
 
@@ -55,7 +66,11 @@ with serial.Serial(COM_ID, timeout = 5) as uart:
         if (len(num_bytes_rcvd) == 0):
             print ("no response from FPCA!")
             sys.exit()
-        print("Received XON!")
+        elif XON in num_bytes_rcvd:
+            print("Received XON!")
+        else:
+            print("Did not receive XON!")
+            sys.exit()
 
 
     print(f"Sending Start Address...")
