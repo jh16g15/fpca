@@ -13,7 +13,7 @@ MEMORY
 
           We may need a section that is Allocatable if we want to use the heap.
    */
-  RAM (rwx) : ORIGIN = 0xf0000000, LENGTH = 512
+  RAM (rwx) : ORIGIN = 0xf0000000, LENGTH = 1024
 }
 ENTRY(_start)
 /* locations of std libraries*/
