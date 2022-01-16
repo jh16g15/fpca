@@ -60,7 +60,7 @@ begin
 
                 gpio_sw_in(15) <= '1';  -- start the bootloader
 
-                wait for 50000 * clk_period;
+                wait for 250000 * clk_period;
 
                 test_runner_cleanup(runner);
             end if;
