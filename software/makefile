@@ -76,7 +76,7 @@ build/minimal_boot.asm : build/minimal_boot.o
 	@echo ""
 
 build/minimal_boot.o : src/boot/minimal_boot.c src/boot/crt0-boot.s
-	$(CC) -g -Os -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections \
+	$(CC) -g -O0 -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections \
 	-nostartfiles -nostdlib -nodefaultlibs -Wl,-T,riscv32-fpca-boot.ld $^ -o $@
 
 
