@@ -16,6 +16,14 @@
 #define UART_RX_BYTE (*((volatile unsigned long *)0x2000000C))
 #define UART_RX_VALID (*((volatile unsigned long *)0x20000010))
 
+#define GPIO_LED (*((volatile unsigned long *)0x10000000))
+#define SSEG (*((volatile unsigned long *)0x10000004))
+#define RW2 (*((volatile unsigned long *)0x10000008))
+#define RW3 (*((volatile unsigned long *)0x1000000C))
+
+#define MAIN_RAM_LEN 8192   // bytes
+
+
 // prints a char to the UART
 void uart_put_char(char c)
 {
@@ -26,7 +34,7 @@ void uart_put_char(char c)
     UART_TX_BYTE = c;
 }
 
-char uart_get_char(void){
+unsigned char uart_get_char(void){
     while(UART_RX_VALID == 0){}
     return UART_RX_BYTE;
 }
@@ -36,6 +44,18 @@ void main(void)
     // set Baud rate to 9600
     UART_DIVISOR = REFCLK / 9600;   // compile - time
 
+    GPIO_LED = 0x2;
+
+    // wipe the old memory contents (32bits at a time)
+    volatile unsigned int *wipe_ptr = 0;
+    for (int i; i < MAIN_RAM_LEN/4; i++)
+    // for (int i=0; i < 100; i++)
+    {
+        *wipe_ptr = 0x00000013;  // fill with NO-OPs
+        wipe_ptr++;  // adr+4
+    }
+    GPIO_LED = 0x1;
+    // tell PC that we are ready
     uart_put_char(XON);
     char gotc;
     do {
@@ -62,7 +82,10 @@ void main(void)
         gotc = uart_get_char(); // get next byte
     };
     uart_put_char(EOT);
-    while(1){}; // do nothing and wait for reset
+    GPIO_LED = 0x0;
+    while (1)
+    {
+    }; // do nothing and wait for reset
 
     //volatile asm("JALR 0(x0)"); // jump to __start
 }
