@@ -166,6 +166,14 @@ begin
             sseg_an         => sseg_an_out
         );
 
+    gen_unmapped : for i in 3 to 14 generate
+        wb_unmapped_slv_inst : entity work.wb_unmapped_slv
+        port map (
+          wb_mosi_in => wb_slave_mosi_arr(i),
+          wb_miso_out => wb_slave_miso_arr(i)
+        );
+    end generate;
+
 
     --! Bootloader memory
     --! xF000_0000 to xFFFF_FFFF
