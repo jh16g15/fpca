@@ -1,0 +1,270 @@
+[*]
+[*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
+[*] Sun Jan 16 16:27:53 2022
+[*]
+[dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.tb_boot.test_alive_6fc9c48710299ccf3223094faed5b043218db072/ghdl/wave.ghw"
+[dumpfile_mtime] "Sun Jan 16 14:42:01 2022"
+[dumpfile_size] 61090732
+[savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_boot.gtkw"
+[timestart] 227400000
+[size] 2560 1377
+[pos] -113 -113
+*-26.000000 1570000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.tb_boot.
+[treeopen] top.tb_boot.simple_soc_inst.
+[treeopen] top.tb_boot.simple_soc_inst.cpu_top_inst.
+[treeopen] top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.
+[treeopen] top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.
+[treeopen] top.tb_boot.simple_soc_inst.wb_arbiter_inst.
+[treeopen] top.tb_boot.simple_soc_inst.wb_interconnect_inst.
+[treeopen] top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_master_miso_out.
+[treeopen] top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_master_mosi_in.
+[treeopen] top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_miso_arr_in.
+[treeopen] top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_miso_arr_in.[2].
+[treeopen] top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_mosi_arr_out.[0].
+[treeopen] top.tb_boot.simple_soc_inst.wb_sp_bram_inst.
+[treeopen] top.tb_boot.simple_soc_inst.wb_uart_simple_inst.
+[treeopen] top.tb_boot.simple_soc_inst.wb_uart_simple_inst.wb_mosi_in.
+[sst_width] 406
+[signals_width] 495
+[sst_expanded] 1
+[sst_vpaned_height] 896
+@200
+-GPIO
+@22
+#{top.tb_boot.simple_soc_inst.gpio_sw_in[31:0]} top.tb_boot.simple_soc_inst.gpio_sw_in[31] top.tb_boot.simple_soc_inst.gpio_sw_in[30] top.tb_boot.simple_soc_inst.gpio_sw_in[29] top.tb_boot.simple_soc_inst.gpio_sw_in[28] top.tb_boot.simple_soc_inst.gpio_sw_in[27] top.tb_boot.simple_soc_inst.gpio_sw_in[26] top.tb_boot.simple_soc_inst.gpio_sw_in[25] top.tb_boot.simple_soc_inst.gpio_sw_in[24] top.tb_boot.simple_soc_inst.gpio_sw_in[23] top.tb_boot.simple_soc_inst.gpio_sw_in[22] top.tb_boot.simple_soc_inst.gpio_sw_in[21] top.tb_boot.simple_soc_inst.gpio_sw_in[20] top.tb_boot.simple_soc_inst.gpio_sw_in[19] top.tb_boot.simple_soc_inst.gpio_sw_in[18] top.tb_boot.simple_soc_inst.gpio_sw_in[17] top.tb_boot.simple_soc_inst.gpio_sw_in[16] top.tb_boot.simple_soc_inst.gpio_sw_in[15] top.tb_boot.simple_soc_inst.gpio_sw_in[14] top.tb_boot.simple_soc_inst.gpio_sw_in[13] top.tb_boot.simple_soc_inst.gpio_sw_in[12] top.tb_boot.simple_soc_inst.gpio_sw_in[11] top.tb_boot.simple_soc_inst.gpio_sw_in[10] top.tb_boot.simple_soc_inst.gpio_sw_in[9] top.tb_boot.simple_soc_inst.gpio_sw_in[8] top.tb_boot.simple_soc_inst.gpio_sw_in[7] top.tb_boot.simple_soc_inst.gpio_sw_in[6] top.tb_boot.simple_soc_inst.gpio_sw_in[5] top.tb_boot.simple_soc_inst.gpio_sw_in[4] top.tb_boot.simple_soc_inst.gpio_sw_in[3] top.tb_boot.simple_soc_inst.gpio_sw_in[2] top.tb_boot.simple_soc_inst.gpio_sw_in[1] top.tb_boot.simple_soc_inst.gpio_sw_in[0]
+#{top.tb_boot.simple_soc_inst.gpio_btn_in[31:0]} top.tb_boot.simple_soc_inst.gpio_btn_in[31] top.tb_boot.simple_soc_inst.gpio_btn_in[30] top.tb_boot.simple_soc_inst.gpio_btn_in[29] top.tb_boot.simple_soc_inst.gpio_btn_in[28] top.tb_boot.simple_soc_inst.gpio_btn_in[27] top.tb_boot.simple_soc_inst.gpio_btn_in[26] top.tb_boot.simple_soc_inst.gpio_btn_in[25] top.tb_boot.simple_soc_inst.gpio_btn_in[24] top.tb_boot.simple_soc_inst.gpio_btn_in[23] top.tb_boot.simple_soc_inst.gpio_btn_in[22] top.tb_boot.simple_soc_inst.gpio_btn_in[21] top.tb_boot.simple_soc_inst.gpio_btn_in[20] top.tb_boot.simple_soc_inst.gpio_btn_in[19] top.tb_boot.simple_soc_inst.gpio_btn_in[18] top.tb_boot.simple_soc_inst.gpio_btn_in[17] top.tb_boot.simple_soc_inst.gpio_btn_in[16] top.tb_boot.simple_soc_inst.gpio_btn_in[15] top.tb_boot.simple_soc_inst.gpio_btn_in[14] top.tb_boot.simple_soc_inst.gpio_btn_in[13] top.tb_boot.simple_soc_inst.gpio_btn_in[12] top.tb_boot.simple_soc_inst.gpio_btn_in[11] top.tb_boot.simple_soc_inst.gpio_btn_in[10] top.tb_boot.simple_soc_inst.gpio_btn_in[9] top.tb_boot.simple_soc_inst.gpio_btn_in[8] top.tb_boot.simple_soc_inst.gpio_btn_in[7] top.tb_boot.simple_soc_inst.gpio_btn_in[6] top.tb_boot.simple_soc_inst.gpio_btn_in[5] top.tb_boot.simple_soc_inst.gpio_btn_in[4] top.tb_boot.simple_soc_inst.gpio_btn_in[3] top.tb_boot.simple_soc_inst.gpio_btn_in[2] top.tb_boot.simple_soc_inst.gpio_btn_in[1] top.tb_boot.simple_soc_inst.gpio_btn_in[0]
+#{top.tb_boot.simple_soc_inst.gpio_led_out[31:0]} top.tb_boot.simple_soc_inst.gpio_led_out[31] top.tb_boot.simple_soc_inst.gpio_led_out[30] top.tb_boot.simple_soc_inst.gpio_led_out[29] top.tb_boot.simple_soc_inst.gpio_led_out[28] top.tb_boot.simple_soc_inst.gpio_led_out[27] top.tb_boot.simple_soc_inst.gpio_led_out[26] top.tb_boot.simple_soc_inst.gpio_led_out[25] top.tb_boot.simple_soc_inst.gpio_led_out[24] top.tb_boot.simple_soc_inst.gpio_led_out[23] top.tb_boot.simple_soc_inst.gpio_led_out[22] top.tb_boot.simple_soc_inst.gpio_led_out[21] top.tb_boot.simple_soc_inst.gpio_led_out[20] top.tb_boot.simple_soc_inst.gpio_led_out[19] top.tb_boot.simple_soc_inst.gpio_led_out[18] top.tb_boot.simple_soc_inst.gpio_led_out[17] top.tb_boot.simple_soc_inst.gpio_led_out[16] top.tb_boot.simple_soc_inst.gpio_led_out[15] top.tb_boot.simple_soc_inst.gpio_led_out[14] top.tb_boot.simple_soc_inst.gpio_led_out[13] top.tb_boot.simple_soc_inst.gpio_led_out[12] top.tb_boot.simple_soc_inst.gpio_led_out[11] top.tb_boot.simple_soc_inst.gpio_led_out[10] top.tb_boot.simple_soc_inst.gpio_led_out[9] top.tb_boot.simple_soc_inst.gpio_led_out[8] top.tb_boot.simple_soc_inst.gpio_led_out[7] top.tb_boot.simple_soc_inst.gpio_led_out[6] top.tb_boot.simple_soc_inst.gpio_led_out[5] top.tb_boot.simple_soc_inst.gpio_led_out[4] top.tb_boot.simple_soc_inst.gpio_led_out[3] top.tb_boot.simple_soc_inst.gpio_led_out[2] top.tb_boot.simple_soc_inst.gpio_led_out[1] top.tb_boot.simple_soc_inst.gpio_led_out[0]
+#{top.tb_boot.simple_soc_inst.sseg_display_data[15:0]} top.tb_boot.simple_soc_inst.sseg_display_data[15] top.tb_boot.simple_soc_inst.sseg_display_data[14] top.tb_boot.simple_soc_inst.sseg_display_data[13] top.tb_boot.simple_soc_inst.sseg_display_data[12] top.tb_boot.simple_soc_inst.sseg_display_data[11] top.tb_boot.simple_soc_inst.sseg_display_data[10] top.tb_boot.simple_soc_inst.sseg_display_data[9] top.tb_boot.simple_soc_inst.sseg_display_data[8] top.tb_boot.simple_soc_inst.sseg_display_data[7] top.tb_boot.simple_soc_inst.sseg_display_data[6] top.tb_boot.simple_soc_inst.sseg_display_data[5] top.tb_boot.simple_soc_inst.sseg_display_data[4] top.tb_boot.simple_soc_inst.sseg_display_data[3] top.tb_boot.simple_soc_inst.sseg_display_data[2] top.tb_boot.simple_soc_inst.sseg_display_data[1] top.tb_boot.simple_soc_inst.sseg_display_data[0]
+@200
+-UART
+@420
+top.tb_boot.simple_soc_inst.wb_uart_simple_inst.jh_uart_tx_inst.state
+@28
+top.tb_boot.uart_tx
+top.tb_boot.simple_soc_inst.wb_uart_simple_inst.jh_uart_tx_inst.uart_tx_valid_in
+top.tb_boot.simple_soc_inst.wb_uart_simple_inst.jh_uart_tx_inst.uart_tx_ready_out
+@200
+-
+@28
+top.tb_boot.simple_soc_inst.wb_uart_simple_inst.wb_mosi_in.stb
+top.tb_boot.simple_soc_inst.wb_uart_simple_inst.wb_miso_out.ack
+@200
+-Clock and Reset
+@28
+top.tb_boot.clk
+top.tb_boot.reset
+@200
+-CPU Core
+@28
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.addr_align_err_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.mem_err
+top.tb_boot.simple_soc_inst.cpu_top_inst.alu_func3_err
+top.tb_boot.simple_soc_inst.cpu_top_inst.opcode_err
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.cpu_err_out
+@420
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.state
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_alu_inst.dbg_op_type
+@200
+-CPU Control
+@28
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.fetch_req_out
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.fetch_busy_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.instr_valid_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.extern_halt_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.uses_mem_access_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.uses_writeback_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.mem_req_out
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.mem_busy_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_control_inst.mem_done_in
+@200
+-CPU Instruction Fetch
+@28
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.fetch_req_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.instr_valid_out
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.branch_en_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.if_wb_mosi_out.cyc
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.if_wb_mosi_out.stb
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.if_wb_miso_in.stall
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.if_wb_miso_in.ack
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_instr_fetch_inst.if_wb_miso_in.err
+@200
+-CPU Decoder
+@420
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_decode_inst.encoding
+@200
+-CPU Registers
+@28
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_regs_inst.write_port_en_in
+@200
+-zero
+-ra
+-sp
+-gp
+-tp
+-t0-2
+-s0/fp
+-s1
+-a0-1
+-a2-7
+-s2-11
+-t3-6
+-CPU ALU
+@28
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_alu_inst.alu_en_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_alu_inst.alu_func3_err_out
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_alu_inst.branch_en
+@420
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_alu_inst.dbg_op_type
+@200
+-CPU Dataflow
+@28
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.write_load_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.write_alu_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.write_ret_addr_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.branch_en_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.branch_en_out
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.addr_align_err_out
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.mem_req_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.mem_done_out
+@420
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.size
+@200
+-Mem access address (raw)
+-MEM WB master
+@28
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.cmd_req_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.cmd_stall
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.cmd_we_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.cmd_unsigned_flag_in
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.cmd_unsigned_saved
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.rsp_err_out
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.rsp_valid_out
+@420
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.state
+@28
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.wb_clk
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.wb_cyc
+@200
+-Actual WB bus
+@28
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.wb_mosi_out.cyc
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.wb_mosi_out.stb
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.wb_miso_in.stall
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.wb_mosi_out.we
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.wb_miso_in.ack
+top.tb_boot.simple_soc_inst.cpu_top_inst.cpu_dataflow_inst.wb_master_inst.wb_miso_in.err
+@200
+-WB Arbiter
+@420
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.state
+@200
+-WB arbiter 1 IN (data)
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[31:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[31] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[30] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[29] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[28] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[27] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[26] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[25] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[24] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[23] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[22] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[21] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[20] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[19] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[18] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[17] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[16] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[15] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[14] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[13] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[12] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[11] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[10] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[9] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[8] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[7] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[6] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[5] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[4] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rdat[0]
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[31:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[31] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[30] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[29] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[28] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[27] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[26] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[25] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[24] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[23] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[22] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[21] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[20] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[19] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[18] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[17] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[16] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[15] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[14] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[13] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[12] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[11] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[10] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[9] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[8] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[7] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[6] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[5] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[4] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.adr[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.cyc
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.lock
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.sel[3:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.sel[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.sel[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.sel[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.sel[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.stb
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[31:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[31] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[30] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[29] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[28] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[27] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[26] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[25] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[24] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[23] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[22] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[21] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[20] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[19] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[18] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[17] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[16] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[15] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[14] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[13] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[12] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[11] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[10] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[9] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[8] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[7] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[6] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[5] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[4] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.wdat[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.ack
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.err
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_mosi_in.we
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.rty
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_1_miso_out.stall
+@200
+-WB arbiter 0 IN (instr)
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[31:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[31] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[30] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[29] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[28] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[27] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[26] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[25] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[24] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[23] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[22] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[21] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[20] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[19] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[18] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[17] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[16] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[15] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[14] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[13] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[12] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[11] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[10] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[9] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[8] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[7] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[6] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[5] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[4] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.adr[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.cyc
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.lock
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.sel[3:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.sel[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.sel[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.sel[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.sel[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.stb
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[31:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[31] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[30] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[29] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[28] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[27] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[26] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[25] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[24] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[23] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[22] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[21] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[20] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[19] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[18] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[17] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[16] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[15] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[14] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[13] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[12] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[11] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[10] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[9] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[8] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[7] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[6] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[5] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[4] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.wdat[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_mosi_in.we
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.ack
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.err
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[31:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[31] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[30] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[29] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[28] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[27] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[26] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[25] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[24] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[23] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[22] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[21] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[20] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[19] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[18] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[17] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[16] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[15] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[14] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[13] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[12] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[11] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[10] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[9] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[8] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[7] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[6] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[5] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[4] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rdat[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.rty
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_0_miso_out.stall
+@200
+-Wb arbiter To Interconnect
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[31:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[31] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[30] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[29] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[28] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[27] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[26] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[25] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[24] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[23] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[22] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[21] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[20] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[19] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[18] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[17] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[16] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[15] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[14] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[13] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[12] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[11] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[10] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[9] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[8] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[7] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[6] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[5] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[4] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.adr[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.cyc
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.lock
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.sel[3:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.sel[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.sel[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.sel[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.sel[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.stb
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[31:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[31] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[30] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[29] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[28] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[27] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[26] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[25] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[24] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[23] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[22] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[21] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[20] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[19] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[18] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[17] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[16] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[15] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[14] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[13] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[12] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[11] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[10] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[9] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[8] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[7] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[6] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[5] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[4] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.wdat[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_mosi_out.we
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.ack
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.err
+@22
+#{top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[31:0]} top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[31] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[30] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[29] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[28] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[27] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[26] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[25] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[24] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[23] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[22] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[21] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[20] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[19] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[18] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[17] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[16] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[15] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[14] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[13] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[12] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[11] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[10] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[9] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[8] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[7] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[6] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[5] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[4] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[3] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[2] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[1] top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rdat[0]
+@28
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.rty
+top.tb_boot.simple_soc_inst.wb_arbiter_inst.wb_master_sel_miso_in.stall
+@200
+-WB Interconnect
+@28
++{wb_slave_mosi_arr_out[0].stb} top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_mosi_arr_out[0].stb
+@29
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_master_miso_out.err
+@28
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_mosi_arr_out[1].stb
+@200
+-WB Slave 2 (UART)
+@28
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_mosi_arr_out[2].cyc
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_mosi_arr_out[2].lock
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_mosi_arr_out[2].stb
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_mosi_arr_out[2].we
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_miso_arr_in[2].ack
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_miso_arr_in[2].err
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_miso_arr_in[2].rty
+top.tb_boot.simple_soc_inst.wb_interconnect_inst.wb_slave_miso_arr_in[2].stall
+@200
+-SoC Memory
+@28
+top.tb_boot.simple_soc_inst.wb_sp_bram_inst.wb_miso_out.ack
+top.tb_boot.simple_soc_inst.wb_sp_bram_inst.wb_miso_out.err
+top.tb_boot.simple_soc_inst.wb_sp_bram_inst.wb_miso_out.rty
+top.tb_boot.simple_soc_inst.wb_sp_bram_inst.wb_miso_out.stall
+top.tb_boot.simple_soc_inst.wb_sp_bram_inst.wb_mosi_in.cyc
+top.tb_boot.simple_soc_inst.wb_sp_bram_inst.wb_mosi_in.lock
+top.tb_boot.simple_soc_inst.wb_sp_bram_inst.wb_mosi_in.stb
+top.tb_boot.simple_soc_inst.wb_sp_bram_inst.wb_mosi_in.we
+@200
+-Mem contents
+-Mem Stack
+-SoC Registers
+@28
+top.tb_boot.simple_soc_inst.wb_gpio_regs_inst.wb_clk
+top.tb_boot.simple_soc_inst.wb_gpio_regs_inst.wb_miso_out.ack
+top.tb_boot.simple_soc_inst.wb_gpio_regs_inst.wb_miso_out.err
+top.tb_boot.simple_soc_inst.wb_gpio_regs_inst.wb_miso_out.rty
+top.tb_boot.simple_soc_inst.wb_gpio_regs_inst.wb_miso_out.stall
+top.tb_boot.simple_soc_inst.wb_gpio_regs_inst.wb_mosi_in.stb
+top.tb_boot.simple_soc_inst.wb_gpio_regs_inst.wb_mosi_in.we
+top.tb_boot.simple_soc_inst.wb_gpio_regs_inst.wb_reset
+[pattern_trace] 1
+[pattern_trace] 0
