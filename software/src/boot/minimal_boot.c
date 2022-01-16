@@ -51,7 +51,7 @@ void main(void)
     for (int i; i < MAIN_RAM_LEN/4; i++)
     // for (int i=0; i < 100; i++)
     {
-        *wipe_ptr = 0x00000013;  // fill with NO-OPs
+        *wipe_ptr = 0x0000000;  // fill with NO-OPs
         wipe_ptr++;  // adr+4
     }
     GPIO_LED = 0x1;
@@ -75,17 +75,12 @@ void main(void)
     } while (gotc != STX);
 
     // store the subsequent bytes into memory one at a time, incrementing each time
+    // Keep doing this until we are reset (with SW15=0 to skip the bootloader)
     gotc = uart_get_char(); // get the first byte
-    while (gotc != ETX) { // check for End Of Text
+    while (1) {
         *mem = gotc;    // store it to memory
         mem++;          // increase memory address by 1 byte
         gotc = uart_get_char(); // get next byte
     };
-    uart_put_char(EOT);
-    GPIO_LED = 0x0;
-    while (1)
-    {
-    }; // do nothing and wait for reset
 
-    //volatile asm("JALR 0(x0)"); // jump to __start
 }

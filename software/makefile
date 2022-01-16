@@ -14,7 +14,6 @@ build/main.o \
 build/crt0.o \
 build/uart.o \
 build/utils.o \
-build/bootloader.o \
 
 boot_objects = \
 build/minimal_boot.o
