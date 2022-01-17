@@ -30,7 +30,11 @@ entity simple_soc is
 
         -- UART
         uart_tx_out : out std_logic;
-        uart_rx_in  : in std_logic
+        uart_rx_in  : in std_logic;
+
+        -- I2C (write only)
+        i2c_scl_out : out std_logic;
+        i2c_sda_out : out std_logic
 
     );
 end entity simple_soc;
@@ -141,6 +145,9 @@ begin
     ro_regs_in(0)     <= gpio_btn_in;
     ro_regs_in(1)     <= gpio_sw_in;
     sseg_display_data <= rw_regs_out(1)(15 downto 0);
+
+    i2c_scl_out <= rw_regs_out(2)(0);
+    i2c_sda_out <= rw_regs_out(3)(0);
 
     wb_uart_simple_inst : entity work.wb_uart_simple
         generic map(

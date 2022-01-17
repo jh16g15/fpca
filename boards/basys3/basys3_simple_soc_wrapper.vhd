@@ -24,7 +24,10 @@ entity basys3_simple_soc_wrapper is
         RsTx : out std_logic;
         RsRx : in std_logic;
         -- mirrored UART_TX for a logic analyser
-        JB : out std_logic_vector(0 downto 0)
+        JB : out std_logic_vector(0 downto 0);
+        
+        -- I2C SCL (0) / SDA (1)
+        JC : out std_logic_vector(1 downto 0)
 
     );
 end entity basys3_simple_soc_wrapper;
@@ -51,6 +54,9 @@ architecture rtl of basys3_simple_soc_wrapper is
 
     signal uart_tx : std_logic;
     signal uart_rx : std_logic;
+    
+    signal i2c_scl : std_logic;
+    signal i2c_sda : std_logic;
 
     component clk_wiz_0 is
         port (
@@ -128,7 +134,9 @@ begin
             sseg_ca_out  => sseg_ca,
             sseg_an_out  => sseg_an,
             uart_tx_out  => uart_tx,
-            uart_rx_in   => uart_rx
+            uart_rx_in   => uart_rx,
+            i2c_scl_out => i2c_scl,
+            i2c_sda_out => i2c_sda
 
         );
         -- UART TX OUT
@@ -136,5 +144,9 @@ begin
         JB(0) <= uart_tx;
         -- UART RX IN
         uart_rx <= RsRx;
+        
+        -- I2C
+        JC(0) <= i2c_scl;
+        JC(1) <= i2c_sda;
 
 end architecture;
