@@ -44,8 +44,8 @@ begin
     test_runner_setup(runner, runner_cfg);
     show(get_logger(default_checker), display_handler, pass);
     while test_suite loop
-      if run("test_alive") then
-        info("Hello world test_alive");
+      if run("start_low") then
+        info("start_low Started");
         val_in <= '0';
         wait for 0.5 ms;
         check_equal(val_out, '0', "check still 0");
@@ -62,7 +62,24 @@ begin
         wait for 2 ms;
         check_equal(val_out, '0', "check that now we've gone to '0'");
         test_runner_cleanup(runner);
-
+      elsif run("start_high") then
+          info("start_high Started");
+          val_in <= '1';
+          wait for 0.5 ms;
+          check_equal(val_out, '0', "check still 0");
+          val_in <= '1';
+          wait for 1.1 ms;
+          check_equal(val_out, '1', "check now 1 as stable for more than debounce period");
+          val_in <= '0';
+          wait for 0.1 ms;
+          check_equal(val_out, '1', "check that the short pulse of '0' has been rejected");
+          val_in <= '1';
+          wait for 0.1 ms;
+          check_equal(val_out, '1', "check still '1'");
+          val_in <= '0';
+          wait for 2 ms;
+          check_equal(val_out, '0', "check that now we've gone to '0'");
+          test_runner_cleanup(runner);
       end if;
     end loop;
   end process main;
