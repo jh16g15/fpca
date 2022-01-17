@@ -6,6 +6,11 @@ int get_bit(int reg, int bitnum)
     return (reg >> bitnum) & 0x1;
 }
 
+char get_bit_char(char reg, int bitnum)
+{
+    return (reg >> bitnum) & 0x1;
+}
+
 
 #ifdef SIM
 void delay_ms(int dly)

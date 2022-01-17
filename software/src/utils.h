@@ -9,5 +9,6 @@
 
 void delay_ms(int dly_ms);
 int get_bit(int reg, int bitnum);
+char get_bit_char(char reg, int bitnum);
 
 #endif // _DELAY_H_

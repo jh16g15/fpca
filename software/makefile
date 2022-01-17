@@ -14,6 +14,7 @@ build/main.o \
 build/crt0.o \
 build/uart.o \
 build/utils.o \
+build/ssd1306_i2c.o \
 
 boot_objects = \
 build/minimal_boot.o
