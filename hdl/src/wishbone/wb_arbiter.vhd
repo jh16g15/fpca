@@ -4,11 +4,15 @@ use ieee.numeric_std.all;
 
 use work.wb_pkg.all;
 use work.joe_common_pkg.all;
---! Simple 2:1 Wishbone Arbiter controlling access to a shared Wishbone bus 
+--! Simple 2:1 Wishbone Arbiter controlling access to a shared Wishbone bus
 --!
+--! "simple"    : Arbiter stays at the last accessed master
+--! "priority"  : Arbiter always moves back to wb_master_0 after each access to
+--!               prevent an extra cycle of latency when accessing one master more
+--!               frequently than the other
 entity wb_arbiter is
     generic (
-        G_ARBITER : string := "simple" -- "simple" only
+        G_ARBITER : string := "simple" -- "simple" or "priority" only
     );
     port (
         wb_clk   : in std_logic;
@@ -46,37 +50,42 @@ begin
 
     wb_master_0_miso_out <= wb_master_sel_miso_in when state = SEL0 else C_WB_MISO_INIT; -- INIT has stall = '1'
     wb_master_1_miso_out <= wb_master_sel_miso_in when state = SEL1 else C_WB_MISO_INIT; -- INIT has stall = '1'
-
-    gen_priority : if G_ARBITER = "simple" generate
-        process (wb_clk)
-        begin
-            if rising_edge(wb_clk) then
-                if wb_reset = '1' then
-                    -- default back to IDLE
-                    state <= IDLE;
-                else
-                    case state is
-                        when IDLE =>
-                            if wb_master_0_mosi_in.cyc = '1' then
-                                state <= SEL0;
-                            elsif wb_master_1_mosi_in.cyc = '1' then
-                                state <= SEL1;
-                            end if;
-                        when SEL0 =>
-                            -- if we have stopped using the bus, and the other master is requesting access
-                            if wb_master_0_mosi_in.cyc = '0' and wb_master_1_mosi_in.cyc = '1' then
-                                state <= SEL1;
-                            end if;
-                        when SEL1 =>
+    process (wb_clk)
+    begin
+        if rising_edge(wb_clk) then
+            if wb_reset = '1' then
+                -- default back to IDLE
+                state <= IDLE;
+            else
+                case state is
+                    when IDLE =>
+                        if wb_master_0_mosi_in.cyc = '1' then
+                            state <= SEL0;
+                        elsif wb_master_1_mosi_in.cyc = '1' then
+                            state <= SEL1;
+                        end if;
+                    when SEL0 =>
+                        -- if we have stopped using the bus, and the other master is requesting access
+                        if wb_master_0_mosi_in.cyc = '0' and wb_master_1_mosi_in.cyc = '1' then
+                            state <= SEL1;
+                        end if;
+                    when SEL1 =>
+                        if G_ARBITER = "simple" then
                             -- if we have stopped using the bus, and the other master is requesting access
                             if wb_master_0_mosi_in.cyc = '1' and wb_master_1_mosi_in.cyc = '0' then
                                 state <= SEL0;
                             end if;
-                        when others =>
-                            null;
-                    end case;
-                end if;
+                        end if;
+                        if G_ARBITER = "priority" then
+                            -- if we have stopped using the bus, switch back to SEL0 automatically
+                            if wb_master_1_mosi_in.cyc = '0' then
+                                state <= SEL0;
+                            end if;
+                        end if;
+                    when others =>
+                        null;
+                end case;
             end if;
-        end process;
-    end generate;
+        end if;
+    end process;
 end architecture;

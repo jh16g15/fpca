@@ -85,6 +85,9 @@ begin
         );
     -- 2:1 arbiter
     wb_arbiter_inst : entity work.wb_arbiter
+        generic map (
+            G_ARBITER => "priority"
+        )
         port map(
             wb_clk                 => clk,
             wb_reset               => reset,
