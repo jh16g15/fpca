@@ -27,6 +27,11 @@
 #define SSD1306_CONTROL_DATA_CONTINUOUS 0x40    //  Continuous data follows
 
 
+#define SSD1306_ADDR_MODE_HORIZONTAL 0x0    // autoincrement to next page
+#define SSD1306_ADDR_MODE_VERTICAL 0x1
+#define SSD1306_ADDR_MODE_PAGE 0x2          // wrap around to start of same page
+
+
 /*  This should give us a delay suitable for use in 100KHz I2C
     100KHz I2C will use a period of 50,000ns
     We want to toggle our clock every 25,000ns
@@ -158,6 +163,9 @@ void ssd1306_display_init(void){
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0xaf);
     i2c_stop();
+
+    // set to Horizontal Address mode (wrap to next line/page)
+    ssd1306_set_address_mode(SSD1306_ADDR_MODE_HORIZONTAL);
 }
 
 void ssd1306_display_sleep(void){
@@ -167,3 +175,17 @@ void ssd1306_display_sleep(void){
     i2c_write_byte(0xae);
     i2c_stop();
 }
+
+
+void ssd1306_set_address_mode(char mode)
+{
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_COMMAND);
+    i2c_write_byte(0x20);   // set memory addressing mode
+    i2c_write_byte(mode);
+    i2c_stop();
+}
+
+
+// only for horizontal address mode
