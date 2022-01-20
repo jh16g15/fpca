@@ -44,10 +44,14 @@ void main(void)
             "jr t0;");
     }
 
-    Q_SSEG = 0xc0de;
+    Q_SSEG = 0xc001;
 
     // Enable the charge pump and turn the display on
     ssd1306_display_init();
+    ssd1306_clear_screen();
+
+    ssd1306_setup_address_ptrs(0, 0);
+    ssd1306_write_solid_char();
 
     int count = 0;
     while (1)

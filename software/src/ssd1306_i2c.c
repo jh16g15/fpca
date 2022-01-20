@@ -187,5 +187,78 @@ void ssd1306_set_address_mode(char mode)
     i2c_stop();
 }
 
+// x and y is the character "coordinate" in the text-mode screen buffer
+// the screen has 8 pages and 128 columns of pixels.
 
-// only for horizontal address mode
+// each text-mode char is 8x16, so 8 columns `wide` and 2 pages `tall`
+
+// this means that in text-mode, we have 4 lines of 16 character text,
+// so x is range(0, 15) and y is range(0, 3)
+
+// HORIZONTAL/VERTICAL ADDRESS MODE ONLY
+void ssd1306_setup_address_ptrs(char x, char y)
+{
+    // 0-15 => 0-127
+    char start_col = 8 * x;
+    char end_col = start_col + 7;
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_COMMAND);
+    i2c_write_byte(0x21);   // setup column start and end address
+    i2c_write_byte(start_col);
+    i2c_write_byte(end_col);
+    i2c_stop();
+    // 0-3 => 0-7
+    char start_page = 2 * y;
+    char end_page = start_page + 1;
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_COMMAND);
+    i2c_write_byte(0x22);   // setup page start and end address
+    i2c_write_byte(start_page);
+    i2c_write_byte(end_page);
+    i2c_stop();
+}
+
+
+void ssd1306_write_solid_char(void)
+{
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
+    // two `page` rows of 8 columns, so 16 bytes for a glyph
+    for (int i = 0; i < 16;i++)
+    {
+        i2c_write_byte(0xff);
+    }
+    i2c_stop();
+}
+
+void ssd1306_clear_screen(void)
+{
+    // 0 - 127
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_COMMAND);
+    i2c_write_byte(0x21);   // setup column start and end address
+    i2c_write_byte(0);
+    i2c_write_byte(127);
+    i2c_stop();
+    // 0 - 7
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_COMMAND);
+    i2c_write_byte(0x22);   // setup page start and end address
+    i2c_write_byte(0);
+    i2c_write_byte(7);
+    i2c_stop();
+
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
+    int total_bytes = 128 * 8;
+    for (int i = 0; i < total_bytes; i++){
+        i2c_write_byte(0x00);
+    }
+    i2c_stop();
+}
