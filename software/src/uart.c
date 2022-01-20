@@ -38,6 +38,7 @@ void uart_puts(char *s)
         uart_put_char(c); // print this char
         s++;     // increment pointer to move through array
     } while (c != '\0');
+    uart_put_char('\r');    // for PUTTY compat
     uart_put_char('\n');
 }
 

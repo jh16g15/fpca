@@ -46,72 +46,76 @@ void main(void)
 
     Q_SSEG = 0xc001;
 
+    ssd1306_display_sleep();
     // Enable the charge pump and turn the display on
     ssd1306_display_init();
     ssd1306_clear_screen();
 
-    ssd1306_setup_address_ptrs(0, 0);
+    char x = 0;
+    char y = 0;
+    ssd1306_set_cursor(x, y);
     ssd1306_write_solid_char();
+    // update cursor
+    x++;
+    ssd1306_set_cursor(x, y);
 
     int count = 0;
     while (1)
     {
-        // ssd1306_display_on();
-
-        count = count - 1;
+        count = count + 1;
 
         GPIO_LED = count;
         if (get_bit(GPIO_BTN, BTN_L))
         {
-            uart_puts("Turning Whole Display On!");
-            ssd1306_whole_display_on();
+            uart_puts("L pressed (solid)");
+
+            ssd1306_write_glyph(0);
+            // update cursor
+            x++;
+            ssd1306_set_cursor(x, y);
+            //ssd1306_advance_cursor(&x, &y);
+
+
+            while (get_bit(GPIO_BTN, BTN_L))
+            {
+            } // wait until button released
+            uart_puts("L released");
+
         }
         if (get_bit(GPIO_BTN, BTN_R))
         {
-            uart_puts("Reverting back to GDDRAM contents!");
-            ssd1306_resume_ram_content();
+            uart_puts("R pressed (empty)");
+            ssd1306_write_glyph(1);
+            // update cursor
+            x++;
+            ssd1306_set_cursor(x, y);
+            // ssd1306_advance_cursor(&x, &y);
+
+            while (get_bit(GPIO_BTN, BTN_R)){} // wait until button released
+            uart_puts("R released");
+        }
+        if (get_bit(GPIO_BTN, BTN_U))
+        {
+            uart_puts("U pressed (checkers)");
+            ssd1306_write_glyph(2);
+            // update cursor
+            x++;
+            ssd1306_set_cursor(x, y);
+            // ssd1306_advance_cursor(&x, &y);
+            while (get_bit(GPIO_BTN, BTN_U)){} // wait until button released
+            uart_puts("U released");
+        }
+        if (get_bit(GPIO_BTN, BTN_D))
+        {
+            uart_puts("D pressed (borders)");
+            ssd1306_write_glyph(3);
+            // update cursor
+            x++;
+            ssd1306_set_cursor(x, y);
+            // ssd1306_advance_cursor(&x, &y);
+            while (get_bit(GPIO_BTN, BTN_D)){} // wait until button released
+            uart_puts("D released");
         }
 
-        // uart_set_baud(9600);
-
-        // uart_puts("\r\n");
-        // uart_puts("The FPCA has booted!");
-
-        // while (1)
-        // {
-        //     // test the buttons are being filled correctly
-        //     GPIO_LED = GPIO_BTN;
-
-        //     // simple UART echo server
-        //     if (uart_rx_valid()){
-        //         uart_put_char(uart_get_char());
-        //     }
-
-        //     if (get_bit(GPIO_BTN, BTN_L))
-        //     {
-        //         uart_puts("Left Button Pressed");
-        //         uart_puts("Setting Baud Rate to 9600");
-        //         uart_set_baud(9600);
-        //     }
-        //     if (get_bit(GPIO_BTN, BTN_R))
-        //     {
-        //         uart_puts("Right Button Pressed");
-        //         uart_puts("Setting Baud Rate to 115200");
-        //         uart_set_baud(115200);
-        //     }
-        //     if (get_bit(GPIO_BTN, BTN_U))
-        //     {
-        //         uart_puts("Up Button Pressed");
-        //         uart_puts("Setting Baud Rate to 921600");
-        //         uart_set_baud(921600);
-        //     }
-        //     if (get_bit(GPIO_BTN, BTN_D))
-        //     {
-        //         uart_puts("Down Button Pressed");
-        //     }
-
-        //     count = count + 1;
-        //     Q_SSEG = count;
-        // }
     }
 }

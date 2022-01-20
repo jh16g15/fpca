@@ -2,27 +2,21 @@
 
 #include "ssd1306_i2c.h"
 #include "utils.h"
+#include "uart.h"
 
 
 // using bit-bang GPIO I2C at approx 100KHz (SSD1306 supports up to 400KHz)
 #define I2C_SCL (*((volatile unsigned long *)0x10000008))
 #define I2C_SDA (*((volatile unsigned long *)0x1000000C))
 
+#define CURSOR_MAX_X 16
+#define CURSOR_MAX_Y 4
+
 #define SSD1306_ADDR_W 0x78
 #define SSD1306_ADDR_R 0x79
 
-// #define SSD1306_ADDR_W 0x7a
-// #define SSD1306_ADDR_R 0x7b
-
-// Bit 7: Continuation (only valid for DATA control words)
-//  Co=0 for just data bytes following
-//  Co=1 for alternating control/data
-
-// Bit 6: D/C# (Data/Command byte)
-// D = 1 for next byte DATA (for GDDRAM)
-// D = 0 for next byte COMMAND
-// #define SSD1306_CONTROL_COMMAND 0x80            // one command byte (also try 0x00 from QMK oled_driver.c)
-#define SSD1306_CONTROL_COMMAND 0x00            // one command byte (also try 0x00 from QMK oled_driver.c)
+// #define SSD1306_CONTROL_COMMAND 0x80            // one command byte follows
+#define SSD1306_CONTROL_COMMAND 0x00            // Continuous command bytes follow
 #define SSD1306_CONTROL_DATA 0xC0               // one data byte follows
 #define SSD1306_CONTROL_DATA_CONTINUOUS 0x40    //  Continuous data follows
 
@@ -31,6 +25,23 @@
 #define SSD1306_ADDR_MODE_VERTICAL 0x1
 #define SSD1306_ADDR_MODE_PAGE 0x2          // wrap around to start of same page
 
+#define NUM_GLPYHS 4
+/* Each glyph consists of 2 strips of 8 bytes (each byte is 8 pixels tall)
+ * Total is 16 bytes
+ */
+char font_data[NUM_GLPYHS * 16] = {
+    // solid block
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    // empty block
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    //checkerboard
+    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
+    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
+    // borders
+    0xff, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xff,
+    0xff, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0xff};
 
 /*  This should give us a delay suitable for use in 100KHz I2C
     100KHz I2C will use a period of 50,000ns
@@ -196,21 +207,22 @@ void ssd1306_set_address_mode(char mode)
 // so x is range(0, 15) and y is range(0, 3)
 
 // HORIZONTAL/VERTICAL ADDRESS MODE ONLY
-void ssd1306_setup_address_ptrs(char x, char y)
+
+void ssd1306_set_cursor(char x, char y)
 {
     // 0-15 => 0-127
     char start_col = 8 * x;
     char end_col = start_col + 7;
-    i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
-    i2c_write_byte(SSD1306_CONTROL_COMMAND);
-    i2c_write_byte(0x21);   // setup column start and end address
-    i2c_write_byte(start_col);
-    i2c_write_byte(end_col);
-    i2c_stop();
+    ssd1306_set_col_start_end(start_col, end_col);
+
     // 0-3 => 0-7
     char start_page = 2 * y;
     char end_page = start_page + 1;
+    ssd1306_set_page_start_end(start_page, end_page);
+}
+
+void ssd1306_set_page_start_end(char start_page, char end_page)
+{
     i2c_start();
     i2c_write_byte(SSD1306_ADDR_W);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
@@ -219,6 +231,18 @@ void ssd1306_setup_address_ptrs(char x, char y)
     i2c_write_byte(end_page);
     i2c_stop();
 }
+void ssd1306_set_col_start_end(char start_col, char end_col)
+{
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_COMMAND);
+    i2c_write_byte(0x21);   // setup column start and end address
+    i2c_write_byte(start_col);
+    i2c_write_byte(end_col);
+    i2c_stop();
+}
+
+
 
 
 void ssd1306_write_solid_char(void)
@@ -233,6 +257,25 @@ void ssd1306_write_solid_char(void)
     }
     i2c_stop();
 }
+
+void ssd1306_write_glyph(char id)
+{
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
+    // two `page` rows of 8 columns, so 16 bytes for a glyph
+    uart_puts("1");
+    int index = id * 16;
+    uart_puts("2");
+    for (int i = 0; i < 16; i++)
+    {
+        i2c_write_byte(font_data[index+i]);
+        // uart_puts(".");
+    }
+    uart_puts("3");
+    i2c_stop();
+}
+
 
 void ssd1306_clear_screen(void)
 {
@@ -261,4 +304,23 @@ void ssd1306_clear_screen(void)
         i2c_write_byte(0x00);
     }
     i2c_stop();
+}
+
+// pass x and y by reference to modify
+void ssd1306_advance_cursor(char *x_ptr, char *y_ptr)
+{
+    uart_puts("Advancing Cursor");
+    *x_ptr++;
+    if (*x_ptr > CURSOR_MAX_X){ // handle X wrapping
+        uart_puts("Handling cursor x overflow");
+        *x_ptr = 0;
+        *y_ptr++;
+        if (*y_ptr > CURSOR_MAX_Y){ // handle Y wrapping
+            uart_puts("Handling cursor y overflow");
+            *y_ptr = 0;
+        }
+    }
+    uart_puts("Setting new page/col limits");
+    ssd1306_set_cursor(*x_ptr, *y_ptr);
+    uart_puts("Done");
 }
