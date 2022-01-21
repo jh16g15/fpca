@@ -32,7 +32,8 @@ with open(rows_first_font_file, "r") as rf:
 
         for i in range(total_glyphs):
             # get the relevant 16 lines
-            old_char = old_font_rom[16*i:16*i+16]  # python slicing is not like HDL!
+            old_char_upper = old_font_rom[16*i:16*i+8]      # python slicing is not like HDL!
+            old_char_lower = old_font_rom[16*i+8:16*i+16]   # python slicing is not like HDL!
 
 
 
