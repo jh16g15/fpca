@@ -258,6 +258,8 @@ void ssd1306_write_solid_char(void)
     i2c_stop();
 }
 
+// TODO: is this data getting corrupted?
+// Try splitting across multiple transactions
 void ssd1306_write_glyph(char id)
 {
     i2c_start();
