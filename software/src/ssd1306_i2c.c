@@ -337,6 +337,26 @@ void ssd1306_fill_screen(char d)
     i2c_stop();
 }
 
+void ssd1306_write_gram_byte(char d)
+{
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
+    i2c_write_byte(d);
+    i2c_stop();
+}
+
+void ssd1306_write_gram_bytes(char *d, char num)
+{
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
+    for (int i = 0; i < num; i++){
+        i2c_write_byte(d[i]);
+    }
+    i2c_stop();
+}
+
 // pass x and y by reference to modify
 void ssd1306_advance_cursor(char *x_ptr, char *y_ptr)
 {

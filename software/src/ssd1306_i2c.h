@@ -20,6 +20,8 @@ void ssd1306_write_glyph(char id);
 void ssd1306_clear_screen(void);
 void ssd1306_fill_screen(char d);
 
+void ssd1306_write_gram_byte(char d);
+
 void ssd1306_set_address_mode(char mode);
 void ssd1306_set_page_start_end(char start_page, char end_page);
 void ssd1306_set_col_start_end(char start_col, char end_col);
