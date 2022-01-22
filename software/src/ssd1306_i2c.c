@@ -277,22 +277,17 @@ void ssd1306_write_solid_char(void)
 // Try splitting across multiple transactions
 void ssd1306_write_glyph(char id)
 {
-    i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
-    i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
     // two `page` rows of 8 columns, so 16 bytes for a glyph
     uart_puts("1");
     int index = id * 16;
     uart_puts("2");
     for (int i = 0; i < 16; i++)
     {
-        i2c_write_byte(font_data[index+i]);
+        ssd1306_write_gram_byte(font_data[index+i]);
         // uart_puts(".");
     }
     uart_puts("3");
-    i2c_stop();
 }
-
 
 void ssd1306_clear_screen(void)
 {
