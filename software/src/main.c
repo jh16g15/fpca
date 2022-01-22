@@ -93,13 +93,12 @@ void main(void)
 
             ssd1306_write_glyph(0);
             // update cursor
-            x++;
-            ssd1306_set_cursor(x, y);
-            //ssd1306_advance_cursor(&x, &y);
-
-            while (get_bit(GPIO_BTN, BTN_L))
-            {
-            } // wait until button released
+            // x++;
+            // ssd1306_set_cursor(x, y);
+            ssd1306_advance_cursor(&x, &y);
+            Q_SSEG_UPPER = x;
+            Q_SSEG_LOWER = y;
+            while (get_bit(GPIO_BTN, BTN_L)){} // wait until button released
             uart_puts("L released");
 
         }
@@ -108,9 +107,11 @@ void main(void)
             uart_puts("R pressed (empty)");
             ssd1306_write_glyph(1);
             // update cursor
-            x++;
-            ssd1306_set_cursor(x, y);
-            // ssd1306_advance_cursor(&x, &y);
+            // x++;
+            // ssd1306_set_cursor(x, y);
+            ssd1306_advance_cursor(&x, &y);
+            Q_SSEG_UPPER = x;
+            Q_SSEG_LOWER = y;
 
             while (get_bit(GPIO_BTN, BTN_R)){} // wait until button released
             uart_puts("R released");
@@ -120,9 +121,11 @@ void main(void)
             uart_puts("U pressed (checkers)");
             ssd1306_write_glyph(2);
             // update cursor
-            x++;
-            ssd1306_set_cursor(x, y);
-            // ssd1306_advance_cursor(&x, &y);
+            // x++;
+            // ssd1306_set_cursor(x, y);
+            ssd1306_advance_cursor(&x, &y);
+            Q_SSEG_UPPER = x;
+            Q_SSEG_LOWER = y;
             while (get_bit(GPIO_BTN, BTN_U)){} // wait until button released
             uart_puts("U released");
         }
@@ -131,13 +134,16 @@ void main(void)
             uart_puts("D pressed (borders)");
             ssd1306_write_glyph(3);
             // update cursor
-            x++;
-            ssd1306_set_cursor(x, y);
-            // ssd1306_advance_cursor(&x, &y);
+            // x++;
+            // ssd1306_set_cursor(x, y);
+            ssd1306_advance_cursor(&x, &y);
+            Q_SSEG_UPPER = x;
+            Q_SSEG_LOWER = y;
             while (get_bit(GPIO_BTN, BTN_D)){} // wait until button released
             uart_puts("D released");
         }
 
     }
     //*/
+    uart_puts("ERR: Should never get here!");
 }
