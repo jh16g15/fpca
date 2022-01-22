@@ -71,11 +71,25 @@ void main(void)
     }
     //*/
 
-
-    //*     SSD1306 Library Test for writing Glyphs (font chars)
+    //*     SSD1306 Font Test
     char x = 0;
     char y = 0;
     ssd1306_set_cursor(x, y);
+    for (int i = 0; i < 128; i++){
+        ssd1306_write_glyph(y * 16 + x);
+        ssd1306_advance_cursor(&x, &y);
+        Q_SSEG_UPPER = x;
+        Q_SSEG_LOWER = y;
+    }
+    while(1){}
+
+    //*/
+
+        /*     SSD1306 Library Test for writing Glyphs (font chars)
+    char x = 0;
+    char y = 0;
+    ssd1306_set_cursor(x, y);
+
     ssd1306_write_solid_char();
     // update cursor
     x++;
@@ -145,5 +159,5 @@ void main(void)
 
     }
     //*/
-    uart_puts("ERR: Should never get here!");
+        uart_puts("ERR: Should never get here!");
 }

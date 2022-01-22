@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "uart.h"
 
+#include "ssd1306_font.h"
 
 // using bit-bang GPIO I2C at approx 100KHz (SSD1306 supports up to 400KHz)
 #define I2C_SCL (*((volatile unsigned long *)0x10000008))
@@ -25,10 +26,8 @@
 #define SSD1306_ADDR_MODE_VERTICAL 0x1
 #define SSD1306_ADDR_MODE_PAGE 0x2          // wrap around to start of same page
 
+/*
 #define NUM_GLPYHS 4
-/* Each glyph consists of 2 strips of 8 bytes (each byte is 8 pixels tall, LSB at the top)
- * Total is 16 bytes
- */
 char font_data[NUM_GLPYHS * 16] = {
     // solid block
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // upper
@@ -42,6 +41,8 @@ char font_data[NUM_GLPYHS * 16] = {
     // borders
     0xff, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0xff,
     0xff, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xff};
+
+//*/
 
 /*  This should give us a delay suitable for use in 100KHz I2C
     100KHz I2C will use a period of 50,000ns
