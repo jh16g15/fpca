@@ -35,8 +35,8 @@ CFLAGS= -g -c $(COPT)
 # Change the RV extensions here:
 CFLAGS_RV = $(CFLAGS) -march=rv32i -mabi=ilp32 -ffreestanding
 
-# CC_PC=gcc
-# CFLAGS_PC= $(CFLAGS)
+CC_PC=gcc
+CFLAGS_PC= $(CFLAGS)
 
 LDFLAGS = -Map=build/output.map
 # LDFLAGS_RV = $(LDFLAGS) --gc-sections -nostartfiles -T riscv32-fpca.ld
@@ -106,12 +106,10 @@ build/main.elf : $(objects)
 	$(LD) -o $@ $^ $(LDFLAGS_RV)
 
 
-# hosted : hosted-build/hosted-test.o
-# 	$(CC_PC) -g src/hosted-test.c -o build/hosted-test
+hosted :
+	$(CC_PC) -g src/hosted-test.c -o build/hosted-test
+	./build/hosted-test
 
-# hosted-build/%.o : src/%.c
-# 	@echo building $@ from $<
-# 	$(CC_PC) $(CFLAGS_PC) $< -o $@
 
 build/%.o : src/%.c
 	@echo building $@ from $<
