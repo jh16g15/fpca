@@ -56,12 +56,10 @@ void uart_put_char(char c)
 void uart_put_byte(int b)
 {
     // wait for UART to go idle
-    // GPIO_LED = 2;
     while (UART_TX_IDLE == 0)
     {
     }
     UART_TX_BYTE = b;
-    // GPIO_LED = 0;
 }
 
 // Receive 32bit unsigned, LSByte first
