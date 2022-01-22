@@ -50,18 +50,31 @@ char font_data[NUM_GLPYHS * 16] = {
     so lets have an I2C delay every 12,500ns.
 
     At a 50MHz SYSCLK, this is a period of 20ns per cycle
-
     A NOP (ADDI) takes 5 cycles (s0 100ns)
 
-    so excluding the loop maintenance, we need 125 NOPs between I2C 'events'
-
 */
+// Using `-O0`
+// 13 for ~19KHz
+// 6 for ~33KHz
+// 5 for ~37KHz
+// 4 for ~40KHz
+// 3 for ~48KHz
+// 1 for ~70KHz
+#define I2C_DELAY_LOOP_COUNT 1
+
+// Without LOOP, number of NO-OPs
+// 3 NOPs for ~100KHz (peak 154KHz)
+// 2 NOPs for ~108KHz (peak 170KHz)
+// 1 NOPs for ~114KHz (peak 181KHz)
 // quarter I2C clock period
 void i2c_delay(void){
-    for (int i = 13; i>0; i--){
-        asm volatile(       // 5 cycles
-            "NOP"
-        );
+    // for (int i = I2C_DELAY_LOOP_COUNT; i>0; i--){
+    // asm volatile( // 5 cycles each
+    //     // "NOP;"
+    //     // "NOP;"
+    //     // "NOP;"
+
+    // );
         /* -O0 loop maintenance:
         LW i                // 10 cycles
         ADDI i, -1          //  5 cycles
@@ -73,11 +86,13 @@ void i2c_delay(void){
 
         This adds up to 45 * 20ns = 900 ns
 
-        So for our 12500 ns delay, we need approx 13 loops (will still be slightly too long, but close enough)
+        So for our 12500 ns delay, we need approx 13 loops for 100KHz (will still be slightly too long, but close enough)
+
+        For 400KHz, we need a delay of
 
         */
 
-    }
+    //}
 }
 
 void i2c_start(void){
@@ -346,13 +361,15 @@ void ssd1306_write_gram_byte(char d)
     i2c_stop();
 }
 
-void ssd1306_write_gram_bytes(char *d, char num)
+// void ssd1306_write_gram_bytes(char *d, char num)
+void ssd1306_write_gram_bytes(char d, char num)
 {
     i2c_start();
     i2c_write_byte(SSD1306_ADDR_W);
     i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
     for (int i = 0; i < num; i++){
-        i2c_write_byte(d[i]);
+        // i2c_write_byte(d[i]);
+        i2c_write_byte(d);
     }
     i2c_stop();
 }

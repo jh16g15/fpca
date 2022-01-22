@@ -31,6 +31,7 @@
 #include "ssd1306_i2c.h"
 
 // function prototypes
+#define num_continuous_bytes 1
 
 void main(void)
 {
@@ -44,24 +45,25 @@ void main(void)
             "jr t0;");
     }
 
-    Q_SSEG = 0xc001;
+    Q_SSEG = 0xc0de;
 
     ssd1306_display_sleep();
     // Enable the charge pump and turn the display on
     ssd1306_display_init();
-
     ssd1306_clear_screen();
+
+
     while (1)
     {
         // ssd1306_clear_screen();
-        for (int i = 0; i < 128 * 8; i++)
+        for (int i = 0; i < ((128 * 8) / num_continuous_bytes); i++)
         {
-            ssd1306_write_gram_byte(0x00);
+            ssd1306_write_gram_bytes(0x00, num_continuous_bytes);
         }
         // ssd1306_fill_screen(0xFF);
-        for (int i = 0; i < 128 * 8; i++)
+        for (int i = 0; i < ((128 * 8) / num_continuous_bytes); i++)
         {
-            ssd1306_write_gram_byte(0xff);
+            ssd1306_write_gram_bytes(0xff, num_continuous_bytes);
         }
     }
 
