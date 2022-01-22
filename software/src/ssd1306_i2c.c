@@ -308,6 +308,35 @@ void ssd1306_clear_screen(void)
     i2c_stop();
 }
 
+void ssd1306_fill_screen(char d)
+{
+    // 0 - 127
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_COMMAND);
+    i2c_write_byte(0x21);   // setup column start and end address
+    i2c_write_byte(0);
+    i2c_write_byte(127);
+    i2c_stop();
+    // 0 - 7
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_COMMAND);
+    i2c_write_byte(0x22);   // setup page start and end address
+    i2c_write_byte(0);
+    i2c_write_byte(7);
+    i2c_stop();
+
+    i2c_start();
+    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
+    int total_bytes = 128 * 8;
+    for (int i = 0; i < total_bytes; i++){
+        i2c_write_byte(d);
+    }
+    i2c_stop();
+}
+
 // pass x and y by reference to modify
 void ssd1306_advance_cursor(char *x_ptr, char *y_ptr)
 {
