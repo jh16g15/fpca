@@ -45,13 +45,14 @@ LDFLAGS = -Map=build/output.map
 LDFLAGS_RV = $(LDFLAGS) -lgcc --gc-sections  -T riscv32-fpca.ld
 
 # as this is the first "recipe", executing "make" on its own will run this
+all: clean main boot asm # hosted
+	@echo Made everything!
+
 main : hex/main.hex
 
 # alternative target to get the disassembly as well
-asm : build/main.asm main build/minimal_boot.asm
+asm : build/main.asm  main build/minimal_boot.asm
 
-all: main boot asm # hosted
-	@echo Made everything!
 
 # always treat this file as "out-of-date", so we always display the asm to the terminal
 .PHONY : build/main.asm
@@ -66,14 +67,14 @@ hex/boot.hex : build/minimal_boot.o
 
 build/minimal_boot.asm : build/minimal_boot.o
 
-	@echo ""
-	@echo "******************** START $@ *********************"
-	@echo ""
-	riscv32-unknown-elf-objdump -d -S $<
 	riscv32-unknown-elf-objdump -d -S $< > $@
-	@echo ""
-	@echo "********************* END $@ **********************"
-	@echo ""
+	@#@echo ""
+	@#@echo "******************** START $@ *********************"
+	@#@echo ""
+	@#riscv32-unknown-elf-objdump -d -S $<
+	@#@echo ""
+	@#@echo "********************* END $@ **********************"
+	@#@echo ""
 
 build/minimal_boot.o : src/boot/minimal_boot.c src/boot/crt0-boot.s
 	$(CC) -g -O0 -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections \
@@ -91,14 +92,14 @@ hex/main.hex : build/main.elf
 
 build/main.asm : build/main.elf
 	@# output to file and to terminal
-	@echo ""
-	@echo "******************** START $@ *********************"
-	@echo ""
+	@# @echo ""
+	@# @echo "******************** START $@ *********************"
+	@# @echo ""
+	@# riscv32-unknown-elf-objdump -d -S $<
+	@# @echo ""
+	@# @echo "********************* END $@ **********************"
+	@# @echo ""
 	riscv32-unknown-elf-objdump -d -S $< > $@
-	@echo ""
-	@echo "********************* END $@ **********************"
-	@echo ""
-	riscv32-unknown-elf-objdump -d -S $<
 
 # This step links all the object files together
 build/main.elf : $(objects)
@@ -119,6 +120,8 @@ build/%.o : src/%.s
 	@echo building $@ from $<
 	$(CC) $(CFLAGS_RV)  $< -o $@
 
+upload : hex/main.hex
+	./upload.sh COM8
 
 clean:
 	rm -rf build/*.*
