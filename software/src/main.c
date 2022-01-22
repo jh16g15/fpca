@@ -75,7 +75,7 @@ void main(void)
     char x = 0;
     char y = 0;
     ssd1306_set_cursor(x, y);
-    for (int i = 0; i < 128; i++){
+    for (int i = 0; i < 64; i++){
         ssd1306_write_glyph(y * 16 + x);
         ssd1306_advance_cursor(&x, &y);
         Q_SSEG_UPPER = x;

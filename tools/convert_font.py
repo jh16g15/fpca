@@ -3,6 +3,8 @@
 ## Convert a "rows font" text file to a "columns font" suitable for the SSD1306
 
 
+def reverse_string(chars):
+    return chars[::-1]
 
 
 ## The existing font I have is the IBM VGA 8x16, which is 8 bits wide and 16 bits tall.
@@ -64,7 +66,7 @@ with open(rows_first_font_file, "r") as rf:
             # for i in range(0,8):
             for i in range(0,8):
                 byte += old_char[i][j]
-
+            byte = reverse_string(byte)
             byte_num = int(byte,2)
             byte_hex = hex(byte_num)    # this is probably fine for C
             print(f"byte {j}: {byte} ({byte_hex}) formatted = {byte_num:#04x}")
@@ -77,6 +79,7 @@ with open(rows_first_font_file, "r") as rf:
             for i in range(8,16):
                 byte += old_char[i][j]
 
+            byte = reverse_string(byte)
             byte_num = int(byte,2)
             byte_hex = hex(byte_num)    # this is probably fine for C
             print(f"byte {j}: {byte} ({byte_hex}) formatted = {byte_num:#04x}")
@@ -113,7 +116,7 @@ with open(cols_first_font_file, "w") as wf:
 
 
 test_bits = "01234567"
-rev_bits = reverse_bit_string(test_bits)
+rev_bits = reverse_string(test_bits)
 print(f"TEST: {test_bits} -> {rev_bits}")
 
 
