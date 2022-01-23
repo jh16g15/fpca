@@ -7,7 +7,7 @@ The FPCA (Friendly Programmable Computing Asset) is a RISC-V SoC design with acc
     - 50 MHz on Artix-7
     - ALU/BRANCH 5 CPI
     - LOAD 9 CPI
-    - STORE 10 CPI
+    - STORE 8 CPI
 - Wishbone B4 Instruction Fetch and Data Access
 
 # Current Peripherals
