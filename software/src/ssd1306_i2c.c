@@ -26,24 +26,6 @@
 #define SSD1306_ADDR_MODE_VERTICAL 0x1
 #define SSD1306_ADDR_MODE_PAGE 0x2          // wrap around to start of same page
 
-/*
-#define NUM_GLPYHS 4
-char font_data[NUM_GLPYHS * 16] = {
-    // solid block
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // upper
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // lower
-    // empty block
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    //checkerboard
-    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
-    0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA,
-    // borders
-    0xff, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0xff,
-    0xff, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xff};
-
-//*/
-
 /*  This should give us a delay suitable for use in 100KHz I2C
     100KHz I2C will use a period of 50,000ns
     We want to toggle our clock every 25,000ns
@@ -69,21 +51,22 @@ char font_data[NUM_GLPYHS * 16] = {
 // 1 NOPs for ~114KHz (peak 181KHz)
 // quarter I2C clock period
 void i2c_delay(void){
-    // for (int i = I2C_DELAY_LOOP_COUNT; i>0; i--){
-    // asm volatile( // 5 cycles each
-    //     // "NOP;"
-    //     // "NOP;"
-    //     // "NOP;"
+    for (int i = I2C_DELAY_LOOP_COUNT; i>0; i--){
+        asm volatile( // 5 cycles each
+            "NOP;"
+            // "NOP;"
+            // "NOP;"
 
-    // );
+        );
+    }
         /* -O0 loop maintenance:
-        LW i                // 10 cycles
+        LW i                //  9 cycles
         ADDI i, -1          //  5 cycles
-        SW i                // 10
-        LW i                // 10
+        SW i                //  8
+        LW i                //  9
         BGTZ i              //  5
 
-        so each loop is 40+work cycles long, (=45 in this case)
+        so each loop is 36+work cycles long, (=41 in this case)
 
         This adds up to 45 * 20ns = 900 ns
 
@@ -93,7 +76,6 @@ void i2c_delay(void){
 
         */
 
-    //}
 }
 
 void i2c_start(void){
@@ -274,20 +256,17 @@ void ssd1306_write_solid_char(void)
     i2c_stop();
 }
 
-// TODO: is this data getting corrupted?
-// Try splitting across multiple transactions
 void ssd1306_write_glyph(char id)
 {
     // two `page` rows of 8 columns, so 16 bytes for a glyph
-    uart_puts("1");
     int index = id * 16;
-    uart_puts("2");
     for (int i = 0; i < 16; i++)
     {
+        // need to write one byte at a time otherwise we
+        // can get dropped bytes (bitbanged I2C controller
+        // not very good, and doesn't support clock stretching etc )
         ssd1306_write_gram_byte(font_data[index+i]);
-        // uart_puts(".");
     }
-    uart_puts("3");
 }
 
 void ssd1306_clear_screen(void)
@@ -387,4 +366,49 @@ void ssd1306_advance_cursor(char *x_ptr, char *y_ptr)
     uart_puts("Setting new page/col limits");
     ssd1306_set_cursor(*x_ptr, *y_ptr);
     uart_puts("Done");
+}
+
+void ssd1306_putc(char c, char *x_ptr, char *y_ptr)
+{
+    // we could optionally check for /r and /n here
+    ssd1306_write_glyph(c);
+    ssd1306_advance_cursor(x_ptr, y_ptr);
+}
+
+void ssd1306_puts(char *s, char *x_ptr, char *y_ptr)
+{
+    char c;
+    do
+    {
+        c = *s;  // character of string (contents of s mem)
+        // we could optionally check for /r and /n here
+        ssd1306_putc(c, x_ptr, y_ptr); // print this char
+        s++;     // increment pointer to move through array
+    } while (c != '\0');
+}
+
+void ssd1306_newline(char *x_ptr, char *y_ptr)
+{
+    *x_ptr = 0; // move X to start of  line
+    char new_y = *y_ptr;    // increment y
+    new_y = (new_y + 1) % (CURSOR_MAX_Y + 1);
+    *y_ptr = new_y;
+    ssd1306_set_cursor(0, new_y);
+}
+
+void ssd1306_carriage_return(char *x_ptr, char *y_ptr)
+{
+    *x_ptr = 0; // move X to start of  line
+    ssd1306_set_cursor(0, *y_ptr);
+}
+
+// replace the current line's contents with NULL
+void ssd1306_clearline(char *x_ptr, char *y_ptr)
+{
+    ssd1306_carriage_return(x_ptr, y_ptr);
+    for (int i = 0; i <= CURSOR_MAX_X; i++){
+        ssd1306_write_glyph(0);
+        ssd1306_advance_cursor(x_ptr, y_ptr);
+    }
+    ssd1306_carriage_return(x_ptr, y_ptr);  // this might put us on the next line
 }
