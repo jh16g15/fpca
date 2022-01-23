@@ -23,15 +23,19 @@ void delay_ms(int dly)
 }
 #endif
 #ifndef SIM
-// this is approximate
+// this is approximate: valid for -O0 only!
 void delay_ms(int dly_ms)
 {
-    const int ms_reps = 0x3A8;
+    const int ms_reps = 1220-1;
+    // 36 + (1220*41) cycles per iteration, so subract 1 iteration
     for (int i = 0; i < dly_ms; i++)
     {
+        // 36+5 cycles per iteration
+        // at 50MHz (0.02us), each iter is 41*0.02us = 0.82us
+        // So we want 1000/0.82=1220 iterations for a 1ms delay
         for (int j = 0; j < ms_reps; j++)
         {
-            asm("nop");
+            asm volatile("nop");
         }
     }
 }
