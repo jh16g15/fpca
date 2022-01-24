@@ -63,8 +63,11 @@ architecture rtl of timer is
     signal pwm_value   : unsigned (G_TIMER_W - 1 downto 0) := (others => '1'); -- threshold for PWM
     signal top_value   : unsigned (G_TIMER_W - 1 downto 0) := (others => '1'); -- threshold for return-to-0
     -- UP = 1, DOWN = 0
-    signal count_direction : std_logic;
-    signal pwm_direction   : std_logic;
+
+    type t_count_dir is (UP, DOWN);
+
+    signal count_direction : t_count_dir;
+    signal pwm_direction   : t_count_dir;
     signal pwm_i           : std_logic := '0';
 begin
 
@@ -80,10 +83,10 @@ begin
                 pwm_i <= '0';
             end if;
             -- handle counting direction
-            count_direction <= pwm_direction when pwm_mode_enable_in = '1' else '1';
+            count_direction <= pwm_direction when pwm_mode_enable_in = '1' else UP;
 
         else
-            count_direction <= '1'; -- UP
+            count_direction <= UP;
             pwm_out         <= '0';
         end if;
     end process;
@@ -110,7 +113,7 @@ begin
             else
                 if count_enable_in = '1' then
                     -- count_direction controlled by pwm_mode
-                    if count_direction = '1' then
+                    if count_direction = UP then
                         count_value <= count_value + 1;
                     else
                         count_value <= count_value - 1;
@@ -122,13 +125,13 @@ begin
                             count_value    <= 0;
                             oflow_flag_out <= '1';  -- reset with clr_oflow_flag_in
                         else
-                            pwm_direction <= '0'; -- count down
+                            pwm_direction <= DOWN; -- count down
                         end if;
 
                     end if;
 
                     if count_value = 0 then
-                        pwm_direction <= '1'; -- count up
+                        pwm_direction <= UP; -- count up
                     end if;
                 end if;
             end if;
