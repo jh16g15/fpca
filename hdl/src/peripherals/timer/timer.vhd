@@ -87,7 +87,7 @@ begin
 
         else
             count_direction <= UP;
-            pwm_out         <= '0';
+            pwm_i         <= '0';
         end if;
     end process;
 
@@ -123,7 +123,7 @@ begin
                     if count_value >= top_value then
                         if pwm_mode_enable_in = '0' then
                             count_value    <= 0;
-                            oflow_flag_out <= '1';  -- reset with clr_oflow_flag_in
+                            oflow_flag_out <= '1'; -- reset with clr_oflow_flag_in
                         else
                             pwm_direction <= DOWN; -- count down
                         end if;
@@ -136,6 +136,13 @@ begin
                 end if;
             end if;
 
+            if reset = '1' then
+                count_value <= (others => '0');
+                pwm_value <= (others => '1');
+                top_value <= (others => '1');
+                oflow_flag_out <= '0';
+                pwm_out <= '0';
+            end if;
         end if;
     end process;
 end architecture;
