@@ -6,27 +6,29 @@ use work.joe_common_pkg.all;
 
 -- 32b counter @ 50 MHz is up to about 85 seconds of counting
 
--- STANDARD MODE:
--- 1. Set up increment/decrement mode
--- 2. Set the initial value
--- 3. Enable the counter
+-- TIMING MODE:
+-- 1. Set the initial value (=0)
+-- 2. Set the "top threshold" to xFFFF_FFFF
+-- 2. Enable the counter
+-- 3. Read the current count when task is finished
 
--- INTERRUPT/OVERFLOW MODE: (not currently supported)
+-- INTERRUPT/OVERFLOW MODE:
 -- 1. Set a "top threshold"
--- 2. Set to "increment mode"
--- 3. Set the initial value (0)
--- 4. Enable the counter
--- 5. When the counter reaches "top threshold", oflow_out = '1' and counter returns to 0
--- 6. oflow_out flag remains '1' until cleared
+-- 2. Set the initial value (0)
+-- 3. Enable the counter
+-- 4. When the counter reaches "top threshold", oflow_out = '1' and counter returns to 0
+-- 5. oflow_out flag remains '1' until cleared
 
--- PWM MODE: (not currently supported)
+-- PWM MODE:
 -- 1. Set a "pwm threshold" and a "top threshold"
 -- 2. Set counter to 0
--- 3. Counter increments to "pwm threshold"
--- 4. PWM_OUT = '1'
--- 5. Counter reaches "counter top threshold"
--- 6. Counter decrements to "pwm threshold"
--- 7. PWM_OUT = '0' etc...
+-- 3. Enable PWM mode
+-- 4. Enable the counter
+-- 5. Counter increments to "pwm threshold"
+-- 6. PWM_OUT = '1'
+-- 7. Counter reaches "counter top threshold"
+-- 8. Counter decrements to "pwm threshold"
+-- 9. PWM_OUT = '0' etc...
 
 entity timer is
     generic (
@@ -43,7 +45,7 @@ entity timer is
         count_enable_in : in std_logic;
         count_value_out : out std_logic_vector(G_TIMER_W - 1 downto 0);
 
-        -- PWM and Interrupts (optional features)
+        -- PWM and Overflow (optional features)
         pwm_threshold_in       : in std_logic_vector(G_TIMER_W - 1 downto 0);
         pwm_thresh_valid_in    : in std_logic;
         count_top_threshold_in : in std_logic_vector(G_TIMER_W - 1 downto 0);
