@@ -31,8 +31,7 @@ use work.joe_common_pkg.all;
 entity timer is
     generic (
         G_TIMER_W           : integer := 32;
-        G_PWM_SUPPORT       : boolean := false;
-        G_INTERRUPT_SUPPORT : boolean := false
+        G_PWM_SUPPORT       : boolean := true
     );
     port (
         clk   : in std_logic;
@@ -96,10 +95,10 @@ begin
         if rising_edge(clk) then
             -- for interrupts and PWM
             if pwm_thresh_valid_in = '1' then
-                pwm_value <= pwm_threshold_in;
+                pwm_value <= unsigned(pwm_threshold_in);
             end if;
             if top_thresh_valid_in = '1' then
-                top_value <= count_top_threshold_in;
+                top_value <= unsigned(count_top_threshold_in);
             end if;
             if clr_oflow_flag_in = '1' then
                 oflow_flag_out <= '0';
@@ -109,7 +108,7 @@ begin
 
             -- Main counting loop
             if new_count_value_valid_in = '1' then
-                count_value <= new_count_value_in;
+                count_value <= unsigned(new_count_value_in);
             else
                 if count_enable_in = '1' then
                     -- count_direction controlled by pwm_mode
@@ -121,8 +120,8 @@ begin
 
                     -- overflow - reset counter (unless PWM)
                     if count_value >= top_value then
-                        if pwm_mode_enable_in = '0' then
-                            count_value    <= 0;
+                        if pwm_mode_enable_in = '0' or G_PWM_SUPPORT = false then
+                            count_value    <= (others => '0');
                             oflow_flag_out <= '1'; -- reset with clr_oflow_flag_in
                         else
                             pwm_direction <= DOWN; -- count down
