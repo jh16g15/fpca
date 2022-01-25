@@ -42,6 +42,7 @@ VU.add_source_files(src_dir / "packages" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "peripherals" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "peripherals" / "common" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "peripherals" / "uart" / "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(src_dir / "peripherals" / "timer" / "*.vhd", "lib", allow_empty=True)
 
 
 

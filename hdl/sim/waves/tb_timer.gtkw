@@ -1,0 +1,33 @@
+[*]
+[*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
+[*] Tue Jan 25 00:22:34 2022
+[*]
+[dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.tb_timer.pwm_test_e6655a94d392b1803d9c00a24edd87078ffa33f6/ghdl/wave.ghw"
+[dumpfile_mtime] "Tue Jan 25 00:20:41 2022"
+[dumpfile_size] 3998
+[savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_timer.gtkw"
+[timestart] 0
+[size] 2560 1377
+[pos] -165 -165
+*-29.000000 4 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.tb_timer.
+[sst_width] 214
+[signals_width] 182
+[sst_expanded] 1
+[sst_vpaned_height] 425
+@28
+top.tb_timer.timer_inst.pwm_out
+@420
+top.tb_timer.timer_inst.pwm_direction
+top.tb_timer.timer_inst.count_direction
+@28
+top.tb_timer.timer_inst.oflow_flag_out
+top.tb_timer.timer_inst.clr_oflow_flag_in
+top.tb_timer.timer_inst.pwm_mode_enable_in
+top.tb_timer.timer_inst.top_thresh_valid_in
+top.tb_timer.timer_inst.pwm_thresh_valid_in
+@29
+top.tb_timer.timer_inst.count_enable_in
+[pattern_trace] 1
+[pattern_trace] 0
