@@ -118,11 +118,11 @@ begin
             elsif run("pwm_test") then
                 info("Running pwm_test (not self checking)");
                 -- enable PWM mode
-                pwm_mode_enable_in       <= '1';
+                pwm_mode_enable_in <= '1';
                 -- load values
                 new_count_value_in       <= (others => '0');
-                count_top_threshold_in   <= std_logic_vector(to_unsigned(20, 32));
-                pwm_threshold_in         <= std_logic_vector(to_unsigned(10, 32));
+                count_top_threshold_in   <= std_logic_vector(to_unsigned(100, 32));
+                pwm_threshold_in         <= std_logic_vector(to_unsigned(70, 32));
                 new_count_value_valid_in <= '1';
                 top_thresh_valid_in      <= '1';
                 pwm_thresh_valid_in      <= '1';
@@ -133,7 +133,7 @@ begin
                 -- start counting
                 count_enable_in <= '1';
 
-                wait for 100 * clk_period;
+                wait for 1000 * clk_period;
                 test_runner_cleanup(runner);
             end if;
         end loop;

@@ -128,9 +128,9 @@ begin
                         end if;
 
                     end if;
-
-                    if count_value = 0 then
-                        pwm_direction <= UP; -- count up
+                    -- "bounce off" 0 when down counting
+                    if count_value = 1 then
+                        pwm_direction <= UP; -- count up for next cycle (after setting to 0 this cycle if down counting)
                     end if;
                 end if;
             end if;

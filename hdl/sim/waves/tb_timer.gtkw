@@ -1,21 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
-[*] Tue Jan 25 00:22:34 2022
+[*] Tue Jan 25 00:27:24 2022
 [*]
 [dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.tb_timer.pwm_test_e6655a94d392b1803d9c00a24edd87078ffa33f6/ghdl/wave.ghw"
-[dumpfile_mtime] "Tue Jan 25 00:20:41 2022"
-[dumpfile_size] 3998
+[dumpfile_mtime] "Tue Jan 25 00:22:40 2022"
+[dumpfile_size] 12210
 [savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_timer.gtkw"
-[timestart] 0
+[timestart] 438500000
 [size] 2560 1377
-[pos] -165 -165
-*-29.000000 4 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -191 -191
+*-26.000000 686800000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.tb_timer.
-[sst_width] 214
-[signals_width] 182
+[treeopen] top.tb_timer.timer_inst.
+[sst_width] 404
+[signals_width] 198
 [sst_expanded] 1
-[sst_vpaned_height] 425
+[sst_vpaned_height] 896
 @28
 top.tb_timer.timer_inst.pwm_out
 @420
@@ -27,7 +28,14 @@ top.tb_timer.timer_inst.clr_oflow_flag_in
 top.tb_timer.timer_inst.pwm_mode_enable_in
 top.tb_timer.timer_inst.top_thresh_valid_in
 top.tb_timer.timer_inst.pwm_thresh_valid_in
-@29
 top.tb_timer.timer_inst.count_enable_in
+@22
+#{top.tb_timer.timer_inst.count_value_out[31:0]} top.tb_timer.timer_inst.count_value_out[31] top.tb_timer.timer_inst.count_value_out[30] top.tb_timer.timer_inst.count_value_out[29] top.tb_timer.timer_inst.count_value_out[28] top.tb_timer.timer_inst.count_value_out[27] top.tb_timer.timer_inst.count_value_out[26] top.tb_timer.timer_inst.count_value_out[25] top.tb_timer.timer_inst.count_value_out[24] top.tb_timer.timer_inst.count_value_out[23] top.tb_timer.timer_inst.count_value_out[22] top.tb_timer.timer_inst.count_value_out[21] top.tb_timer.timer_inst.count_value_out[20] top.tb_timer.timer_inst.count_value_out[19] top.tb_timer.timer_inst.count_value_out[18] top.tb_timer.timer_inst.count_value_out[17] top.tb_timer.timer_inst.count_value_out[16] top.tb_timer.timer_inst.count_value_out[15] top.tb_timer.timer_inst.count_value_out[14] top.tb_timer.timer_inst.count_value_out[13] top.tb_timer.timer_inst.count_value_out[12] top.tb_timer.timer_inst.count_value_out[11] top.tb_timer.timer_inst.count_value_out[10] top.tb_timer.timer_inst.count_value_out[9] top.tb_timer.timer_inst.count_value_out[8] top.tb_timer.timer_inst.count_value_out[7] top.tb_timer.timer_inst.count_value_out[6] top.tb_timer.timer_inst.count_value_out[5] top.tb_timer.timer_inst.count_value_out[4] top.tb_timer.timer_inst.count_value_out[3] top.tb_timer.timer_inst.count_value_out[2] top.tb_timer.timer_inst.count_value_out[1] top.tb_timer.timer_inst.count_value_out[0]
+@28
+top.tb_timer.timer_inst.clk
+@25
+#{top.tb_timer.timer_inst.top_value[31:0]} top.tb_timer.timer_inst.top_value[31] top.tb_timer.timer_inst.top_value[30] top.tb_timer.timer_inst.top_value[29] top.tb_timer.timer_inst.top_value[28] top.tb_timer.timer_inst.top_value[27] top.tb_timer.timer_inst.top_value[26] top.tb_timer.timer_inst.top_value[25] top.tb_timer.timer_inst.top_value[24] top.tb_timer.timer_inst.top_value[23] top.tb_timer.timer_inst.top_value[22] top.tb_timer.timer_inst.top_value[21] top.tb_timer.timer_inst.top_value[20] top.tb_timer.timer_inst.top_value[19] top.tb_timer.timer_inst.top_value[18] top.tb_timer.timer_inst.top_value[17] top.tb_timer.timer_inst.top_value[16] top.tb_timer.timer_inst.top_value[15] top.tb_timer.timer_inst.top_value[14] top.tb_timer.timer_inst.top_value[13] top.tb_timer.timer_inst.top_value[12] top.tb_timer.timer_inst.top_value[11] top.tb_timer.timer_inst.top_value[10] top.tb_timer.timer_inst.top_value[9] top.tb_timer.timer_inst.top_value[8] top.tb_timer.timer_inst.top_value[7] top.tb_timer.timer_inst.top_value[6] top.tb_timer.timer_inst.top_value[5] top.tb_timer.timer_inst.top_value[4] top.tb_timer.timer_inst.top_value[3] top.tb_timer.timer_inst.top_value[2] top.tb_timer.timer_inst.top_value[1] top.tb_timer.timer_inst.top_value[0]
+#{top.tb_timer.timer_inst.pwm_value[31:0]} top.tb_timer.timer_inst.pwm_value[31] top.tb_timer.timer_inst.pwm_value[30] top.tb_timer.timer_inst.pwm_value[29] top.tb_timer.timer_inst.pwm_value[28] top.tb_timer.timer_inst.pwm_value[27] top.tb_timer.timer_inst.pwm_value[26] top.tb_timer.timer_inst.pwm_value[25] top.tb_timer.timer_inst.pwm_value[24] top.tb_timer.timer_inst.pwm_value[23] top.tb_timer.timer_inst.pwm_value[22] top.tb_timer.timer_inst.pwm_value[21] top.tb_timer.timer_inst.pwm_value[20] top.tb_timer.timer_inst.pwm_value[19] top.tb_timer.timer_inst.pwm_value[18] top.tb_timer.timer_inst.pwm_value[17] top.tb_timer.timer_inst.pwm_value[16] top.tb_timer.timer_inst.pwm_value[15] top.tb_timer.timer_inst.pwm_value[14] top.tb_timer.timer_inst.pwm_value[13] top.tb_timer.timer_inst.pwm_value[12] top.tb_timer.timer_inst.pwm_value[11] top.tb_timer.timer_inst.pwm_value[10] top.tb_timer.timer_inst.pwm_value[9] top.tb_timer.timer_inst.pwm_value[8] top.tb_timer.timer_inst.pwm_value[7] top.tb_timer.timer_inst.pwm_value[6] top.tb_timer.timer_inst.pwm_value[5] top.tb_timer.timer_inst.pwm_value[4] top.tb_timer.timer_inst.pwm_value[3] top.tb_timer.timer_inst.pwm_value[2] top.tb_timer.timer_inst.pwm_value[1] top.tb_timer.timer_inst.pwm_value[0]
+#{top.tb_timer.timer_inst.count_value[31:0]} top.tb_timer.timer_inst.count_value[31] top.tb_timer.timer_inst.count_value[30] top.tb_timer.timer_inst.count_value[29] top.tb_timer.timer_inst.count_value[28] top.tb_timer.timer_inst.count_value[27] top.tb_timer.timer_inst.count_value[26] top.tb_timer.timer_inst.count_value[25] top.tb_timer.timer_inst.count_value[24] top.tb_timer.timer_inst.count_value[23] top.tb_timer.timer_inst.count_value[22] top.tb_timer.timer_inst.count_value[21] top.tb_timer.timer_inst.count_value[20] top.tb_timer.timer_inst.count_value[19] top.tb_timer.timer_inst.count_value[18] top.tb_timer.timer_inst.count_value[17] top.tb_timer.timer_inst.count_value[16] top.tb_timer.timer_inst.count_value[15] top.tb_timer.timer_inst.count_value[14] top.tb_timer.timer_inst.count_value[13] top.tb_timer.timer_inst.count_value[12] top.tb_timer.timer_inst.count_value[11] top.tb_timer.timer_inst.count_value[10] top.tb_timer.timer_inst.count_value[9] top.tb_timer.timer_inst.count_value[8] top.tb_timer.timer_inst.count_value[7] top.tb_timer.timer_inst.count_value[6] top.tb_timer.timer_inst.count_value[5] top.tb_timer.timer_inst.count_value[4] top.tb_timer.timer_inst.count_value[3] top.tb_timer.timer_inst.count_value[2] top.tb_timer.timer_inst.count_value[1] top.tb_timer.timer_inst.count_value[0]
 [pattern_trace] 1
 [pattern_trace] 0
