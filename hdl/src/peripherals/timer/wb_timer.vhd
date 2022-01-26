@@ -52,7 +52,7 @@ architecture rtl of wb_timer is
 
 begin
 
-    timer_interrupt_out <= oflow_flag and interrupt_enable;
+    timer_interrupt_out(0) <= oflow_flag and interrupt_enable;
 
     -- this slave can always respond to requests, so no stalling is required
     wb_miso_out.stall <= '0';
@@ -66,10 +66,10 @@ begin
                 wb_miso_out.rty <= '0';
 
                 -- reset writeable registers
-                count_enable <= '0';
+                count_enable     <= '0';
                 interrupt_enable <= '0';
-                pwm_mode_enable <= '0';
-                count_enable <= '0';
+                pwm_mode_enable  <= '0';
+                count_enable     <= '0';
             else
                 -- defaults
                 wb_miso_out.ack  <= '0';
@@ -81,7 +81,7 @@ begin
                 new_count_value_valid_in <= '0';
                 top_thresh_valid_in      <= '0';
                 pwm_thresh_valid_in      <= '0';
-                clr_oflow_flag        <= '0';
+                clr_oflow_flag           <= '0';
 
                 if wb_mosi_in.stb = '1' and wb_miso_out.stall = '0' then -- assume CYC asserted by master for STB to be high
                     -- always ACK this cycle (sync operation with 1 wait state)
@@ -109,8 +109,8 @@ begin
                     else
                         -- read logic
                         case(wb_mosi_in.adr(3 downto 0)) is
-                            when x"00" => wb_miso_out.rdat <= count_value_out;
-                            when x"04" => wb_miso_out.rdat <=
+                            when x"0" => wb_miso_out.rdat <= count_value_out;
+                            when x"4" =>
 
                             wb_miso_out.rdat     <= (others => '0'); -- default, overwrite with below ctl/status bits
                             wb_miso_out.rdat(0)  <= count_enable;
@@ -118,8 +118,8 @@ begin
                             wb_miso_out.rdat(2)  <= pwm_mode_enable;
                             wb_miso_out.rdat(16) <= oflow_flag;
 
-                            when x"08"  => wb_miso_out.rdat <= count_top_threshold_in;
-                            when x"0C"  => wb_miso_out.rdat <= pwm_threshold_in;
+                            when x"8"   => wb_miso_out.rdat <= count_top_threshold_in;
+                            when x"C"   => wb_miso_out.rdat <= pwm_threshold_in;
                             when others => null;
                         end case;
 
