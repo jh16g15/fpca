@@ -32,8 +32,8 @@ architecture rtl of wb_timer is
     -- [2]      Enable PWM mode
     -- [8]     Clear timer overflow
     -- [16]     Timer Overflow
-    -- xC: Timer Threshold Register (32b)
-    -- x8: PWM Threshold Register (32b)
+    -- x8: Timer Threshold Register (32b)
+    -- xC: PWM Threshold Register (32b)
     constant G_TIMER_W : integer := 32;
 
     signal new_count_value_in       : std_logic_vector(G_TIMER_W - 1 downto 0); -- Reg x0 (On Write)

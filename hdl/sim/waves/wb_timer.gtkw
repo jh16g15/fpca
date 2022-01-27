@@ -1,0 +1,65 @@
+[*]
+[*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
+[*] Wed Jan 26 23:28:52 2022
+[*]
+[dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.wb_timer_tb.counting_test_54317ecec9abe663b824cb457f2f10e279e29895/ghdl/wave.ghw"
+[dumpfile_mtime] "Wed Jan 26 23:23:53 2022"
+[dumpfile_size] 5466
+[savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/wb_timer.gtkw"
+[timestart] 0
+[size] 2560 1377
+[pos] -35 -35
+*-27.000000 481100000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.wb_timer_tb.
+[treeopen] top.wb_timer_tb.wb_miso.
+[treeopen] top.wb_timer_tb.wb_timer_inst.
+[treeopen] top.wb_timer_tb.wb_timer_inst.timer_inst.
+[sst_width] 214
+[signals_width] 254
+[sst_expanded] 1
+[sst_vpaned_height] 896
+@28
+top.wb_timer_tb.wb_clk
+top.wb_timer_tb.wb_reset
+top.wb_timer_tb.wb_mosi.cyc
+top.wb_timer_tb.wb_mosi.stb
+top.wb_timer_tb.wb_miso.stall
+@22
+#{top.wb_timer_tb.wb_mosi.adr[31:0]} top.wb_timer_tb.wb_mosi.adr[31] top.wb_timer_tb.wb_mosi.adr[30] top.wb_timer_tb.wb_mosi.adr[29] top.wb_timer_tb.wb_mosi.adr[28] top.wb_timer_tb.wb_mosi.adr[27] top.wb_timer_tb.wb_mosi.adr[26] top.wb_timer_tb.wb_mosi.adr[25] top.wb_timer_tb.wb_mosi.adr[24] top.wb_timer_tb.wb_mosi.adr[23] top.wb_timer_tb.wb_mosi.adr[22] top.wb_timer_tb.wb_mosi.adr[21] top.wb_timer_tb.wb_mosi.adr[20] top.wb_timer_tb.wb_mosi.adr[19] top.wb_timer_tb.wb_mosi.adr[18] top.wb_timer_tb.wb_mosi.adr[17] top.wb_timer_tb.wb_mosi.adr[16] top.wb_timer_tb.wb_mosi.adr[15] top.wb_timer_tb.wb_mosi.adr[14] top.wb_timer_tb.wb_mosi.adr[13] top.wb_timer_tb.wb_mosi.adr[12] top.wb_timer_tb.wb_mosi.adr[11] top.wb_timer_tb.wb_mosi.adr[10] top.wb_timer_tb.wb_mosi.adr[9] top.wb_timer_tb.wb_mosi.adr[8] top.wb_timer_tb.wb_mosi.adr[7] top.wb_timer_tb.wb_mosi.adr[6] top.wb_timer_tb.wb_mosi.adr[5] top.wb_timer_tb.wb_mosi.adr[4] top.wb_timer_tb.wb_mosi.adr[3] top.wb_timer_tb.wb_mosi.adr[2] top.wb_timer_tb.wb_mosi.adr[1] top.wb_timer_tb.wb_mosi.adr[0]
+@28
+top.wb_timer_tb.wb_miso.ack
+top.wb_timer_tb.wb_miso.err
+@22
+#{top.wb_timer_tb.wb_miso.rdat[31:0]} top.wb_timer_tb.wb_miso.rdat[31] top.wb_timer_tb.wb_miso.rdat[30] top.wb_timer_tb.wb_miso.rdat[29] top.wb_timer_tb.wb_miso.rdat[28] top.wb_timer_tb.wb_miso.rdat[27] top.wb_timer_tb.wb_miso.rdat[26] top.wb_timer_tb.wb_miso.rdat[25] top.wb_timer_tb.wb_miso.rdat[24] top.wb_timer_tb.wb_miso.rdat[23] top.wb_timer_tb.wb_miso.rdat[22] top.wb_timer_tb.wb_miso.rdat[21] top.wb_timer_tb.wb_miso.rdat[20] top.wb_timer_tb.wb_miso.rdat[19] top.wb_timer_tb.wb_miso.rdat[18] top.wb_timer_tb.wb_miso.rdat[17] top.wb_timer_tb.wb_miso.rdat[16] top.wb_timer_tb.wb_miso.rdat[15] top.wb_timer_tb.wb_miso.rdat[14] top.wb_timer_tb.wb_miso.rdat[13] top.wb_timer_tb.wb_miso.rdat[12] top.wb_timer_tb.wb_miso.rdat[11] top.wb_timer_tb.wb_miso.rdat[10] top.wb_timer_tb.wb_miso.rdat[9] top.wb_timer_tb.wb_miso.rdat[8] top.wb_timer_tb.wb_miso.rdat[7] top.wb_timer_tb.wb_miso.rdat[6] top.wb_timer_tb.wb_miso.rdat[5] top.wb_timer_tb.wb_miso.rdat[4] top.wb_timer_tb.wb_miso.rdat[3] top.wb_timer_tb.wb_miso.rdat[2] top.wb_timer_tb.wb_miso.rdat[1] top.wb_timer_tb.wb_miso.rdat[0]
+#{top.wb_timer_tb.wb_mosi.sel[3:0]} top.wb_timer_tb.wb_mosi.sel[3] top.wb_timer_tb.wb_mosi.sel[2] top.wb_timer_tb.wb_mosi.sel[1] top.wb_timer_tb.wb_mosi.sel[0]
+#{top.wb_timer_tb.wb_mosi.wdat[31:0]} top.wb_timer_tb.wb_mosi.wdat[31] top.wb_timer_tb.wb_mosi.wdat[30] top.wb_timer_tb.wb_mosi.wdat[29] top.wb_timer_tb.wb_mosi.wdat[28] top.wb_timer_tb.wb_mosi.wdat[27] top.wb_timer_tb.wb_mosi.wdat[26] top.wb_timer_tb.wb_mosi.wdat[25] top.wb_timer_tb.wb_mosi.wdat[24] top.wb_timer_tb.wb_mosi.wdat[23] top.wb_timer_tb.wb_mosi.wdat[22] top.wb_timer_tb.wb_mosi.wdat[21] top.wb_timer_tb.wb_mosi.wdat[20] top.wb_timer_tb.wb_mosi.wdat[19] top.wb_timer_tb.wb_mosi.wdat[18] top.wb_timer_tb.wb_mosi.wdat[17] top.wb_timer_tb.wb_mosi.wdat[16] top.wb_timer_tb.wb_mosi.wdat[15] top.wb_timer_tb.wb_mosi.wdat[14] top.wb_timer_tb.wb_mosi.wdat[13] top.wb_timer_tb.wb_mosi.wdat[12] top.wb_timer_tb.wb_mosi.wdat[11] top.wb_timer_tb.wb_mosi.wdat[10] top.wb_timer_tb.wb_mosi.wdat[9] top.wb_timer_tb.wb_mosi.wdat[8] top.wb_timer_tb.wb_mosi.wdat[7] top.wb_timer_tb.wb_mosi.wdat[6] top.wb_timer_tb.wb_mosi.wdat[5] top.wb_timer_tb.wb_mosi.wdat[4] top.wb_timer_tb.wb_mosi.wdat[3] top.wb_timer_tb.wb_mosi.wdat[2] top.wb_timer_tb.wb_mosi.wdat[1] top.wb_timer_tb.wb_mosi.wdat[0]
+@28
+top.wb_timer_tb.wb_mosi.we
+@201
+-wb_timer
+@24
+#{top.wb_timer_tb.wb_timer_inst.count_value_out[31:0]} top.wb_timer_tb.wb_timer_inst.count_value_out[31] top.wb_timer_tb.wb_timer_inst.count_value_out[30] top.wb_timer_tb.wb_timer_inst.count_value_out[29] top.wb_timer_tb.wb_timer_inst.count_value_out[28] top.wb_timer_tb.wb_timer_inst.count_value_out[27] top.wb_timer_tb.wb_timer_inst.count_value_out[26] top.wb_timer_tb.wb_timer_inst.count_value_out[25] top.wb_timer_tb.wb_timer_inst.count_value_out[24] top.wb_timer_tb.wb_timer_inst.count_value_out[23] top.wb_timer_tb.wb_timer_inst.count_value_out[22] top.wb_timer_tb.wb_timer_inst.count_value_out[21] top.wb_timer_tb.wb_timer_inst.count_value_out[20] top.wb_timer_tb.wb_timer_inst.count_value_out[19] top.wb_timer_tb.wb_timer_inst.count_value_out[18] top.wb_timer_tb.wb_timer_inst.count_value_out[17] top.wb_timer_tb.wb_timer_inst.count_value_out[16] top.wb_timer_tb.wb_timer_inst.count_value_out[15] top.wb_timer_tb.wb_timer_inst.count_value_out[14] top.wb_timer_tb.wb_timer_inst.count_value_out[13] top.wb_timer_tb.wb_timer_inst.count_value_out[12] top.wb_timer_tb.wb_timer_inst.count_value_out[11] top.wb_timer_tb.wb_timer_inst.count_value_out[10] top.wb_timer_tb.wb_timer_inst.count_value_out[9] top.wb_timer_tb.wb_timer_inst.count_value_out[8] top.wb_timer_tb.wb_timer_inst.count_value_out[7] top.wb_timer_tb.wb_timer_inst.count_value_out[6] top.wb_timer_tb.wb_timer_inst.count_value_out[5] top.wb_timer_tb.wb_timer_inst.count_value_out[4] top.wb_timer_tb.wb_timer_inst.count_value_out[3] top.wb_timer_tb.wb_timer_inst.count_value_out[2] top.wb_timer_tb.wb_timer_inst.count_value_out[1] top.wb_timer_tb.wb_timer_inst.count_value_out[0]
+@28
+top.wb_timer_tb.wb_timer_inst.timer_inst.count_enable_in
+@22
+#{top.wb_timer_tb.wb_timer_inst.new_count_value_in[31:0]} top.wb_timer_tb.wb_timer_inst.new_count_value_in[31] top.wb_timer_tb.wb_timer_inst.new_count_value_in[30] top.wb_timer_tb.wb_timer_inst.new_count_value_in[29] top.wb_timer_tb.wb_timer_inst.new_count_value_in[28] top.wb_timer_tb.wb_timer_inst.new_count_value_in[27] top.wb_timer_tb.wb_timer_inst.new_count_value_in[26] top.wb_timer_tb.wb_timer_inst.new_count_value_in[25] top.wb_timer_tb.wb_timer_inst.new_count_value_in[24] top.wb_timer_tb.wb_timer_inst.new_count_value_in[23] top.wb_timer_tb.wb_timer_inst.new_count_value_in[22] top.wb_timer_tb.wb_timer_inst.new_count_value_in[21] top.wb_timer_tb.wb_timer_inst.new_count_value_in[20] top.wb_timer_tb.wb_timer_inst.new_count_value_in[19] top.wb_timer_tb.wb_timer_inst.new_count_value_in[18] top.wb_timer_tb.wb_timer_inst.new_count_value_in[17] top.wb_timer_tb.wb_timer_inst.new_count_value_in[16] top.wb_timer_tb.wb_timer_inst.new_count_value_in[15] top.wb_timer_tb.wb_timer_inst.new_count_value_in[14] top.wb_timer_tb.wb_timer_inst.new_count_value_in[13] top.wb_timer_tb.wb_timer_inst.new_count_value_in[12] top.wb_timer_tb.wb_timer_inst.new_count_value_in[11] top.wb_timer_tb.wb_timer_inst.new_count_value_in[10] top.wb_timer_tb.wb_timer_inst.new_count_value_in[9] top.wb_timer_tb.wb_timer_inst.new_count_value_in[8] top.wb_timer_tb.wb_timer_inst.new_count_value_in[7] top.wb_timer_tb.wb_timer_inst.new_count_value_in[6] top.wb_timer_tb.wb_timer_inst.new_count_value_in[5] top.wb_timer_tb.wb_timer_inst.new_count_value_in[4] top.wb_timer_tb.wb_timer_inst.new_count_value_in[3] top.wb_timer_tb.wb_timer_inst.new_count_value_in[2] top.wb_timer_tb.wb_timer_inst.new_count_value_in[1] top.wb_timer_tb.wb_timer_inst.new_count_value_in[0]
+@28
+top.wb_timer_tb.wb_timer_inst.timer_inst.new_count_value_valid_in
+@22
+#{top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[31:0]} top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[31] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[30] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[29] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[28] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[27] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[26] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[25] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[24] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[23] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[22] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[21] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[20] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[19] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[18] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[17] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[16] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[15] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[14] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[13] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[12] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[11] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[10] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[9] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[8] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[7] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[6] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[5] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[4] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[3] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[2] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[1] top.wb_timer_tb.wb_timer_inst.count_top_threshold_in[0]
+@28
+top.wb_timer_tb.wb_timer_inst.timer_inst.top_thresh_valid_in
+@22
+#{top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[31:0]} top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[31] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[30] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[29] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[28] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[27] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[26] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[25] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[24] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[23] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[22] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[21] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[20] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[19] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[18] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[17] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[16] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[15] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[14] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[13] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[12] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[11] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[10] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[9] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[8] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[7] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[6] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[5] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[4] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[3] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[2] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[1] top.wb_timer_tb.wb_timer_inst.pwm_threshold_in[0]
+@28
+top.wb_timer_tb.wb_timer_inst.timer_inst.pwm_thresh_valid_in
+top.wb_timer_tb.wb_timer_inst.timer_inst.pwm_mode_enable_in
+top.wb_timer_tb.wb_timer_inst.timer_inst.pwm_out
+@420
+top.wb_timer_tb.wb_timer_inst.timer_inst.count_direction
+@28
+top.wb_timer_tb.wb_timer_inst.timer_inst.oflow_flag_out
+top.wb_timer_tb.wb_timer_inst.timer_inst.clr_oflow_flag_in
+[pattern_trace] 1
+[pattern_trace] 0
