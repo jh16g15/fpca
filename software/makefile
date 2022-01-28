@@ -15,6 +15,7 @@ build/crt0.o \
 build/uart.o \
 build/utils.o \
 build/ssd1306_i2c.o \
+build/terminal.o \
 
 boot_objects = \
 build/minimal_boot.o
@@ -42,7 +43,8 @@ LDFLAGS = -Map=build/output.map
 # LDFLAGS_RV = $(LDFLAGS) --gc-sections -nostartfiles -T riscv32-fpca.ld
 # we don't need -nostartfiles as a standalone linker invocation requires it to be provided explicitly
 # we need libgcc.a (-lgcc) for soft mult/div, as we aren't using RV32IM
-LDFLAGS_RV = $(LDFLAGS) -lgcc --gc-sections  -T riscv32-fpca.ld
+# we also need one of the following: libc.a, libc_nano.a, libg.a, libg_nano.a for malloc etc
+LDFLAGS_RV = $(LDFLAGS) -lgcc -lg_nano --gc-sections  -T riscv32-fpca.ld
 
 # as this is the first "recipe", executing "make" on its own will run this
 all: clean main boot asm # hosted

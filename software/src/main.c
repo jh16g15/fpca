@@ -17,6 +17,7 @@
 #include "gpio.h"
 #include "utils.h"
 #include "ssd1306_i2c.h"
+#include "terminal.h"
 
 // function prototypes
 
@@ -35,7 +36,7 @@ void main(void)
     Q_SSEG = 0xc0de;
     uart_set_baud(9600);
 
-
+    t_terminal *oled_term = create_terminal(16, 4);
 
     ssd1306_display_sleep();
     // Enable the charge pump and turn the display on
