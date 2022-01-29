@@ -24,6 +24,7 @@ void delay_ms(int dly)
 #endif
 #ifndef SIM
 // this is approximate: valid for -O0 only!
+// TODO: replace with use of timer
 void delay_ms(int dly_ms)
 {
     const int ms_reps = 1220-1;
