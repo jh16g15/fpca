@@ -116,7 +116,7 @@ begin
     --! x0000_0000 to x0FFF_FFFF
     wb_sp_bram_inst : entity work.wb_sp_bram
         generic map(
-            G_MEM_DEPTH_WORDS => 2048,
+            G_MEM_DEPTH_WORDS => 4096,
             G_INIT_FILE       => G_MEM_INIT_FILE
         )
         port map(
