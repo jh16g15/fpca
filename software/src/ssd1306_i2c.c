@@ -3,6 +3,7 @@
 #include "ssd1306_i2c.h"
 #include "utils.h"
 #include "uart.h"
+#include "terminal.h"
 
 #include "ssd1306_font.h"
 
@@ -10,11 +11,15 @@
 #define I2C_SCL (*((volatile unsigned long *)0x10000008))
 #define I2C_SDA (*((volatile unsigned long *)0x1000000C))
 
+#define SSD1306_WIDTH_CHARS 16
+#define SSD1306_HEIGHT_CHARS 4
+
+// only used for deprecated funcs
 #define CURSOR_MAX_X (16-1)
 #define CURSOR_MAX_Y (4-1)
 
-#define SSD1306_ADDR_W 0x78
-#define SSD1306_ADDR_R 0x79
+#define SSD1306_ADDR_WR 0x78
+#define SSD1306_ADDR_RD 0x79
 
 // #define SSD1306_CONTROL_COMMAND 0x80            // one command byte follows
 #define SSD1306_CONTROL_COMMAND 0x00            // Continuous command bytes follow
@@ -144,7 +149,7 @@ void i2c_stop(void){
 
 void ssd1306_whole_display_on(void){
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0xa5);
     i2c_stop();
@@ -152,7 +157,7 @@ void ssd1306_whole_display_on(void){
 
 void ssd1306_resume_ram_content(void){
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0xa4);
     i2c_stop();
@@ -161,14 +166,14 @@ void ssd1306_resume_ram_content(void){
 void ssd1306_display_init(void){
     // Charge pump setting -> Enable Charge Pump
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0x8d);
     i2c_write_byte(0x14);
     i2c_stop();
     // Display ON
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0xaf);
     i2c_stop();
@@ -179,7 +184,7 @@ void ssd1306_display_init(void){
 
 void ssd1306_display_sleep(void){
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0xae);
     i2c_stop();
@@ -189,7 +194,7 @@ void ssd1306_display_sleep(void){
 void ssd1306_set_address_mode(char mode)
 {
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0x20);   // set memory addressing mode
     i2c_write_byte(mode);
@@ -222,7 +227,7 @@ void ssd1306_set_cursor(char x, char y)
 void ssd1306_set_page_start_end(char start_page, char end_page)
 {
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0x22);   // setup page start and end address
     i2c_write_byte(start_page);
@@ -232,7 +237,7 @@ void ssd1306_set_page_start_end(char start_page, char end_page)
 void ssd1306_set_col_start_end(char start_col, char end_col)
 {
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0x21);   // setup column start and end address
     i2c_write_byte(start_col);
@@ -246,7 +251,7 @@ void ssd1306_set_col_start_end(char start_col, char end_col)
 void ssd1306_write_solid_char(void)
 {
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
     // two `page` rows of 8 columns, so 16 bytes for a glyph
     for (int i = 0; i < 16;i++)
@@ -273,7 +278,7 @@ void ssd1306_clear_screen(void)
 {
     // 0 - 127
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0x21);   // setup column start and end address
     i2c_write_byte(0);
@@ -281,7 +286,7 @@ void ssd1306_clear_screen(void)
     i2c_stop();
     // 0 - 7
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0x22);   // setup page start and end address
     i2c_write_byte(0);
@@ -289,7 +294,7 @@ void ssd1306_clear_screen(void)
     i2c_stop();
 
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
     int total_bytes = 128 * 8;
     for (int i = 0; i < total_bytes; i++){
@@ -302,7 +307,7 @@ void ssd1306_fill_screen(char d)
 {
     // 0 - 127
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0x21);   // setup column start and end address
     i2c_write_byte(0);
@@ -310,7 +315,7 @@ void ssd1306_fill_screen(char d)
     i2c_stop();
     // 0 - 7
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_COMMAND);
     i2c_write_byte(0x22);   // setup page start and end address
     i2c_write_byte(0);
@@ -318,7 +323,7 @@ void ssd1306_fill_screen(char d)
     i2c_stop();
 
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
     int total_bytes = 128 * 8;
     for (int i = 0; i < total_bytes; i++){
@@ -330,7 +335,7 @@ void ssd1306_fill_screen(char d)
 void ssd1306_write_gram_byte(char d)
 {
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
     i2c_write_byte(d);
     i2c_stop();
@@ -340,7 +345,7 @@ void ssd1306_write_gram_byte(char d)
 void ssd1306_write_gram_bytes(char d, char num)
 {
     i2c_start();
-    i2c_write_byte(SSD1306_ADDR_W);
+    i2c_write_byte(SSD1306_ADDR_WR);
     i2c_write_byte(SSD1306_CONTROL_DATA_CONTINUOUS);
     for (int i = 0; i < num; i++){
         // i2c_write_byte(d[i]);
@@ -411,4 +416,22 @@ void ssd1306_clearline(char *x_ptr, char *y_ptr)
         ssd1306_advance_cursor(x_ptr, y_ptr);
     }
     ssd1306_carriage_return(x_ptr, y_ptr);  // this might put us on the next line
+}
+
+/*
+ *  New "terminal.h" support
+ */
+// flush the contents of a terminal buffer to the SSD1306
+void ssd1306_refresh(t_terminal *t)
+{
+    // assume "horizontal" address mode, page 0-7, cols 0-128
+
+    // iterate through t->buf until screen is full
+    int ssd1306_numchars = SSD1306_HEIGHT_CHARS * SSD1306_WIDTH_CHARS;
+
+    // write the top row of bytes first
+
+    // index into font rom
+
+
 }
