@@ -187,6 +187,11 @@ void ssd1306_display_init(void)
 
     // set to Horizontal Address mode (wrap to next line/page)
     ssd1306_set_address_mode(SSD1306_ADDR_MODE_HORIZONTAL);
+
+    // set to whole screen GRAM update
+    ssd1306_set_page_start_end(0,7);
+    ssd1306_set_col_start_end(0,127);
+
 }
 
 void ssd1306_display_sleep(void)
