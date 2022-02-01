@@ -30,7 +30,7 @@ int wrap_cursor(t_terminal *t)
  */
 
 // allocate memory for a new "terminal" object of width `w` chars, and height `h` chars.
-t_terminal *create_terminal(int w, int h)
+t_terminal *terminal_create(unsigned int w, unsigned int h)
 {
     // get a pointer to some allocated memory for our char buffer
     char *mem = malloc(w * h * sizeof(char));
