@@ -21,7 +21,7 @@
 #define RW2 (*((volatile unsigned long *)0x10000008))
 #define RW3 (*((volatile unsigned long *)0x1000000C))
 
-#define MAIN_RAM_LEN 8192   // bytes
+#define MAIN_RAM_LEN 16384   // bytes
 
 
 // prints a char to the UART
