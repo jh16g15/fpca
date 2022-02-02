@@ -8,3 +8,5 @@ software/test
 hdl/sim/teroshdl_out.xml
 hdl/sim/teroshdl_export.json
 fpca.gen
+boards/tang_nano_9k/fpca/fpca.gprj.user
+boards/tang_nano_4k
