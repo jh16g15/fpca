@@ -1,16 +1,64 @@
 //Copyright (C)2014-2020 Gowin Semiconductor Corporation.
-//All rights reserved. 
+//All rights reserved.
 //File Title: Physical Constraints file
 //GOWIN Version: V1.9.6.02Beta
 //Part Number: GW1NR-LV9QN88PC6/I5
 //Created Time: Fri 01 07 19:29:56 2022
 
-IO_LOC "LED[5]" 16;
-IO_LOC "LED[4]" 15;
-IO_LOC "LED[3]" 14;
-IO_LOC "LED[2]" 13;
-IO_LOC "LED[1]" 11;
-IO_LOC "LED[0]" 10;
+// Note: The `IO_LOC` is the GW1NR-9 Pin Number
+
+
+// Input Clock
+IO_LOC "XTAL_IN" 52;
+IO_PORT "XTAL_IN" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+
+// LEDs (active low!)
+IO_LOC "LEDn[5]" 16;
+IO_LOC "LEDn[4]" 15;
+IO_LOC "LEDn[3]" 14;
+IO_LOC "LEDn[2]" 13;
+IO_LOC "LEDn[1]" 11;
+IO_LOC "LEDn[0]" 10;
+
+// Buttons
+IO_LOC "Reset_Button" 4;
+IO_LOC "User_Button" 3;
+
+// UART (to BL702)
+// Settings from picotiny example
+IO_LOC "UART_TX" 17;
+IO_PORT "UART_TX" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+IO_LOC "UART_RX" 18;
+IO_PORT "UART_RX" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// TF Card (Micro-SD card)
+//IO_LOC "TF_MISO" 39;
+//IO_PORT "TF_MISO" IO_TYPE=LVCMOS33;
+//IO_LOC "TF_CS" 38;
+//IO_PORT "TF_CS" IO_TYPE=LVCMOS33;
+//IO_LOC "TF_MOSI" 37;
+//IO_PORT "TF_MOSI" IO_TYPE=LVCMOS33;
+//IO_LOC "TF_SCLK" 36;
+//IO_PORT "TF_SCLK" IO_TYPE=LVCMOS33;
+
+// External Flash
+//IO_LOC "FLASH_MISO" 62;
+//IO_LOC "FLASH_MOSI" 61;
+//IO_LOC "FLASH_CS" 60;
+//IO_LOC "FLASH_SCK" 59;
+
+
+// 40-pin LCD connector (mutually exclusive with HDMI)
+// Control Signals
+IO_LOC "LCD_DEN" 33;    // "Data Enable"
+IO_PORT "LCD_DEN" IO_TYPE=LVCMOS33;
+IO_LOC "LCD_SYNC" 34;   // VSYNC
+IO_PORT "LCD_SYNC" IO_TYPE=LVCMOS33;
+IO_LOC "LCD_HYNC" 40;   // HSYNC
+IO_PORT "LCD_HYNC" IO_TYPE=LVCMOS33;
+IO_LOC "LCD_CLK" 35;    // Clock (~9 MHz for 480x272)
+IO_PORT "LCD_CLK" IO_TYPE=LVCMOS33;
+// Data signals
 IO_LOC "LCD_B[4]" 41;
 IO_PORT "LCD_B[4]" IO_TYPE=LVCMOS33;
 IO_LOC "LCD_B[3]" 42;
@@ -43,15 +91,3 @@ IO_LOC "LCD_R[1]" 74;
 IO_PORT "LCD_R[1]" IO_TYPE=LVCMOS33;
 IO_LOC "LCD_R[0]" 75;
 IO_PORT "LCD_R[0]" IO_TYPE=LVCMOS33;
-IO_LOC "LCD_DEN" 33;
-IO_PORT "LCD_DEN" IO_TYPE=LVCMOS33;
-IO_LOC "LCD_SYNC" 34;
-IO_PORT "LCD_SYNC" IO_TYPE=LVCMOS33;
-IO_LOC "LCD_HYNC" 40;
-IO_PORT "LCD_HYNC" IO_TYPE=LVCMOS33;
-IO_LOC "LCD_CLK" 35;
-IO_PORT "LCD_CLK" IO_TYPE=LVCMOS33;
-IO_LOC "XTAL_IN" 52;
-IO_PORT "XTAL_IN" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
-IO_LOC "Reset_Button" 4;
-IO_LOC "User_Button" 3;
