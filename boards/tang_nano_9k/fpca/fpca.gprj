@@ -8,5 +8,10 @@
         <File path="src/Tang_nano_9K_LCD.cst" type="file.cst" enable="1"/>
         <File path="src/Tang_nano_9K_LCD.sdc" type="file.sdc" enable="1"/>
         <File path="src/tang_nano_9k_wrapper.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/gowin_rpll/gowin_rpll.vhd" type="file.vhdl" enable="1"/>
+        <File path="D:/Documents/fpga/fpca/hdl/src/peripherals/display_old/display_colour_ram.vhd" type="file.vhdl" enable="1"/>
+        <File path="D:/Documents/fpga/fpca/hdl/src/peripherals/display_old/display_text_controller.vhd" type="file.vhdl" enable="1"/>
+        <File path="D:/Documents/fpga/fpca/hdl/src/peripherals/display_old/pkg_lcd_params_480_272_60hz.vhd" type="file.vhdl" enable="1"/>
+        <File path="D:/Documents/fpga/fpca/hdl/src/peripherals/display_old/simple_dual_two_clocks.vhd" type="file.vhdl" enable="1"/>
     </FileList>
 </Project>
