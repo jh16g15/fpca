@@ -23,6 +23,6 @@ package pkg_lcd_params_480_272_60hz is
     constant END_BPORCH_Y   : integer := END_SYNC_Y + BACK_PORCH_Y;     -- 288
 
     -- '1' for active high, '0' for active low
-    constant ACTIVE_HS  : std_logic := '1';
-    constant ACTIVE_VS  : std_logic := '1';
+    constant ACTIVE_HS  : std_logic := '0';
+    constant ACTIVE_VS  : std_logic := '0';
 end pkg_lcd_params_480_272_60hz;

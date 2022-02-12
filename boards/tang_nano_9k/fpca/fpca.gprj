@@ -13,5 +13,6 @@
         <File path="D:/Documents/fpga/fpca/hdl/src/peripherals/display_old/display_text_controller.vhd" type="file.vhdl" enable="1"/>
         <File path="D:/Documents/fpga/fpca/hdl/src/peripherals/display_old/pkg_lcd_params_480_272_60hz.vhd" type="file.vhdl" enable="1"/>
         <File path="D:/Documents/fpga/fpca/hdl/src/peripherals/display_old/simple_dual_two_clocks.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/lcd_counters.vhd" type="file.vhdl" enable="1"/>
     </FileList>
 </Project>

@@ -8,9 +8,9 @@ entity tang_nano_9k_wrapper is
 
         LEDn : out std_logic_vector(5 downto 0); -- active low
 
-        -- active low?
-        Reset_Button : in std_logic;
-        User_Button : in std_logic;
+        -- active low
+        Reset_Button_n : in std_logic;
+        User_Button_n : in std_logic;
 
         UART_TX : out std_logic;
         UART_RX : in std_logic;
@@ -49,13 +49,18 @@ architecture rtl of tang_nano_9k_wrapper is
             clkin  : in std_logic
         );
     end component;
+
+    signal x_count : integer;
+    signal y_count : integer;
+
+    signal red : std_logic_vector(4 downto 0);
+    signal green : std_logic_vector(5 downto 0);
+    signal blue : std_logic_vector(4 downto 0);
 begin
 
-    reset   <= Reset_Button;
+    reset   <= not Reset_Button_n;
     reset_n <= not reset;
 
---    reset   <= not reset_n;
---    reset_n <= Reset_Button;
 
     LEDn <= not led;
 
@@ -79,25 +84,45 @@ begin
         end if;
     end process;
 
-        LCD_DEN  <= '0';
-        LCD_SYNC  <= vga_vs;
-        LCD_HYNC  <= vga_hs;
-        LCD_CLK   <= pixelclk;
+    LCD_CLK   <= pixelclk;
 
-        LCD_R  <= vga_red & '0';
-        LCD_G  <= vga_green & "00";
-        LCD_B  <= vga_blue & '0';
+    process (all)
+    begin
+        red <= (others => '0');
+        green <= (others => '0');
+        blue <= (others => '0');
 
-    display_text_controller_inst : entity work.display_text_controller
-        port map(
-            pixelclk => pixelclk,
-            areset_n => reset_n,
-            vga_hs   => vga_hs,
-            vga_vs   => vga_vs,
-            -- 12-bit VGA
-            vga_r => vga_red,
-            vga_g => vga_green,
-            vga_b => vga_blue
-        );
+        if x_count = 0 then
+            red <= (others => '1');
+        end if;
+        if x_count = 480-1 then
+            red <= (others => '1');
+        end if;
+        if y_count = 0 then
+            green <= (others => '1');
+        end if;
+        if y_count = 272-1 then
+            blue <= (others => '1');
+        end if;
+    end process;
+
+
+    lcd_control_inst : entity work.lcd_control
+    port map (
+      pixelclk => pixelclk,
+      reset => reset,
+      LCD_HSYNC => LCD_HYNC,
+      LCD_VSYNC => LCD_SYNC,
+      LCD_DATA_EN => LCD_DEN,
+      x_count_out => x_count,
+      y_count_out => y_count,
+      red_in => red,
+      green_in => green,
+      blue_in => blue,
+      LCD_R_out => LCD_R,
+      LCD_G_out => LCD_G,
+      LCD_B_out => LCD_B
+    );
+
 
 end architecture;
