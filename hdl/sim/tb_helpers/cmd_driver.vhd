@@ -33,7 +33,7 @@ entity cmd_driver is
 end entity cmd_driver;
 
 architecture rtl of cmd_driver is
-    constant C_NUM_CMDS : integer := 20;
+    constant C_NUM_CMDS : integer := 21;
 
     constant CMD_H : integer := 71;
     constant CMD_L : integer := 68;
@@ -79,10 +79,11 @@ architecture rtl of cmd_driver is
         mem(13) := W & UBYTE & x"0000_0014" & x"0000_0088"; -- Store byte ()
         mem(14) := R & UBYTE & x"0000_0014" & x"0000_0088"; -- load byte (unsigned)
         mem(15) := R & SBYTE & x"0000_0014" & x"FFFF_FF88"; -- load byte (signed)
-        mem(16) := W & UBYTE & x"0000_0021" & x"0000_0085"; -- Store byte (not aligned)
-        mem(17) := R & UBYTE & x"0000_0021" & x"0000_0085"; -- load byte (unsigned)
-        mem(18) := R & SBYTE & x"0000_0021" & x"FFFF_FF85"; -- load byte (signed)
-        mem(19) := RL & WORD & x"0000_0020" & x"0000_8500"; -- read word - check just that byte written
+        mem(16) := W & WORD  & x"0000_0020" & x"0000_0000"; -- load this word with 0's
+        mem(17) := W & UBYTE & x"0000_0021" & x"0000_0085"; -- Store byte (not aligned)
+        mem(18) := R & UBYTE & x"0000_0021" & x"0000_0085"; -- load byte (unsigned)
+        mem(19) := R & SBYTE & x"0000_0021" & x"FFFF_FF85"; -- load byte (signed)
+        mem(20) := RL & WORD & x"0000_0020" & x"0000_8500"; -- read word - check just that byte written
         return mem;
     end function;
 
