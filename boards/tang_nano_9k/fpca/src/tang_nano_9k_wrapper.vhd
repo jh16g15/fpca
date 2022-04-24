@@ -88,10 +88,16 @@ begin
 
     process (all)
     begin
+        -- defaults
         red <= (others => '0');
         green <= (others => '0');
         blue <= (others => '0');
 
+        -- red <= "11111";
+        -- green <= "100000";
+        -- blue <= "10000";
+
+        -- borders
         if x_count = 0 then
             red <= (others => '1');
         end if;
@@ -107,7 +113,10 @@ begin
     end process;
 
 
-    lcd_control_inst : entity work.lcd_control
+    lcd_counters_inst : entity work.lcd_counters
+    generic map (
+        G_PIXEL_DATA_LATENCY => 0
+    )
     port map (
       pixelclk => pixelclk,
       reset => reset,

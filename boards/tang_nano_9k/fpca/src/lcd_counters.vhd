@@ -4,7 +4,13 @@ use ieee.numeric_std.all;
 
 use work.pkg_lcd_params_480_272_60hz.all;
 
-entity lcd_control is
+entity lcd_counters is
+    generic (
+        -- How many clocks the display logic takes to get the colour data from the pixel XY coordinates -
+        -- tells us how many cycles to delay the LCD_HSYNC/LCD_VSYNC/LCD_DATA_EN signals by to sync up
+        -- 0 for combinational
+        G_PIXEL_DATA_LATENCY : integer := 0
+    );
     port (
         pixelclk   : in std_logic;
         reset : in std_logic;
@@ -29,19 +35,52 @@ entity lcd_control is
         LCD_B_out : out std_logic_vector(4 downto 0)
 
     );
-end entity lcd_control;
+end entity lcd_counters;
 
-architecture rtl of lcd_control is
+architecture rtl of lcd_counters is
     signal h_count  : integer;
     signal v_count  : integer;
 
     signal active_area : std_logic;
+
+    signal hsync_i : std_logic;
+    signal vsync_i : std_logic;
+    signal data_en_i : std_logic;
+
+    signal dly_hsync : std_logic_vector(G_PIXEL_DATA_LATENCY downto 0);
+    signal dly_vsync : std_logic_vector(G_PIXEL_DATA_LATENCY downto 0);
+    signal dly_data_en : std_logic_vector(G_PIXEL_DATA_LATENCY downto 0);
 begin
+
+    -- original
+    no_pipe : if G_PIXEL_DATA_LATENCY = 0 generate
+        LCD_HSYNC <= hsync_i;
+        LCD_VSYNC <= vsync_i;
+        LCD_DATA_EN <= data_en_i;
+    end generate;
+
+    -- delay pipeline shift register to sync the control signals to the fetched pixel data
+    -- TODO: do we also need to change where we mask off the input data to 0s, to account for these delays?
+    -- output from the end of the pipeline
+    dly_gen : if G_PIXEL_DATA_LATENCY > 0 generate
+        LCD_HSYNC <= dly_hsync(dly_hsync'left);
+        LCD_VSYNC <= dly_vsync(dly_vsync'left);
+        LCD_DATA_EN <= dly_data_en(dly_data_en'left);
+        dly_proc : process(pixelclk, reset)
+        begin
+            if rising_edge(pixelclk) then
+                dly_hsync <= dly_hsync(dly_hsync'left-1 downto 0) & hsync_i;
+                dly_vsync <= dly_vsync(dly_vsync'left-1 downto 0) & vsync_i;
+                dly_data_en <= dly_data_en(dly_data_en'left-1 downto 0) & data_en_i;
+            end if;
+        end process;
+
+    end generate;
 
     x_count_out <= h_count;
     y_count_out <= v_count;
 
-    LCD_DATA_EN <= active_area;
+    data_en_i <= active_area;
 
     sync_counters : process(pixelclk, reset)
     begin
@@ -87,15 +126,15 @@ begin
             end if;
 
             if (h_count >= END_FPORCH_X) and (h_count < END_SYNC_X) then
-                LCD_HSYNC <= ACTIVE_HS;
+                hsync_i <= ACTIVE_HS;
             else
-                LCD_HSYNC <= not ACTIVE_HS;
+                hsync_i <= not ACTIVE_HS;
             end if;
 
             if (v_count >= END_FPORCH_Y) and (v_count < END_SYNC_Y) then
-                LCD_VSYNC <= ACTIVE_VS;
+                vsync_i <= ACTIVE_VS;
             else
-                LCD_VSYNC <= not ACTIVE_VS;
+                vsync_i <= not ACTIVE_VS;
             end if;
 
         end if;
