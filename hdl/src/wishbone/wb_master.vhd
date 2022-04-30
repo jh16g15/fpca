@@ -93,7 +93,7 @@ begin
                             cmd_stall          <= '1';
                             wb_cyc             <= '1';
                             wb_stb             <= '1';
-                            wb_mosi_out.adr    <= cmd_addr_in;
+                            wb_mosi_out.adr    <= cmd_addr_in(C_WB_ADDR_W-1 downto 2) & b"00";  -- force 32 bit aligned addresses
                             wb_mosi_out.sel    <= cmd_sel_in;
                             wb_mosi_out.we     <= cmd_we_in;
                             wb_mosi_out.wdat   <= wb_align_store_data(cmd_wdata_in, cmd_sel_in);
