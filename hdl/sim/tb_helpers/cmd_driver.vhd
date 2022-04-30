@@ -184,7 +184,7 @@ begin
                     -- synthesis translate_on
                     if cmd_mem(rsp_count)(CMD_L) = '0' then -- if was a read
                         -- synthesis translate_off
-                        check_equal(rsp_rdata_in, exp_rdat, "RDATA got: " & to_hstring(rsp_rdata_in) & " Exp: " & to_hstring(exp_rdat), warning);
+                        check_equal(rsp_rdata_in, exp_rdat, "RDATA got: " & to_hstring(rsp_rdata_in) & " Exp: " & to_hstring(exp_rdat), error);
                         -- synthesis translate_on
                     end if;
 

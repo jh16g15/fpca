@@ -36,7 +36,7 @@ architecture bench of tb_wb_psram_simple is
     constant G_BURST_LEN : integer := 16;
     constant G_MEMCLK_PERIOD : time := 10 ns;
     constant G_DATA_W : integer := 32;
-    constant G_ADDR_W : integer := 21;  -- of PSRAM (21 bits for 8MB?)
+    constant G_PSRAM_ADDR_W : integer := 21;  -- of PSRAM (21 bits for 8MB?)
     constant G_MEM_DEPTH : integer := 32;   -- for simulating with a smaller memory to reduce sim time
     constant C_INIT_DELAY : integer := 10;
     constant C_READ_DELAY : integer := 10;
@@ -45,7 +45,7 @@ architecture bench of tb_wb_psram_simple is
     signal wr_data : std_logic_vector(G_DATA_W-1 downto 0);
     signal rd_data :  std_logic_vector(G_DATA_W-1 downto 0);
     signal rd_data_valid : std_logic;
-    signal addr : std_logic_vector(G_ADDR_W-1 downto 0);
+    signal addr : std_logic_vector(G_PSRAM_ADDR_W-1 downto 0);
     signal cmd : std_logic;
     signal cmd_en : std_logic;
     signal init_calib : std_logic;
@@ -100,7 +100,7 @@ begin
     wb_psram_simple_inst : entity work.wb_psram_simple
         generic map (
           G_BURST_LEN => G_BURST_LEN,
-          G_PSRAM_ADDR_W => G_ADDR_W
+          G_PSRAM_ADDR_W => G_PSRAM_ADDR_W
         )
         port map (
           wb_clk => wb_clk,
@@ -122,7 +122,7 @@ begin
         G_BURST_LEN => G_BURST_LEN,
         G_MEMCLK_PERIOD => G_MEMCLK_PERIOD,
         G_DATA_W => G_DATA_W,
-        G_ADDR_W => G_ADDR_W,
+        G_PSRAM_ADDR_W => G_PSRAM_ADDR_W,
         G_MEM_DEPTH => G_MEM_DEPTH,
         C_INIT_DELAY => C_INIT_DELAY,
         C_READ_DELAY => C_READ_DELAY

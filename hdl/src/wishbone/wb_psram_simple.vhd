@@ -17,7 +17,7 @@ use work.wb_pkg.all; -- 32 bit port, 8 bit granularity
 entity wb_psram_simple is
     generic (
         G_BURST_LEN : integer := 16; -- 32, 64, 128
-        G_PSRAM_ADDR_W : integer := 21
+        G_PSRAM_ADDR_W : integer := 21  -- 64Mbit organised into 2^21 16-bit words
     );
     port (
         wb_clk   : in std_logic;    -- usrclk (clk_out from psram IP)
@@ -77,7 +77,7 @@ begin
                         -- wb_miso_out.ack <= '0';
                         if wb_mosi_in.stb = '1' and wb_miso_out.stall = '0' then -- assume CYC asserted by master for STB to be high
                             -- common to reads and writes
-                            addr_out <= wb_mosi_in.adr(G_PSRAM_ADDR_W-1+2 downto 2);
+                            addr_out <= wb_mosi_in.adr(G_PSRAM_ADDR_W-1+1 downto 1);    -- convert to 16 bit address
                             cmd_out <= wb_mosi_in.we; -- READ/WRITE
                             cmd_en_out <= '1';
                             cmd_cycle_count <= (others => '0'); -- reset cycle counter
