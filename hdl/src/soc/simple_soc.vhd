@@ -152,6 +152,7 @@ begin
     i2c_scl_out <= rw_regs_out(2)(0);
     i2c_sda_out <= rw_regs_out(3)(0);
 
+    -- 0x2000_00000
     wb_uart_simple_inst : entity work.wb_uart_simple
         generic map(
             DEFAULT_BAUD => G_DEFAULT_BAUD,
@@ -165,6 +166,25 @@ begin
             uart_tx_out => uart_tx_out,
             uart_rx_in  => uart_rx_in
         );
+
+    -- 0x3000_0000
+    wb_timer_inst : entity work.wb_timer
+        generic map (
+          G_NUM_TIMERS => G_NUM_TIMERS
+        )
+        port map (
+          wb_clk => clk,
+          wb_reset => reset,
+          wb_mosi_in => wb_slave_mosi_arr(3),
+          wb_miso_out => wb_slave_miso_arr(3),
+          pwm_out => open,
+          timer_interrupt_out => open
+        );
+
+
+
+
+
     quad_seven_seg_driver_inst : entity work.quad_seven_seg_driver
         generic map(
             G_REFCLK_FREQ => G_SOC_FREQ
