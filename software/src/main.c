@@ -19,13 +19,16 @@
 #include "ssd1306_i2c.h"
 #include "terminal.h"
 
+
+#define TEXT_BASE (*((volatile unsigned long *)0x40000000))
+
 // function prototypes
 
 void main(void)
 {
-    // if SW15 set on reset, jump to the bootloader
+    // if SW0 set on reset, jump to the bootloader
     // TODO: Move this to the crt0.s Startup script
-    if (get_bit(GPIO_SW, 15))
+    if (get_bit(GPIO_SW, 0))
     {
         // Jump to bootloader _start
         asm(
@@ -72,8 +75,20 @@ void main(void)
     ssd1306_refresh(oled_term);
     terminal_write_string(oled_term, "\rLoading.........\n");
     ssd1306_refresh(oled_term);
-    while(1){}
 
+    int counter = 0;
+    while (1)
+    {
+        uart_puts("Hello from the FPCA!\r\n");
+        char fg_colour = 1;
+        char bg_colour = 2;
+        char charcode = 0;
+        TEXT_BASE = (bg_colour << 12) + (fg_colour << 8) + charcode;
+        counter++;
+        if (counter > 256){
+            counter = 0;
+        }
+    }
 
     // int tmp=0;
     // while (1)

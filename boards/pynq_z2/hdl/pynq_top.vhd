@@ -3,15 +3,13 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 use work.axi_pkg.all;
+use work.wb_pkg.all;
 
 entity pynq_top is
     generic (
         G_DVI : string := "hamsterworks" -- "hamsterworks"
     );
     port (
-        -- clk   : in std_logic;
-        -- reset : in std_logic;
-
         DDR : inout t_ddr;
 
         -- Zynq Fixed IO
@@ -36,11 +34,19 @@ entity pynq_top is
         led5_g : out std_logic;
         led5_r : out std_logic;
         btn    : in std_logic_vector(3 downto 0);
-        sw     : in std_logic_vector(1 downto 0)
+        sw     : in std_logic_vector(1 downto 0);
+
+        -- UART (to Raspi connector)
+        uart_tx_out : out std_logic; -- Pin 5 (W19)
+        uart_rx_in  : in std_logic   -- Pin 3 (W18)
+
     );
 end entity;
 
 architecture rtl of pynq_top is
+    -- run location: fpca/boards/pynq_z2/fpca
+    constant G_MEM_INIT_FILE : string := "../../../software/hex/main.hex"; -- from toolchain
+    constant G_BOOT_INIT_FILE : string := "../../../software/hex/boot.hex"; -- from toolchain
 
     signal FCLK_CLK0_100 : std_logic;
     signal FCLK_RESET0_N : std_logic;
@@ -71,6 +77,11 @@ architecture rtl of pynq_top is
     signal TMDS_allp : std_logic_vector(3 downto 0);
     signal TMDS_alln : std_logic_vector(3 downto 0);
 
+    signal text_display_wb_mosi : t_wb_mosi;
+    signal text_display_wb_miso : t_wb_miso;
+
+    signal gpio_led : std_logic_vector(31 downto 0);
+
     component clk_wiz_0
         port (
             clk_out1            : out std_logic;
@@ -91,15 +102,13 @@ begin
     led4_g <= locked;
     led5_g <= sw(1);
 
-    led <= btn;
-
     resetn <= FCLK_RESET0_N;
 
     pll : clk_wiz_0
     port map(
         clk_out1            => open,     -- 100MHz
         pixelclk_out        => pixelclk, -- 25MHz
-        hdmi_serdes_clk_out => tmdsclk,  -- 250MHz
+        hdmi_serdes_clk_out => tmdsclk,  -- 250MHz (unused)
         dvi_clk_out         => dvi_clk,  -- 125MHz
         dvi_clkn_out        => dvi_clkn, -- 125MHz, 180deg phase shift
         locked              => locked,
@@ -126,16 +135,18 @@ begin
             );
     end generate;
 
-    display_text_controller_inst : entity work.display_text_controller
+    wb_display_text_controller_inst : entity work.wb_display_text_controller
         port map(
-            pixelclk  => pixelclk,
-            areset_n  => locked,
-            vga_hs    => hsync,
-            vga_vs    => vsync,
-            vga_blank => blank,
-            vga_r     => red_pixel(7 downto 4),
-            vga_g     => green_pixel(7 downto 4),
-            vga_b     => blue_pixel(7 downto 4)
+            pixelclk                 => pixelclk,
+            areset_n                 => locked,
+            vga_hs                   => hsync,
+            vga_vs                   => vsync,
+            vga_blank                => blank,
+            vga_r                    => red_pixel(7 downto 4),
+            vga_g                    => green_pixel(7 downto 4),
+            vga_b                    => blue_pixel(7 downto 4),
+            text_display_wb_mosi_in  => text_display_wb_mosi,
+            text_display_wb_miso_out => text_display_wb_miso
         );
 
     ps_block_custom_wrapper_inst : entity work.ps_block_custom_wrapper
@@ -159,4 +170,28 @@ begin
             S_AXI_HP0_MISO    => S_AXI_HP0_MISO
         );
 
+    led <= gpio_led(3 downto 0);
+
+    simple_soc_inst : entity work.simple_soc
+        generic map(
+            G_MEM_INIT_FILE  => G_MEM_INIT_FILE,
+            G_BOOT_INIT_FILE => G_BOOT_INIT_FILE,
+            G_SOC_FREQ     => 25_000_000,
+            G_DEFAULT_BAUD => 9600
+        )
+        port map(
+            clk                      => pixelclk,
+            reset                    => not locked,
+            gpio_led_out             => gpio_led,
+            gpio_btn_in              => x"0000_000" & btn(3 downto 0),
+            gpio_sw_in               => x"0000_000" & b"00" & sw(1 downto 0),
+            -- sseg_ca_out              => sseg_ca_out,
+            -- sseg_an_out              => sseg_an_out,
+            uart_tx_out              => uart_tx_out,
+            uart_rx_in               => uart_rx_in,
+            i2c_scl_out              => open,
+            i2c_sda_out              => open,
+            text_display_wb_mosi_out => text_display_wb_mosi,
+            text_display_wb_miso_in  => text_display_wb_miso
+        );
 end architecture;

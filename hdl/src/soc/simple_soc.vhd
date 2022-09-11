@@ -10,10 +10,10 @@ use work.joe_common_pkg.all;
 
 entity simple_soc is
     generic (
-        G_MEM_INIT_FILE : string  := "../../software/hex/main.hex";
+        G_MEM_INIT_FILE  : string  := "../../software/hex/main.hex";
         G_BOOT_INIT_FILE : string  := "../../software/hex/boot.hex";
-        G_SOC_FREQ      : integer := 50_000_000;
-        G_DEFAULT_BAUD  : integer := 9600
+        G_SOC_FREQ       : integer := 50_000_000;
+        G_DEFAULT_BAUD   : integer := 9600
     );
     port (
         clk   : in std_logic;
@@ -34,7 +34,11 @@ entity simple_soc is
 
         -- I2C (write only)
         i2c_scl_out : out std_logic;
-        i2c_sda_out : out std_logic
+        i2c_sda_out : out std_logic;
+
+        -- Wishbone to framebuffer
+        text_display_wb_mosi_out : out t_wb_mosi;
+        text_display_wb_miso_in  : in t_wb_miso
 
     );
 end entity simple_soc;
@@ -61,7 +65,7 @@ architecture rtl of simple_soc is
     signal rw_regs_out : t_slv32_arr(G_NUM_RW_REGS - 1 downto 0);
     signal ro_regs_in  : t_slv32_arr(G_NUM_RO_REGS - 1 downto 0);
 
-    attribute mark_debug : boolean;
+    attribute mark_debug                : boolean;
     attribute mark_debug of rw_regs_out : signal is true;
     attribute mark_debug of ro_regs_in  : signal is true;
 
@@ -85,7 +89,7 @@ begin
         );
     -- 2:1 arbiter
     wb_arbiter_inst : entity work.wb_arbiter
-        generic map (
+        generic map(
             G_ARBITER => "priority"
         )
         port map(
@@ -169,22 +173,21 @@ begin
 
     -- 0x3000_0000
     wb_timer_inst : entity work.wb_timer
-        generic map (
-          G_NUM_TIMERS => G_NUM_TIMERS
+        generic map(
+            G_NUM_TIMERS => 1
         )
-        port map (
-          wb_clk => clk,
-          wb_reset => reset,
-          wb_mosi_in => wb_slave_mosi_arr(3),
-          wb_miso_out => wb_slave_miso_arr(3),
-          pwm_out => open,
-          timer_interrupt_out => open
+        port map(
+            wb_clk              => clk,
+            wb_reset            => reset,
+            wb_mosi_in          => wb_slave_mosi_arr(3),
+            wb_miso_out         => wb_slave_miso_arr(3),
+            pwm_out             => open,
+            timer_interrupt_out => open
         );
 
-
-
-
-
+    -- 0x4000_0000 (external framebuffer, up to 256MB of address space)
+    text_display_wb_mosi_out <= wb_slave_mosi_arr(4);
+    wb_slave_miso_arr(4)         <= text_display_wb_miso_in;
     quad_seven_seg_driver_inst : entity work.quad_seven_seg_driver
         generic map(
             G_REFCLK_FREQ => G_SOC_FREQ
@@ -196,26 +199,24 @@ begin
             sseg_an         => sseg_an_out
         );
 
-    gen_unmapped : for i in 4 to 14 generate
+    gen_unmapped : for i in 5 to 14 generate
         wb_unmapped_slv_inst : entity work.wb_unmapped_slv
-        port map (
-          wb_mosi_in => wb_slave_mosi_arr(i),
-          wb_miso_out => wb_slave_miso_arr(i)
-        );
+            port map(
+                wb_mosi_in  => wb_slave_mosi_arr(i),
+                wb_miso_out => wb_slave_miso_arr(i)
+            );
     end generate;
-
-
     --! Bootloader memory
     --! xF000_0000 to xFFFF_FFFF
     bootloader_inst : entity work.wb_sp_bram
-    generic map(
-        G_MEM_DEPTH_WORDS => 256,
-        G_INIT_FILE       => G_BOOT_INIT_FILE
-    )
-    port map(
-        wb_clk      => clk,
-        wb_reset    => reset,
-        wb_mosi_in  => wb_slave_mosi_arr(15),
-        wb_miso_out => wb_slave_miso_arr(15)
-    );
+        generic map(
+            G_MEM_DEPTH_WORDS => 256,
+            G_INIT_FILE       => G_BOOT_INIT_FILE
+        )
+        port map(
+            wb_clk      => clk,
+            wb_reset    => reset,
+            wb_mosi_in  => wb_slave_mosi_arr(15),
+            wb_miso_out => wb_slave_miso_arr(15)
+        );
 end architecture;
