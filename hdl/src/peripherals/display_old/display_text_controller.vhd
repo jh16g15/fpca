@@ -1,21 +1,21 @@
 ----------------------------------------------------------------------------------
--- Company:
+-- Company: 
 -- Engineer: Joseph Hindmarsh
---
+-- 
 -- Create Date: 06.06.2020 13:45:07
--- Design Name:
+-- Design Name: 
 -- Module Name: display_text_controller - rtl
--- Project Name:
+-- Project Name: 
 -- Target Devices: xc7a35tcpg236-1 Artix 7 35T on Basys3
 -- Tool Versions: 2019.2
--- Description:
---
--- Dependencies:
---
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
 -- Revision:
 -- Revision 0.01 - File Created
 -- Additional Comments:
---
+-- 
 ----------------------------------------------------------------------------------
 
 
@@ -32,16 +32,16 @@ use IEEE.NUMERIC_STD.ALL;
 --use UNISIM.VComponents.all;
 
 -- Select which resolution we are targetting
-use work.pkg_lcd_params_480_272_60hz.all;
--- use work.pkg_vga_params_1920_1080_60hz.all;
+--use work.pkg_vga_params_1920_1080_60hz.all;
 --use work.pkg_vga_params_1280_1024_60hz.all;
---use work.pkg_vga_params_640_480_60hz.all;
+use work.pkg_vga_params_640_480_60hz.all;
 
 entity display_text_controller is
     Port ( pixelclk : in STD_LOGIC;
            areset_n : in STD_LOGIC;
            vga_hs : out STD_LOGIC;
            vga_vs : out STD_LOGIC;
+           vga_blank : out STD_LOGIC;
            vga_r : out STD_LOGIC_VECTOR (3 downto 0);
            vga_g : out STD_LOGIC_VECTOR (3 downto 0);
            vga_b : out STD_LOGIC_VECTOR (3 downto 0));
@@ -51,23 +51,23 @@ architecture rtl of display_text_controller is
  -- font parameters
     constant CHAR_W : integer := 8;
     constant CHAR_H : integer := 16;
-
+    
     -- display parameters
     constant CHARS_X : integer := END_ACTIVE_X / CHAR_W;
     constant CHARS_Y : integer := END_ACTIVE_Y / CHAR_H;
-
+    
     -- font RAM parameters
-    constant CHARS_IN_FONT : integer := 256;    --
+    constant CHARS_IN_FONT : integer := 256;    -- 
     constant FONT_ADDR_W : integer := 12;        -- todo: parametersise this
     constant FONT_DATA_W : integer := CHAR_W;
     constant FONT_DEPTH : integer := CHAR_H * CHARS_IN_FONT;
-
+    
     -- text RAM parameters
     constant TEXT_ADDR_W : integer := 16;        -- todo: parametersise this
     constant TEXT_DATA_W : integer := 18;        -- 8 bit charcode, 10 bit colours
     constant TEXT_DEPTH : integer := CHARS_X * CHARS_Y;
 
-
+    
     -- RAM control signals
     signal font_ena      : std_logic;
     signal font_enb      : std_logic;
@@ -83,21 +83,21 @@ architecture rtl of display_text_controller is
     signal text_addrb    : std_logic_vector(TEXT_ADDR_W-1 downto 0);
     signal text_dia      : std_logic_vector(TEXT_DATA_W-1 downto 0);
     signal text_dob      : std_logic_vector(TEXT_DATA_W-1 downto 0);
-
-    signal h_count  : integer;
+    
+    signal h_count  : integer; 
     signal v_count  : integer;
-    signal h_count_d1  : integer;
+    signal h_count_d1  : integer; 
     signal v_count_d1  : integer;
-    signal h_count_d2  : integer;
+    signal h_count_d2  : integer; 
     signal v_count_d2  : integer;
-    signal h_count_d3  : integer;
+    signal h_count_d3  : integer; 
     signal v_count_d3  : integer;
     signal active_area : std_logic;
-
+    
     signal char_x   : integer;
     signal char_y   : integer;
     signal char_address : integer;
-
+    
     -- display signals
     signal font_line : std_logic_vector(CHAR_W-1 downto 0);
     signal font_row : unsigned(FONT_ADDR_W-1 downto 0); -- needs to be same size to add to charcode_base_address
@@ -111,8 +111,10 @@ architecture rtl of display_text_controller is
     signal font_bit : std_logic;
     signal colour_selected : std_logic_vector(11 downto 0);
     signal font_bit_select : unsigned(2 downto 0);
-
+    
 begin
+
+vga_blank <= not active_area;
 
 -- Write side for Text and Font Memories - not currently implemented
 font_ena <= '0';
@@ -125,15 +127,15 @@ text_addra <= std_logic_vector(to_unsigned(0 , TEXT_ADDR_W));
 text_dia <= (others => '0');
 
 
--- We are using a 5 stage pipeline to improve performance and allow us to hit our 108MHz pixelclk
+-- We are using a 5 stage pipeline to improve performance and allow us to hit our 108MHz pixelclk 
 -- target for 1280x1024
 
 -------------------------------------------------------------------
 -- Stage 1: Hcount and Vcount counters, CharAddress calculation
 -------------------------------------------------------------------
-sync_counters : process(pixelclk, areset_n)
-    begin
-    if areset_n = '0' then
+sync_counters : process(pixelclk)
+    begin   
+    if areset_n = '0' then 
         h_count <= 0;
         v_count <= 0;
     else
@@ -145,7 +147,7 @@ sync_counters : process(pixelclk, areset_n)
             -- counters
             if h_count >=  END_BPORCH_X then
                 h_count <= 0;
-            else
+            else 
                 h_count <= h_count + 1;
             end if;
             if v_count >= END_BPORCH_Y then
@@ -155,7 +157,7 @@ sync_counters : process(pixelclk, areset_n)
                     v_count <= v_count + 1;
                 end if;
             end if;
-
+      
         end if;
     end if;
 end process;
@@ -178,7 +180,7 @@ text_enb <= '1';    -- TODO: should this be enabled differently?
             DATA_W => TEXT_DATA_W,
             DEPTH  => TEXT_DEPTH,
             USE_INIT_FILE => true,
-            INIT_FILE_NAME => "D:/Documents/vivado/microblaze_vga/tools/text_ram_small.txt",
+            INIT_FILE_NAME => "D:/Documents/vivado/microblaze_vga/tools/text_ram.txt",
             INIT_FILE_IS_HEX => false
         )
         port map(
@@ -197,7 +199,7 @@ delay_counters_1 : process(pixelclk) is begin
         h_count_d1 <= h_count;
         v_count_d1 <= v_count;
     end if;
-end process;
+end process; 
 -------------------------------------------------------------------
 -- Stage 3: Font and Colour RAMs
 -------------------------------------------------------------------
@@ -215,7 +217,8 @@ font_ram : entity work.simple_dual_two_clocks
             DATA_W => FONT_DATA_W,
             DEPTH  => FONT_DEPTH,
             USE_INIT_FILE => true,
-            INIT_FILE_NAME => "D:/Documents/vivado/microblaze_vga/tools/font_rom.txt"
+            INIT_FILE_NAME => "D:/Documents/vivado/microblaze_vga/tools/font_rom.txt",
+            INIT_FILE_IS_HEX => false
         )
         port map(
             clka    => pixelclk,
@@ -241,7 +244,7 @@ delay_counters_2 : process(pixelclk) is begin
         h_count_d2 <= h_count_d1;
         v_count_d2 <= v_count_d1;
     end if;
-end process;
+end process; 
 -------------------------------------------------------------------
 -- Stage 4: Font line bit select
 -------------------------------------------------------------------
@@ -252,7 +255,7 @@ delay_counters_3 : process(pixelclk) is begin
         h_count_d3 <= h_count_d2;
         v_count_d3 <= v_count_d2;
     end if;
-end process;
+end process; 
 
 font_line <= font_dob;
 -- reverse the font bit selected so hcount=0 means bit=7, 1=>6, 2 => 5 etc
@@ -280,21 +283,21 @@ output_reg_proc : process(pixelclk) is begin
             vga_g <= x"0";
             vga_b <= x"0";
         end if;
-
+        
         if (h_count_d3 >= END_FPORCH_X) and (h_count_d3 < END_SYNC_X) then
             vga_hs <= ACTIVE_HS;
         else
             vga_hs <= not ACTIVE_HS;
         end if;
-
+        
         if (v_count_d3 >= END_FPORCH_Y) and (v_count_d3 < END_SYNC_Y) then
             vga_vs <= ACTIVE_VS;
-        else
+        else 
             vga_vs <= not ACTIVE_VS;
         end if;
-
-
-
+        
+  
+        
     end if;
 end process;
 

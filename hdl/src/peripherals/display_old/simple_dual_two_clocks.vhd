@@ -17,7 +17,7 @@ generic(
 	DEPTH          : integer   := 1024;
 	USE_INIT_FILE  : boolean   := false;
 	INIT_FILE_NAME : string    := "";
-	INIT_FILE_IS_HEX : boolean  := true
+	INIT_FILE_IS_HEX : boolean  := false
 );
 port(
 	clka   : in    std_logic;
