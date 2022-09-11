@@ -47,6 +47,7 @@ VU.add_source_files(src_dir / "peripherals" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "peripherals" / "common" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "peripherals" / "uart" / "*.vhd", "lib", allow_empty=True)
 VU.add_source_files(src_dir / "peripherals" / "timer" / "*.vhd", "lib", allow_empty=True)
+VU.add_source_files(src_dir / "peripherals" / "psram" / "*.vhd", "lib", allow_empty=True)
 
 # The GOWIN simulation primitives require the dodgy Synopsys std_logic_arith,
 # std_logic_signed and std_logic_unsigned packages, so only include them if necessary

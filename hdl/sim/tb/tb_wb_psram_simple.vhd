@@ -145,7 +145,7 @@ begin
         test_runner_setup(runner, runner_cfg);
         show(get_logger(default_checker), display_handler, pass); -- show passing assertions
         while test_suite loop
-            if run("test_master_with_bram") then
+            if run("test_master_with_psram") then
                 info("Hello world test_alive");
 
                 cmd_sign_ext <= '0';
