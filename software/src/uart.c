@@ -1,3 +1,4 @@
+#include "cpu.h"
 #include "uart.h"
 
 #define UART_TX_BYTE (*((volatile unsigned long *)0x20000000))

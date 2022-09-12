@@ -1,8 +1,6 @@
 
 //#define SIM
-
-#define BASYS3
-#define REFCLK 50000000
+#include "cpu.h"
 
 // get the bit values for each switch
 #ifdef BASYS3
@@ -77,17 +75,23 @@ void main(void)
     ssd1306_refresh(oled_term);
 
     int counter = 0;
+
+    GPIO_LED = 0xF;
     while (1)
     {
-        uart_puts("Hello from the FPCA!\r\n");
-        char fg_colour = 1;
-        char bg_colour = 2;
+        uart_puts("Greetings\n");
+        char fg_colour = 5;
+        char bg_colour = 1;
         char charcode = 0;
         TEXT_BASE = (bg_colour << 12) + (fg_colour << 8) + charcode;
         counter++;
-        if (counter > 256){
+        if (counter > 256)
+        {
             counter = 0;
         }
+        charcode = counter;
+
+        // uart_putc(charcode);
     }
 
     // int tmp=0;

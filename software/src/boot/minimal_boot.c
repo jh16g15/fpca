@@ -1,4 +1,6 @@
 
+#include "../cpu.h"
+
 #define NUL 0x00    // Null
 #define SOH 0x01    // Start of Heading
 #define STX 0x02    // Start of Text
@@ -9,7 +11,9 @@
 #define XON 0x11    // Ready to receive
 #define XOFF 0x13   // Not ready to receive
 
+#ifndef REFCLK
 #define REFCLK 50000000
+#endif
 #define UART_TX_BYTE (*((volatile unsigned long *)0x20000000))
 #define UART_TX_IDLE (*((volatile unsigned long *)0x20000004))
 #define UART_DIVISOR (*((volatile unsigned long *)0x20000008))
@@ -82,5 +86,5 @@ void main(void)
         mem++;          // increase memory address by 1 byte
         gotc = uart_get_char(); // get next byte
     };
-
+    GPIO_LED = 0x3;
 }
