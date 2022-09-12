@@ -50,6 +50,8 @@ architecture rtl of pynq_top is
 
     signal FCLK_CLK0_100 : std_logic;
     signal FCLK_RESET0_N : std_logic;
+
+    signal reset        : std_logic;
     signal resetn        : std_logic;
 
     signal IRQ_P2F_UART0  : std_logic;
@@ -96,13 +98,20 @@ architecture rtl of pynq_top is
         );
     end component;
 
+    attribute mark_debug : boolean;
+    attribute mark_debug of locked : signal is true;
+    attribute mark_debug of reset : signal is true;
+    -- attribute mark_debug of locked : signal is true;
+
+
 begin
 
     led4_b <= sw(0);
     led4_g <= locked;
     led5_g <= sw(1);
 
-    resetn <= FCLK_RESET0_N;
+    reset <= (not locked) or btn(3) or (not FCLK_RESET0_N);
+    resetn <= not reset;
 
     pll : clk_wiz_0
     port map(
@@ -181,7 +190,7 @@ begin
         )
         port map(
             clk                      => pixelclk,
-            reset                    => not locked,
+            reset                    => reset,
             gpio_led_out             => gpio_led,
             gpio_btn_in              => x"0000_000" & btn(3 downto 0),
             gpio_sw_in               => x"0000_000" & b"00" & sw(1 downto 0),
