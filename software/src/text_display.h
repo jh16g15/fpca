@@ -25,6 +25,13 @@
 #define TEXT_MAX_X 79
 #define TEXT_MAX_Y 29
 
+#define CHAR_SMILEY 1
+#define CHAR_SMILEY_INV 2
+#define CHAR_HEART 3
+#define CHAR_DIAMOND 4
+#define CHAR_CLUB 5
+#define CHAR_SPADE 6
+
 /* memory addressres */
 // #define TEXT_BASE_ADDR 0x40000000
 

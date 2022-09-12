@@ -57,27 +57,30 @@ void main(void)
 
         // text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);
 
-        text_string(1, 2, "=====================================", 37, WHITE, GREY);
-        text_string(1, 3, "Friendly Programmable Computing Asset", 37, WHITE, GREY);
-        text_string(1, 4, "=====================================", 37, WHITE, GREY);
-        text_string(1, 5, "Architecture: RISC-V RV32I           ", 37, WHITE, GREY);
-        text_string(1, 6, "Frequency: 25MHz                     ", 37, WHITE, GREY);
-        text_string(1, 7, "Memory: 16KB                         ", 37, WHITE, GREY);
-        text_string(1, 8, "Font Test:                           ", 37, WHITE, GREY);
-        text_string(1, 9, "Colour Test:                         ", 37, WHITE, GREY);
+        text_string(1, 1, "=======================================", 39, WHITE, GREY);
+        text_string(1, 2, "Friendly Programmable Computing Asset  ", 39, WHITE, GREY);
+        text_string(1, 3, "=======================================", 39, WHITE, GREY);
+        text_string(1, 4, "Architecture: RISC-V RV32I            ", 38, WHITE, GREY);
+        text_string(1, 5, "Frequency: 25MHz                      ", 38, WHITE, GREY);
+        text_string(1, 6, "Memory: 16KB                          ", 38, WHITE, GREY);
+        text_string(1, 7, "Font Test:                            ", 38, WHITE, GREY);
+        text_string(1, 8, "Colour Test:                          ", 38, WHITE, GREY);
+
+        // add smiley
+        text_set(39, 2, CHAR_SMILEY_INV, YELLOW, GREY);
 
         // colour test
         for (char i = 0; i < 8; i++){
-            text_set(14 + i, 9, 0, BLACK, i);
+            text_set(14 + i, 8, 0, BLACK, i);
         }
 
         // font test
         counter++;
-        if (counter > 256)
+        if (counter > 128)
         {
             counter = 0;
         }
-        text_set(12, 8, counter, BLACK, GREY);
+        text_set(12, 7, counter, BLACK, GREY);
         delay_ms(100);
         // uart_putc(charcode);
     }
