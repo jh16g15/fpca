@@ -12,3 +12,13 @@ void text_string(int x, int y, char* string, unsigned int length, char fg_col, c
         text_set(x + i, y, string[i], fg_col, bg_col);
     }
 }
+
+void text_fill(int x1, int y1, int x2, int y2, char col){
+    // fill top to bottom
+    for (int y = y1; y <= y2; y++){
+        // fill left to right
+        for (int x = x1; x <= x2; x++){
+            text_set(x, y, 0, BLACK, col);
+        }
+    }
+}

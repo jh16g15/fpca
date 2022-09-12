@@ -22,7 +22,8 @@
 
 #define TEXT_W 80
 #define TEXT_H 30
-
+#define TEXT_MAX_X 79
+#define TEXT_MAX_Y 29
 
 /* memory addressres */
 // #define TEXT_BASE_ADDR 0x40000000
@@ -33,5 +34,6 @@
 /* function prototypes */
 void text_set(int x, int y, char charcode, char fg_col, char bg_col);
 void text_string(int x, int y, char *string, unsigned int length, char fg_col, char bg_col);
+void text_fill(int x1, int y1, int x2, int y2, char col);
 
 #endif  //_TEXT_DISPLAY_H_

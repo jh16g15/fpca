@@ -46,23 +46,39 @@ void main(void)
     int counter = 0;
 
     GPIO_LED = 0xF;
+    text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);
     while (1)
     {
-        uart_puts("Greetings\n");
+        uart_puts("Hello there, this acts as a delay\n");
         char fg_colour = 5;
         char bg_colour = 1;
         char charcode = 'c';
 
-        text_set(0, 0, 'c', BLACK, WHITE);
-        text_string(0, 1, "Hello", 5, BLACK, WHITE);
 
+        // text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);
+
+        text_string(1, 2, "=====================================", 37, WHITE, GREY);
+        text_string(1, 3, "Friendly Programmable Computing Asset", 37, WHITE, GREY);
+        text_string(1, 4, "=====================================", 37, WHITE, GREY);
+        text_string(1, 5, "Architecture: RISC-V RV32I           ", 37, WHITE, GREY);
+        text_string(1, 6, "Frequency: 25MHz                     ", 37, WHITE, GREY);
+        text_string(1, 7, "Memory: 16KB                         ", 37, WHITE, GREY);
+        text_string(1, 8, "Font Test:                           ", 37, WHITE, GREY);
+        text_string(1, 9, "Colour Test:                         ", 37, WHITE, GREY);
+
+        // colour test
+        for (char i = 0; i < 8; i++){
+            text_set(14 + i, 9, 0, BLACK, i);
+        }
+
+        // font test
         counter++;
         if (counter > 256)
         {
             counter = 0;
         }
-        charcode = counter;
-
+        text_set(12, 8, counter, BLACK, GREY);
+        delay_ms(100);
         // uart_putc(charcode);
     }
 
