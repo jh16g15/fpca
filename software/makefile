@@ -16,6 +16,7 @@ build/uart.o \
 build/utils.o \
 build/ssd1306_i2c.o \
 build/terminal.o \
+build/text_display.o
 
 boot_objects = \
 build/minimal_boot.o

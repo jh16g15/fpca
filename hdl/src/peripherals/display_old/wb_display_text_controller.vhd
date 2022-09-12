@@ -86,11 +86,11 @@ begin
             vga_b          => vga_b,
             font_enable_in => font_enable,
             font_we_in     => mem_we,
-            font_addr_in   => mem_addr,
+            font_addr_in   => b"00" & mem_addr(31 downto 2),    -- convert byte to word address
             font_wdata_in  => mem_wdata,
             text_enable_in => text_enable,
             text_we_in     => mem_we,
-            text_addr_in   => mem_addr,
+            text_addr_in   => b"00" & mem_addr(31 downto 2),    -- convert byte to word address
             text_wdata_in  => mem_wdata
         );
 end architecture;
