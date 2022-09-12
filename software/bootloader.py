@@ -54,7 +54,7 @@ def send_bin_file(bin_file, uart):
 
 print(f"Opening Serial Port {COM_ID}")
 # defaults: 9600 baud, 8,N,1
-with serial.Serial(COM_ID, timeout = 5) as uart:
+with serial.Serial(COM_ID, baudrate = 115200, timeout = 5) as uart:
 # with serial.Serial(COM_ID) as uart:
     print(f"{COM_ID} Open!, waiting to enter Bootloader (Reset with SW0=1)")
 

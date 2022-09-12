@@ -45,8 +45,8 @@ unsigned char uart_get_char(void){
 
 void main(void)
 {
-    // set Baud rate to 9600
-    UART_DIVISOR = REFCLK / 9600;   // compile - time
+    // set Baud rate to 115200
+    UART_DIVISOR = REFCLK / 115200;   // compile - time
 
     GPIO_LED = 0x2;
 
