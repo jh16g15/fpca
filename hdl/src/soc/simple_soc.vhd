@@ -38,7 +38,11 @@ entity simple_soc is
 
         -- Wishbone to framebuffer
         text_display_wb_mosi_out : out t_wb_mosi;
-        text_display_wb_miso_in  : in t_wb_miso
+        text_display_wb_miso_in  : in t_wb_miso;
+
+        -- To Zynq PS Peripherals
+        zynq_ps_peripherals_wb_mosi_out : out t_wb_mosi;
+        zynq_ps_peripherals_wb_miso_in  : in t_wb_miso
 
     );
 end entity simple_soc;
@@ -187,7 +191,7 @@ begin
 
     -- 0x4000_0000 (external framebuffer, up to 256MB of address space)
     text_display_wb_mosi_out <= wb_slave_mosi_arr(4);
-    wb_slave_miso_arr(4)         <= text_display_wb_miso_in;
+    wb_slave_miso_arr(4)     <= text_display_wb_miso_in;
     quad_seven_seg_driver_inst : entity work.quad_seven_seg_driver
         generic map(
             G_REFCLK_FREQ => G_SOC_FREQ
@@ -199,13 +203,17 @@ begin
             sseg_an         => sseg_an_out
         );
 
-    gen_unmapped : for i in 5 to 14 generate
+    gen_unmapped : for i in 5 to 13 generate
         wb_unmapped_slv_inst : entity work.wb_unmapped_slv
             port map(
                 wb_mosi_in  => wb_slave_mosi_arr(i),
                 wb_miso_out => wb_slave_miso_arr(i)
             );
     end generate;
+
+    -- 0xE000_0000 Zynq PS Peripheral registers
+    zynq_ps_peripherals_wb_mosi_out <= wb_slave_mosi_arr(14);
+    wb_slave_miso_arr(14)           <= zynq_ps_peripherals_wb_miso_in;
     --! Bootloader memory
     --! xF000_0000 to xFFFF_FFFF
     bootloader_inst : entity work.wb_sp_bram

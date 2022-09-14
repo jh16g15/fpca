@@ -45,14 +45,14 @@ end entity;
 
 architecture rtl of pynq_top is
     -- run location: fpca/boards/pynq_z2/fpca
-    constant G_MEM_INIT_FILE : string := "../../../software/hex/main.hex"; -- from toolchain
+    constant G_MEM_INIT_FILE  : string := "../../../software/hex/main.hex"; -- from toolchain
     constant G_BOOT_INIT_FILE : string := "../../../software/hex/boot.hex"; -- from toolchain
 
     signal FCLK_CLK0_100 : std_logic;
     signal FCLK_RESET0_N : std_logic;
 
-    signal reset        : std_logic;
-    signal resetn        : std_logic;
+    signal reset  : std_logic;
+    signal resetn : std_logic;
 
     signal IRQ_P2F_UART0  : std_logic;
     signal M_AXI_GP0_MOSI : t_axi_mosi;
@@ -79,8 +79,10 @@ architecture rtl of pynq_top is
     signal TMDS_allp : std_logic_vector(3 downto 0);
     signal TMDS_alln : std_logic_vector(3 downto 0);
 
-    signal text_display_wb_mosi : t_wb_mosi;
-    signal text_display_wb_miso : t_wb_miso;
+    signal text_display_wb_mosi        : t_wb_mosi;
+    signal text_display_wb_miso        : t_wb_miso;
+    signal zynq_ps_peripherals_wb_mosi : t_wb_mosi;
+    signal zynq_ps_peripherals_wb_miso : t_wb_miso;
 
     signal gpio_led : std_logic_vector(31 downto 0);
 
@@ -98,19 +100,17 @@ architecture rtl of pynq_top is
         );
     end component;
 
-    attribute mark_debug : boolean;
+    attribute mark_debug           : boolean;
     attribute mark_debug of locked : signal is true;
-    attribute mark_debug of reset : signal is true;
+    attribute mark_debug of reset  : signal is true;
     -- attribute mark_debug of locked : signal is true;
-
-
 begin
 
     led4_b <= sw(0);
     led4_g <= locked;
     led5_g <= sw(1);
 
-    reset <= (not locked) or btn(3) or (not FCLK_RESET0_N);
+    reset  <= (not locked) or btn(3) or (not FCLK_RESET0_N);
     resetn <= not reset;
 
     pll : clk_wiz_0
@@ -181,26 +181,38 @@ begin
 
     led <= gpio_led(3 downto 0);
 
+    -- connect the FPCA SoC to the Zynq PS peripheral registers
+    wb_to_axi3_shim_inst : entity work.wb_to_axi3_shim
+        port map(
+            wb_clk       => pixelclk,
+            wb_reset     => reset,
+            wb_mosi_in   => zynq_ps_peripherals_wb_mosi,
+            wb_miso_out  => zynq_ps_peripherals_wb_miso,
+            axi_mosi_out => S_AXI_GP0_MOSI,
+            axi_miso_in  => S_AXI_GP0_MISO
+        );
     simple_soc_inst : entity work.simple_soc
         generic map(
             G_MEM_INIT_FILE  => G_MEM_INIT_FILE,
             G_BOOT_INIT_FILE => G_BOOT_INIT_FILE,
-            G_SOC_FREQ     => 25_000_000,
-            G_DEFAULT_BAUD => 9600
+            G_SOC_FREQ       => 25_000_000,
+            G_DEFAULT_BAUD   => 9600
         )
         port map(
-            clk                      => pixelclk,
-            reset                    => reset,
-            gpio_led_out             => gpio_led,
-            gpio_btn_in              => x"0000_000" & btn(3 downto 0),
-            gpio_sw_in               => x"0000_000" & b"00" & sw(1 downto 0),
+            clk          => pixelclk,
+            reset        => reset,
+            gpio_led_out => gpio_led,
+            gpio_btn_in  => x"0000_000" & btn(3 downto 0),
+            gpio_sw_in   => x"0000_000" & b"00" & sw(1 downto 0),
             -- sseg_ca_out              => sseg_ca_out,
             -- sseg_an_out              => sseg_an_out,
-            uart_tx_out              => uart_tx_out,
-            uart_rx_in               => uart_rx_in,
-            i2c_scl_out              => open,
-            i2c_sda_out              => open,
-            text_display_wb_mosi_out => text_display_wb_mosi,
-            text_display_wb_miso_in  => text_display_wb_miso
+            uart_tx_out                     => uart_tx_out,
+            uart_rx_in                      => uart_rx_in,
+            i2c_scl_out                     => open,
+            i2c_sda_out                     => open,
+            text_display_wb_mosi_out        => text_display_wb_mosi,
+            text_display_wb_miso_in         => text_display_wb_miso,
+            zynq_ps_peripherals_wb_mosi_out => zynq_ps_peripherals_wb_mosi,
+            zynq_ps_peripherals_wb_miso_in  => zynq_ps_peripherals_wb_miso
         );
 end architecture;

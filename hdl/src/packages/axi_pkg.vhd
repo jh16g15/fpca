@@ -48,7 +48,7 @@ package axi_pkg is
         wready  : std_logic;
     end record;
 
-    -- 512MB, connected to Zynq PS DDR controller
+    -- 512MB, connected to Zynq PS DDR controller and goes straight out to top level pins
     type t_ddr is record
         addr    : std_logic_vector (14 downto 0);
         ba      : std_logic_vector (2 downto 0);
