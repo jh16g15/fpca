@@ -19,3 +19,4 @@ The FPCA (Friendly Programmable Computing Asset) is a RISC-V SoC design with acc
     - Quad Seven Segment display
     - Software I2C for SSD1306 OLED
 - Separate Bootloader RAM to upload new programs over the UART
+- DVI output (640x480, 80x30 text mode only using 8x16 font)
