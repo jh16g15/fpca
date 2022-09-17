@@ -10,6 +10,11 @@ use work.axi_pkg.all;
 -- Converts to record types from axi_pkg for ease of use.
 --
 entity ps_block_custom_wrapper is
+    generic (
+        G_M_AXI_GP0_DEBUG : boolean := false;
+        G_S_AXI_GP0_DEBUG : boolean := false;
+        G_S_AXI_HP0_DEBUG : boolean := false
+    );
     port (
         AXI_CLK_IN : in std_logic;
         DDR        : inout t_ddr;
@@ -38,7 +43,14 @@ entity ps_block_custom_wrapper is
 end ps_block_custom_wrapper;
 
 architecture STRUCTURE of ps_block_custom_wrapper is
-
+    attribute mark_debug : boolean;
+    attribute mark_debug of M_AXI_GP0_MOSI : signal is G_M_AXI_GP0_DEBUG;
+    attribute mark_debug of M_AXI_GP0_MISO : signal is G_M_AXI_GP0_DEBUG;
+    attribute mark_debug of S_AXI_GP0_MOSI : signal is G_S_AXI_GP0_DEBUG;
+    attribute mark_debug of S_AXI_GP0_MISO : signal is G_S_AXI_GP0_DEBUG;
+    attribute mark_debug of S_AXI_HP0_MOSI : signal is G_S_AXI_HP0_DEBUG;
+    attribute mark_debug of S_AXI_HP0_MISO : signal is G_S_AXI_HP0_DEBUG;
+    
 begin
     u_ps_block_wrapper : entity work.ps_block_wrapper
         port map(

@@ -159,6 +159,7 @@ begin
         );
 
     ps_block_custom_wrapper_inst : entity work.ps_block_custom_wrapper
+        generic map (G_S_AXI_GP0_DEBUG => true)
         port map(
             AXI_CLK_IN        => FCLK_CLK0_100, -- feed back in to drive AXI interfaces
             DDR               => DDR,
