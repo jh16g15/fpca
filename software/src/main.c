@@ -17,6 +17,7 @@
 #include "ssd1306_i2c.h"
 #include "terminal.h"
 #include "text_display.h"
+#include "zynq_ps_uart.h"
 
 
 // function prototypes
@@ -44,6 +45,10 @@ void main(void)
     ssd1306_clear_screen();
 
     int counter = 0;
+
+    zynq_ps_uart_setup();
+    zynq_ps_uart_putc('J');
+    zynq_ps_uart_puts(" Hello there");
 
     GPIO_LED = 0xF;
     text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);

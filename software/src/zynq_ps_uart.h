@@ -9,16 +9,18 @@
 // Registers
 #define ZYNQ_PS_UART_CR (*((volatile unsigned long *)0xE0000000))
 #define ZYNQ_PS_UART_BAUDGEN (*((volatile unsigned long *)0xE0000018))
+#define ZYNQ_PS_UART_BAUDDIV (*((volatile unsigned long *)0xE0000034))
 #define ZYNQ_PS_UART_FIFO (*((volatile unsigned char *)0xE0000030)) // transmit and receive
 
 
 void zynq_ps_uart_setup(){
-    // ZYNQ_PS_UART_BAUDGEN = 0x00000364;  // set baud rate to 115200
+    // default baud rate is 115200, fine for our purposes (ie general debug)
     ZYNQ_PS_UART_CR = 0x00000117;       // Enable Tx/Rx, soft reset FIFOs
 }
 
 // void zynq_ps_uart_set_baud(){
-
+    // ZYNQ_PS_UART_BAUDGEN = 0x00000000;
+    // ZYNQ_PS_UART_BAUDDIV = 0x00000000;
 // }
 
 void zynq_ps_uart_putc(char c){
