@@ -99,6 +99,11 @@ begin
 
     done <= rsp_done;
 
+
+    -- synthesis translate_off
+    show(get_logger(default_checker), display_handler, pass);
+    -- synthesis translate_on
+
     process (clk)
         variable wen           : std_logic;
         variable last          : std_logic;
@@ -117,6 +122,7 @@ begin
         variable cmd_count : integer := 0;
         variable rsp_count : integer := 0;
     begin
+
         if rising_edge(clk) then
             if reset = '1' then
                 index       <= 0;
@@ -158,7 +164,11 @@ begin
 
                     wb_byte_addr_to_byte_sel(addr, transfer_size, word_addr, byte_sel, align_err);
                     -- synthesis translate_off
-                    info(cmd_logger, "addr:" & to_hstring(addr) & " size:" & to_string(transfer_size) & " word addr:" & to_hstring(word_addr) & " byte_sel:" & to_hstring(byte_sel));
+                    if wen = '1' then
+                        info(cmd_logger, "WRITE " & to_hstring(data) & " to addr:" & to_hstring(addr) & " size:" & to_string(transfer_size) & " word addr:" & to_hstring(word_addr) & " byte_sel:" & to_hstring(byte_sel));
+                    else
+                        info(cmd_logger, "READ from addr:" & to_hstring(addr) & " size:" & to_string(transfer_size) & " word addr:" & to_hstring(word_addr) & " byte_sel:" & to_hstring(byte_sel));
+                    end if;
                     -- synthesis translate_on
                     cmd_sel_out <= byte_sel;
                     if index = C_NUM_CMDS - 1 then
