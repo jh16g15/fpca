@@ -16,7 +16,9 @@ entity ps_block_custom_wrapper is
         G_S_AXI_HP0_DEBUG : boolean := false
     );
     port (
-        AXI_CLK_IN : in std_logic;
+        M_AXI_GP0_ACLK_IN : in std_logic;
+        S_AXI_GP0_ACLK_IN : in std_logic;
+        S_AXI_HP0_ACLK_IN : in std_logic;
         DDR        : inout t_ddr;
 
         FCLK_CLK0_100     : out std_logic;
@@ -54,7 +56,10 @@ architecture STRUCTURE of ps_block_custom_wrapper is
 begin
     u_ps_block_wrapper : entity work.ps_block_wrapper
         port map(
-            AXI_CLK_IN                    => AXI_CLK_IN,
+            M_AXI_GP0_ACLK => M_AXI_GP0_ACLK_IN,
+            S_AXI_GP0_ACLK => S_AXI_GP0_ACLK_IN,
+            S_AXI_HP0_ACLK => S_AXI_HP0_ACLK_IN,
+            
             DDR_addr(14 downto 0)         => DDR.addr(14 downto 0),
             DDR_ba(2 downto 0)            => DDR.ba(2 downto 0),
             DDR_cas_n                     => DDR.cas_n,

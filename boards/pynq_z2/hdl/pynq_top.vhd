@@ -161,7 +161,9 @@ begin
     ps_block_custom_wrapper_inst : entity work.ps_block_custom_wrapper
         generic map (G_S_AXI_GP0_DEBUG => true)
         port map(
-            AXI_CLK_IN        => FCLK_CLK0_100, -- feed back in to drive AXI interfaces
+            M_AXI_GP0_ACLK_IN => pixelclk,
+            S_AXI_GP0_ACLK_IN => pixelclk,
+            S_AXI_HP0_ACLK_IN => pixelclk,
             DDR               => DDR,
             FCLK_CLK0_100     => FCLK_CLK0_100,
             FCLK_RESET0_N     => FCLK_RESET0_N, -- reset out
