@@ -18,7 +18,7 @@ boards/tang_nano_9k/fpca/sim/psram_memory_interface_hs_2ch/temp/
 hdl/sim/tb_helpers/psram_memory_interface_hs_2ch/temp/
 boards/pynq_z2/hdl/hamsterworks_dvi/
 # Xilinx Block diagrams/IPs
-**/bd/**/*
+**/bd/
 !**/bd/**/*.bd
 **/ip/**/*
 !**/ip/**/*.xci
