@@ -78,6 +78,8 @@ void main(void)
         for (char i = 0; i < 8; i++){
             text_set(14 + i, 8, 0, BLACK, i);
         }
+        text_set(22, 8, CHAR_SMILEY, RED, GREEN);
+        text_set(23, 8, CHAR_SMILEY_INV, BLUE, WHITE);
 
         // font test
         counter++;
