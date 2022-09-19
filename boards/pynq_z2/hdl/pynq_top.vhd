@@ -159,7 +159,7 @@ begin
         );
 
     ps_block_custom_wrapper_inst : entity work.ps_block_custom_wrapper
-        generic map (G_S_AXI_GP0_DEBUG => true)
+        generic map(G_S_AXI_GP0_DEBUG => false)
         port map(
             M_AXI_GP0_ACLK_IN => pixelclk,
             S_AXI_GP0_ACLK_IN => pixelclk,
@@ -194,12 +194,15 @@ begin
             axi_mosi_out => S_AXI_GP0_MOSI,
             axi_miso_in  => S_AXI_GP0_MISO
         );
+
+    -- FPCA RISC-V SoC and peripherals
     simple_soc_inst : entity work.simple_soc
         generic map(
-            G_MEM_INIT_FILE  => G_MEM_INIT_FILE,
-            G_BOOT_INIT_FILE => G_BOOT_INIT_FILE,
-            G_SOC_FREQ       => 25_000_000,
-            G_DEFAULT_BAUD   => 9600
+            G_MEM_INIT_FILE      => G_MEM_INIT_FILE,
+            G_BOOT_INIT_FILE     => G_BOOT_INIT_FILE,
+            G_SOC_FREQ           => 25_000_000,
+            G_DEFAULT_BAUD       => 9600,
+            G_INCLUDE_JTAG_DEBUG => true -- connect AXI JTAG to the wishbone bus
         )
         port map(
             clk          => pixelclk,

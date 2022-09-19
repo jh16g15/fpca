@@ -10,10 +10,11 @@ use work.joe_common_pkg.all;
 
 entity simple_soc is
     generic (
-        G_MEM_INIT_FILE  : string  := "../../software/hex/main.hex";
-        G_BOOT_INIT_FILE : string  := "../../software/hex/boot.hex";
-        G_SOC_FREQ       : integer := 50_000_000;
-        G_DEFAULT_BAUD   : integer := 9600
+        G_MEM_INIT_FILE      : string  := "../../software/hex/main.hex";
+        G_BOOT_INIT_FILE     : string  := "../../software/hex/boot.hex";
+        G_SOC_FREQ           : integer := 50_000_000;
+        G_DEFAULT_BAUD       : integer := 9600;
+        G_INCLUDE_JTAG_DEBUG : boolean := false
     );
     port (
         clk   : in std_logic;
@@ -62,6 +63,10 @@ architecture rtl of simple_soc is
     signal mem_wb_miso        : t_wb_miso;
     signal wb_master_sel_mosi : t_wb_mosi;
     signal wb_master_sel_miso : t_wb_miso;
+    signal jtag_wb_mosi       : t_wb_mosi;
+    signal jtag_wb_miso       : t_wb_miso;
+    signal wb_cpu_sel_mosi    : t_wb_mosi;
+    signal wb_cpu_sel_miso    : t_wb_miso;
 
     signal wb_slave_mosi_arr : t_wb_mosi_arr(G_NUM_SLAVES - 1 downto 0);
     signal wb_slave_miso_arr : t_wb_miso_arr(G_NUM_SLAVES - 1 downto 0);
@@ -91,6 +96,7 @@ begin
             mem_wb_mosi_out => mem_wb_mosi,
             mem_wb_miso_in  => mem_wb_miso
         );
+
     -- 2:1 arbiter
     wb_arbiter_inst : entity work.wb_arbiter
         generic map(
@@ -103,9 +109,41 @@ begin
             wb_master_0_miso_out   => if_wb_miso,
             wb_master_1_mosi_in    => mem_wb_mosi,
             wb_master_1_miso_out   => mem_wb_miso,
-            wb_master_sel_mosi_out => wb_master_sel_mosi,
-            wb_master_sel_miso_in  => wb_master_sel_miso
+            wb_master_sel_mosi_out => wb_cpu_sel_mosi,
+            wb_master_sel_miso_in  => wb_cpu_sel_miso
         );
+    gen_jtag_false : if G_INCLUDE_JTAG_DEBUG = false generate
+        wb_master_sel_mosi <= wb_cpu_sel_mosi;
+        wb_cpu_sel_miso    <= wb_master_sel_miso;
+    end generate;
+
+    gen_jtag_true : if G_INCLUDE_JTAG_DEBUG = true generate
+        -- wraps a Xilinx JTAG-AXI master
+        jtag_wb_master_inst : entity work.jtag_wb_master
+            port map(
+                clk         => clk,
+                reset       => reset,
+                wb_mosi_out => jtag_wb_mosi,
+                wb_miso_in  => jtag_wb_miso
+            );
+        -- 2:1 arbiter to choose between CPU and JTAG access
+        wb_debug_arbiter_inst : entity work.wb_arbiter
+            generic map(
+                G_ARBITER => "simple" -- most recently used
+            )
+            port map(
+                wb_clk                 => clk,
+                wb_reset               => reset,
+                wb_master_0_mosi_in    => wb_cpu_sel_mosi,
+                wb_master_0_miso_out   => wb_cpu_sel_miso,
+                wb_master_1_mosi_in    => jtag_wb_mosi,
+                wb_master_1_miso_out   => jtag_wb_miso,
+                wb_master_sel_mosi_out => wb_master_sel_mosi,
+                wb_master_sel_miso_in  => wb_master_sel_miso
+            );
+
+    end generate;
+
     -- 1:N interconnect
     wb_interconnect_inst : entity work.wb_interconnect
         generic map(

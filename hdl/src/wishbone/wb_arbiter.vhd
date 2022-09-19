@@ -12,7 +12,8 @@ use work.joe_common_pkg.all;
 --!               frequently than the other
 entity wb_arbiter is
     generic (
-        G_ARBITER : string := "simple" -- "simple" or "priority" only
+        G_ARBITER : string := "simple"; -- "simple" or "priority" only
+        G_ILA : boolean := false
     );
     port (
         wb_clk   : in std_logic;
@@ -34,6 +35,9 @@ architecture rtl of wb_arbiter is
 
     type t_state is (IDLE, SEL0, SEL1);
     signal state : t_state := IDLE;
+    
+    attribute mark_debug           : boolean;
+    attribute mark_debug of state : signal is G_ILA;
 
 begin
 
