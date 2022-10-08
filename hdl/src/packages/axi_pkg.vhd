@@ -4,6 +4,11 @@ use ieee.numeric_std.all;
 
 -- AXI3, for use with Zynq PS interfaces
 package axi_pkg is
+
+    constant AXI_BURST_FIXED : std_logic_vector(1 downto 0) := "00";
+    constant AXI_BURST_INCR  : std_logic_vector(1 downto 0) := "01";
+    constant AXI_BURST_WRAP  : std_logic_vector(1 downto 0) := "10";
+
     type t_axi_mosi is record
         araddr  : std_logic_vector (31 downto 0);
         arburst : std_logic_vector (1 downto 0);
@@ -46,6 +51,68 @@ package axi_pkg is
         rresp   : std_logic_vector (1 downto 0);
         rvalid  : std_logic;
         wready  : std_logic;
+    end record;
+
+    type t_axi64_mosi is record
+        araddr  : std_logic_vector (31 downto 0);
+        arburst : std_logic_vector (1 downto 0);
+        arcache : std_logic_vector (3 downto 0);
+        arid    : std_logic_vector (11 downto 0);
+        arlen   : std_logic_vector (3 downto 0);
+        arlock  : std_logic_vector (1 downto 0);
+        arprot  : std_logic_vector (2 downto 0);
+        arqos   : std_logic_vector (3 downto 0);
+        arsize  : std_logic_vector (2 downto 0);
+        arvalid : std_logic;
+        awaddr  : std_logic_vector (31 downto 0);
+        awburst : std_logic_vector (1 downto 0);
+        awcache : std_logic_vector (3 downto 0);
+        awid    : std_logic_vector (11 downto 0);
+        awlen   : std_logic_vector (3 downto 0);
+        awlock  : std_logic_vector (1 downto 0);
+        awprot  : std_logic_vector (2 downto 0);
+        awqos   : std_logic_vector (3 downto 0);
+        awsize  : std_logic_vector (2 downto 0);
+        awvalid : std_logic;
+        bready  : std_logic;
+        rready  : std_logic;
+        wdata   : std_logic_vector (63 downto 0);
+        wid     : std_logic_vector (11 downto 0);
+        wlast   : std_logic;
+        wstrb   : std_logic_vector (3 downto 0);
+        wvalid  : std_logic;
+    end record;
+
+    type t_axi64_miso is record
+        arready : std_logic;
+        awready : std_logic;
+        bid     : std_logic_vector (11 downto 0);
+        bresp   : std_logic_vector (1 downto 0);
+        bvalid  : std_logic;
+        rdata   : std_logic_vector (63 downto 0);
+        rid     : std_logic_vector (11 downto 0);
+        rlast   : std_logic;
+        rresp   : std_logic_vector (1 downto 0);
+        rvalid  : std_logic;
+        wready  : std_logic;
+    end record;
+
+    type t_axi_stream32_mosi is record
+        tdata  : std_logic_vector (31 downto 0);
+        tvalid : std_logic;
+        tlast  : std_logic;
+    end record;
+    type t_axi_stream32_miso is record
+        tready : std_logic;
+    end record;
+
+    type t_axi_stream64_mosi is record
+        tdata  : std_logic_vector (63 downto 0);
+        tvalid : std_logic;
+        tlast  : std_logic;
+    end record;
+    type t_axi_stream64_miso is record
+        tready : std_logic;
     end record;
 
     -- 512MB, connected to Zynq PS DDR controller and goes straight out to top level pins
