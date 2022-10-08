@@ -81,6 +81,17 @@ architecture rtl of simple_soc is
     -- Seven Segment Display controller
     signal sseg_display_data : std_logic_vector(15 downto 0);
 
+    component jtag_wb_master
+        generic (
+            G_ILA : boolean
+        );
+        port (
+            clk         : in std_logic;
+            reset       : in std_logic;
+            wb_mosi_out : out t_wb_mosi;
+            wb_miso_in  : in t_wb_miso
+        );
+    end component;
 begin
 
     cpu_top_inst : entity work.cpu_top
@@ -119,13 +130,14 @@ begin
 
     gen_jtag_true : if G_INCLUDE_JTAG_DEBUG = true generate
         -- wraps a Xilinx JTAG-AXI master
-        jtag_wb_master_inst : entity work.jtag_wb_master
-            port map(
-                clk         => clk,
-                reset       => reset,
-                wb_mosi_out => jtag_wb_mosi,
-                wb_miso_in  => jtag_wb_miso
-            );
+        jtag_wb_master_inst : jtag_wb_master
+        generic map(G_ILA => true)
+        port map(
+            clk         => clk,
+            reset       => reset,
+            wb_mosi_out => jtag_wb_mosi,
+            wb_miso_in  => jtag_wb_miso
+        );
         -- 2:1 arbiter to choose between CPU and JTAG access
         wb_debug_arbiter_inst : entity work.wb_arbiter
             generic map(
