@@ -36,7 +36,7 @@ def add_some_files_to_vunit(vunit_obj, dir, exclude_patterns, library):
             trimmed_file_list.append(file)
 
     for file in trimmed_file_list:
-        # print(str(file))
+        #print(str(file))
         vunit_obj.add_source_file(file, library)
 
     return True
@@ -47,10 +47,17 @@ def main():
     VU = VUnit.from_argv()
     VU.add_verification_components()
 
-    USE_GOWIN_SIMLIB = True
+    USE_GOWIN_SIMLIB = True # needed for simple_dual_port RAM block (TODO: replace this!)
     gowin_simlib = "/mnt/c/Gowin/Gowin_V1.9.8.03_Education/IDE/simlib/gw1n/prim_sim.vhd"
 
-
+    USE_XILINX_UNISIM = False
+    USE_XILINX_XPM = True
+    xilinx_unisim_dir = "/mnt/c/Xilinx/Vivado/2021.1/data/vhdl/src/unisims"
+    xilinx_xpm_dir = "/mnt/c/Xilinx/Vivado/2021.1/data/ip/xpm"
+    xilinx_exclude = [
+        "secureip",
+        "retarget"
+    ]
 
 
     ## need to use "resolve()" to get abspath
@@ -59,22 +66,19 @@ def main():
     # print(f"2:{os.listdir(Path(__file__).resolve().parents[2])}")
 
     sim_dir = Path(__file__).parent
-    src_dir = Path(__file__).resolve().parents[1] / "src"
-    boards_dir = Path(__file__).resolve().parents[2] / "boards"
-    pynq_dir = Path(__file__).resolve().parents[2] / "boards" / "pynq_z2"
-
-
-    #string pattern match "in"
     sim_exclude = [
         "./vunit_out/ghdl/libraries",
         "./tb_helpers/psram_memory_interface_hs_2ch/temp",
         "./tb_helpers/psram_memory_interface_hs_2ch/",
     ]
+    src_dir = Path(__file__).resolve().parents[1] / "src"
     src_exclude = [
         "/mnt/d/Documents/fpga/fpca/hdl/src/wishbone/jtag_wb_master.vhd",
         "/mnt/d/Documents/fpga/fpca/hdl/src/peripherals/hamsterworks_dvi/",
         "/mnt/d/Documents/fpga/fpca/hdl/src/peripherals/display_old/display_top.vhd",
     ]
+    boards_dir = Path(__file__).resolve().parents[2] / "boards"
+    pynq_dir = Path(__file__).resolve().parents[2] / "boards" / "pynq_z2"
     boards_exclude = [
         "/mnt/d/Documents/fpga/fpca/boards/pynq_z2/bd/",
         "/mnt/d/Documents/fpga/fpca/boards/pynq_z2/bd/",
@@ -97,6 +101,12 @@ def main():
     else:
         VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08", "-frelaxed-rules"])
 
+    if USE_XILINX_UNISIM:
+        VU.add_library("unisim")
+        add_some_files_to_vunit(VU, xilinx_unisim_dir, xilinx_exclude, "unisim")
+    if USE_XILINX_XPM:
+        VU.add_library("xpm")
+        add_some_files_to_vunit(VU, xilinx_xpm_dir, xilinx_exclude, "xpm")
 
     VU.main()
 
