@@ -36,7 +36,7 @@ def add_some_files_to_vunit(vunit_obj, dir, exclude_patterns, library):
             trimmed_file_list.append(file)
 
     for file in trimmed_file_list:
-        print(str(file))
+        # print(str(file))
         vunit_obj.add_source_file(file, library)
 
     return True
