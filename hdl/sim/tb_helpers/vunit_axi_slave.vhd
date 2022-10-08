@@ -27,7 +27,8 @@ entity vunit_axi_slave is
     port (
         axi_clk  : in std_logic;
         axi_mosi : in t_axi_mosi;
-        axi_miso : out t_axi_miso
+        axi_miso : out t_axi_miso;
+        memory_ref_out : out memory_t   -- so tb can access it
 
     );
 end entity vunit_axi_slave;
@@ -56,6 +57,8 @@ architecture rtl of vunit_axi_slave is
     end procedure;
 
 begin
+    -- so testbench can access it
+    memory_ref_out <= mem;
 
     p_alloc : process
         variable empty_buf : buffer_t;
@@ -75,13 +78,13 @@ begin
         info(logger, "Number of bytes (mem): " & to_string(num_bytes(mem)));
         info(logger, "Number of bytes (buf): " & to_string(num_bytes(buf)));
 
-        info(logger, describe_address(mem, 0));
-        info(logger, describe_address(mem, 4));
-        info(logger, describe_address(mem, 8));
-        info(logger, describe_address(mem, 12));
-        info(logger, describe_address(mem, 16));
-        info(logger, "Initial Memory Contents");
-        print_mem_region(mem, x"0000_0000", 5);
+        -- info(logger, describe_address(mem, 0));
+        -- info(logger, describe_address(mem, 4));
+        -- info(logger, describe_address(mem, 8));
+        -- info(logger, describe_address(mem, 12));
+        -- info(logger, describe_address(mem, 16));
+        -- info(logger, "Initial Memory Contents");
+        -- print_mem_region(mem, x"0000_0000", 5);
         wait;
     end process;
 
