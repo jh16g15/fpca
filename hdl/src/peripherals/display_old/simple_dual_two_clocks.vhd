@@ -37,7 +37,7 @@ architecture syn of simple_dual_two_clocks is
 
 
 	impure function InitRamFromFile (RamFileName : in string; is_hex : in boolean) return ram_type is
-        FILE RamFile : text is in RamFileName;
+        FILE RamFile : text open read_mode is RamFileName;
         variable RamFileLine : line;
         variable RAM : ram_type;
     begin
