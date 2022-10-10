@@ -54,6 +54,8 @@ def main():
     USE_XILINX_XPM = True
     xilinx_unisim_dir = "/mnt/c/Xilinx/Vivado/2021.1/data/vhdl/src/unisims"
     xilinx_xpm_dir = "/mnt/c/Xilinx/Vivado/2021.1/data/ip/xpm"
+    xilinx_xpm_vhdl = "/mnt/d/Documents/fpga/xpm_vhdl/src/xpm"
+    xilinx_xpm_ghdl_precompiled = "/mnt/c/Xilinx/Vivado/2021.1/data/vhdl/ghdl/xilinx-vivado/xpm/v08/" #xpm-obj08.cf"
     xilinx_exclude = [
         "secureip",
         "retarget"
@@ -106,7 +108,8 @@ def main():
         add_some_files_to_vunit(VU, xilinx_unisim_dir, xilinx_exclude, "unisim")
     if USE_XILINX_XPM:
         VU.add_library("xpm")
-        add_some_files_to_vunit(VU, xilinx_xpm_dir, xilinx_exclude, "xpm")
+        add_some_files_to_vunit(VU, xilinx_xpm_vhdl, xilinx_exclude, "xpm")
+        # VU.add_external_library("xpm", xilinx_xpm_ghdl_precompiled)
 
     VU.main()
 
