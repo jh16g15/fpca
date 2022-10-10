@@ -6,6 +6,9 @@ use work.joe_common_pkg.all;
 use work.axi_pkg.all;
 use work.graphics_pkg.all;
 
+library xpm;
+use xpm.vcomponents.all;
+
 -- For a pixel based display.
 -- Reads  out a framebuffer from an AXI3 connected memory (ideally Zynq DDR3)
 --
@@ -37,11 +40,6 @@ entity axi3_vdma is
         G_ACTIVE_HS     : std_logic := '0';
         G_ACTIVE_VS     : std_logic := '0';
 
-        -- framebuffer parameters (default 640x480)
-        -- needs to be power of 2 larger than G_END_ACTIVE_X so we can avoid multiplication for address calculation.
-        -- This uses about 2MB per frame for 640x480 @32bpp, which gives us loads of room in the Zynq DDR3
-        G_FRAMEBUFFER_LINE_LEN : integer := 1024; --!
-
         G_PIXEL_FIFO_DEPTH : integer := 512 --! Experiment to see how big this needs to be
     );
     port (
@@ -66,13 +64,13 @@ entity axi3_vdma is
         buffer1_start : in std_logic_vector(31 downto 0);
 
         -- status and control
-        next_frame_in             : in std_logic;                      --! From CPU/GPU logic - choose which buffer to use next
-        start_of_frame            : out std_logic;                     --! to clear next_frame_ready/CPU interrupt
-        pixel_underflow_count_out : out std_logic_vector(31 downto 0); --! count of when our DMA is too slow/not enough buffering
-        frame_skip_count_out      : out std_logic_vector(31 downto 0)  --! count of when we have to display an old frame as the new one isn't ready yet
+        -- frame_skip_count_out      : out std_logic_vector(31 downto 0);  --! count of when we have to display an old frame as the new one isn't ready yet
+        pixel_underflow_count_dma_clk_out : out std_logic_vector(31 downto 0); --! (dma_clk) count of when our DMA is too slow/not enough buffering
+        start_of_frame_dma_clk_out        : out std_logic;                     --! (dma_clk) to clear next_frame_ready/CPU interrupt
+        buffer_sel_dma_clk_in             : in std_logic                       --! (dma_clk) From CPU/GPU logic - choose which buffer to use next
 
-    );
-end entity axi3_vdma;
+        );
+    end entity axi3_vdma;
 
 architecture rtl of axi3_vdma is
     constant G_END_FPORCH_X : integer := G_END_ACTIVE_X + G_FRONT_PORCH_X;
@@ -86,26 +84,40 @@ architecture rtl of axi3_vdma is
     signal h_count : integer range 0 to G_END_BPORCH_X;
     signal v_count : integer range 0 to G_END_BPORCH_Y;
 
-    signal data_enable           : std_logic;
-    signal dma_start_in          : std_logic;
-    signal dma_done_out          : std_logic;
-    signal dma_start_addr_in     : std_logic_vector(31 downto 0);
-    signal dma_axi_burst_mode_in : std_logic_vector(1 downto 0);
-    signal dma_num_words_in      : std_logic_vector(31 downto 0);
-    signal dma_queue_limit_in    : std_logic_vector(31 downto 0);
-    signal dma_stall_in          : std_logic;
+    signal data_enable        : std_logic;
+    signal dma_start          : std_logic;
+    signal dma_done           : std_logic;
+    signal dma_start_addr     : std_logic_vector(31 downto 0);
+    signal dma_axi_burst_mode : std_logic_vector(1 downto 0);
+    signal dma_num_words      : std_logic_vector(31 downto 0);
+    signal dma_queue_limit    : std_logic_vector(31 downto 0);
+    signal dma_stall          : std_logic;
 
     signal dma_axi_stream_mosi   : t_axi_stream32_mosi;
     signal dma_axi_stream_miso   : t_axi_stream32_miso;
     signal pixel_axi_stream_mosi : t_axi_stream32_mosi;
     signal pixel_axi_stream_miso : t_axi_stream32_miso;
-    type t_state is (IDLE, NEW_FRAME, NEW_LINE, STALL, WAIT_FOR_FLUSH);
-
+    type t_state is (WAIT_FOR_FLUSH, WAIT_FOR_VSYNC, LINE_DMA_START, LINE_DMA_WAIT);
     signal state : t_state := WAIT_FOR_FLUSH;
 
+
+    -- framebuffer parameters (default 640x480)
+    -- needs to be power of 2 larger than G_END_ACTIVE_X so we can avoid multiplication for address calculation.
+    -- This uses about 2MB per frame for 640x480 @32bpp, which gives us loads of room in the Zynq DDR3
+    constant LINE_ADDR_SHIFT_AMOUNT : integer := clog2(G_END_ACTIVE_X) + 2;
+
+    -- for example, consider a line 640 pixels wide. We need clog2(640) = 10 bits to store this
+    -- so the line offset becomes Y << (10 + 2)
+    -- So line 0 has an offset of 0
+    -- line 1 has an word offset of 1024 (byte 4096)
+
+    signal dma_line_count               : integer range 0 to G_END_ACTIVE_Y - 1;
+    signal dma_line_addr_offset         : integer;
+    signal dma_frame_addr_offset        : integer;
+    signal vga_vsync                    : std_logic;
+    signal vga_vsync_dma_clk            : std_logic;
     signal pixel_fifo_prog_full         : std_logic;
-    signal pixel_fifo_has_space         : std_logic;
-    signal pixel_fifo_has_space_dma_clk : std_logic;
+    signal pixel_fifo_prog_full_dma_clk : std_logic;
     signal pixel_fifo_empty             : std_logic;
     signal pixel_fifo_empty_dma_clk     : std_logic; -- cdc so we know when the flush is completed
     -- status reporting
@@ -121,6 +133,7 @@ begin
     -- and also to generate the HSYNC, VSYNC and BLANK signals
 
     vga_blank_out <= not data_enable;
+    vga_vsync_out <= vga_vsync;
 
     -- NOTE: these control signals are registered, so are asserted one cycle after the counter reaches that value
     sync_counters : process (pixelclk_in)
@@ -141,7 +154,7 @@ begin
 
                 --sync signals
                 vga_hsync_out <= G_ACTIVE_HS when ((h_count >= G_END_FPORCH_X) and (h_count < G_END_SYNC_X)) else not G_ACTIVE_HS;
-                vga_vsync_out <= G_ACTIVE_VS when ((v_count >= G_END_FPORCH_Y) and (v_count < G_END_SYNC_Y)) else not G_ACTIVE_VS;
+                vga_vsync     <= G_ACTIVE_VS when ((v_count >= G_END_FPORCH_Y) and (v_count < G_END_SYNC_Y)) else not G_ACTIVE_VS;
 
             end if;
         end if;
@@ -155,13 +168,13 @@ begin
         port map(
             axi_clk               => dma_clk_in,
             axi_reset             => dma_reset_in,
-            dma_start_in          => dma_start_in,
-            dma_start_addr_in     => dma_start_addr_in,
+            dma_start_in          => dma_start,
+            dma_start_addr_in     => dma_start_addr,
             dma_axi_burst_mode_in => AXI_BURST_INCR,
-            dma_num_words_in      => dma_num_words_in,
+            dma_num_words_in      => dma_num_words,
             dma_queue_limit_in    => uint2slv(4),
-            dma_stall_in          => dma_stall_in,
-            dma_done_out          => dma_done_out,
+            dma_stall_in          => dma_stall,
+            dma_done_out          => dma_done,
             dma_axi_hp_mosi_out   => dma_axi_hp_mosi_out,
             dma_axi_hp_miso_in    => dma_axi_hp_miso_in,
             axi_stream_mosi_out   => dma_axi_stream_mosi,
@@ -169,47 +182,97 @@ begin
         );
 
     dma_ctrl_proc : process (dma_clk_in)
+        variable v_dma_line_addr_offset : integer;
     begin
         if rising_edge(dma_clk_in) then
             if dma_reset_in = '1' then
                 state <= WAIT_FOR_FLUSH;
             else
-                -- type t_state is (IDLE, NEW_FRAME, NEW_LINE, STALL, WAIT_FOR_FLUSH);
-
                 -- state machine description:
-                When we reset (or have an error), start flushing the pixel FIFO and don't start any more DMA
-                After the pixel FIFO is empty, wait for the end of the current frame, then start a new frame as normal
+                -- When we reset (or have an error), start flushing the pixel FIFO and don't start any more DMA
+                -- After the pixel FIFO is empty, wait for the end of the current frame, then start a new frame as normal
 
+                -- start the DMA for the next frame when our VSYNC is asserted (this should give us enough time, as that will be
+                -- multiple lines before the active area)
 
+                -- as individual lines are not contiguously in memory, do one DMA transfer per line. We don't need to wait for a HSYNC each time though
 
+                --defaults:
+                start_of_frame_dma_clk_out <= '0';
                 case state is
-                    when IDLE           =>
-                    when NEW_FRAME      =>
-                    when NEW_LINE       =>
-                    when STALL          =>
                     when WAIT_FOR_FLUSH =>
-                    when others         =>
-                        null;
+                        ------------------------------------------------------
+                        -- don't start any more DMA transfers until the pixel
+                        -- FIFO is empty to resync the data
+                        ------------------------------------------------------
+                        dma_start <= '0';
+                        if dma_done = '1' and pixel_fifo_empty_dma_clk = '1' then
+                            state <= WAIT_FOR_VSYNC;
+                        end if;
+
+                    when WAIT_FOR_VSYNC =>
+                        ----------------------------------------------------------------
+                        -- when we get a VSYNC, we can then get ready for the next frame
+                        ----------------------------------------------------------------
+                        if vga_vsync_dma_clk = '1' then
+                            start_of_frame_dma_clk_out    <= '1';
+                            dma_line_count        <= 0;
+                            dma_line_addr_offset  <= 0;
+                            dma_frame_addr_offset <= slv2uint(buffer1_start) when buffer_sel_dma_clk_in = '1' else slv2uint(buffer0_start);
+                            state                 <= LINE_DMA_START;
+                        end if;
+
+                    when LINE_DMA_START =>
+                        --------------------------------------------------------
+                        -- Start a DMA
+                        --------------------------------------------------------
+                        dma_start <= '1';
+                        v_dma_line_addr_offset := shift_left(dma_line_count, LINE_ADDR_SHIFT_AMOUNT);
+                        dma_start_addr <= uint2slv(dma_frame_addr_offset + v_dma_line_addr_offset);
+                        dma_num_words  <= uint2slv(G_END_ACTIVE_X); -- number of horizontal pixels
+                        state          <= LINE_DMA_START;
+
+                    when LINE_DMA_WAIT =>
+                        --------------------------------------------------------
+                        -- Wait for the line buffer transfer to complete
+                        -- (can be stalled by pixel_fifo_prog_full)
+                        --------------------------------------------------------
+                        dma_start <= '0';
+                        if dma_done = '1' then
+                            -- if we have finished reading out the current frame, wait until the next one is ready
+                            if dma_line_count = G_END_ACTIVE_Y - 1 then
+                                state <= WAIT_FOR_VSYNC;
+                            else -- read out the next line
+                                dma_line_count <= dma_line_count + 1;
+                                state          <= LINE_DMA_START;
+                            end if;
+                        end if;
+
+                    when others =>
+                        state <= WAIT_FOR_FLUSH;
                 end case;
             end if;
         end if;
     end process;
+
+    -- we will use the prog_full flag to stall the DMA transfer until we have room for another burst
+    dma_stall <= pixel_fifo_prog_full_dma_clk;
+
     -----------------------------------------------------------------
     -- 3. Read Data CDC FIFO and pixel readout
     -----------------------------------------------------------------
-    -- we will use the prog_full flag to stall the DMA transfer until we have room for another burst
-    pixel_fifo_has_space <= not pixel_fifo_prog_full;
-    pixel_fifo_empty     <= not pixel_axi_stream_mosi.tvalid;
 
-    -- CDC back to the dma_clk domain
+    -- CDC back to the dma_clk domain (all bits must be independent)
     xpm_cdc_to_dma_clk_inst : xpm_cdc_array_single
-    generic map(DEST_SYNC_FF => 2, WIDTH => 2)
+    generic map(DEST_SYNC_FF => 2, WIDTH => 3)
     port map(
-        dest_out => (pixel_fifo_empty_dma_clk, pixel_fifo_has_space_dma_clk),
+        dest_out => (pixel_fifo_empty_dma_clk, pixel_fifo_prog_full_dma_clk, vga_vsync_dma_clk),
         dest_clk => dma_clk_in,
         src_clk  => pixelclk_in,
-        src_in   => (pixel_fifo_empty, pixel_fifo_has_space)
+        src_in   => (pixel_fifo_empty, pixel_fifo_prog_full, vga_vsync)
     );
+
+    pixel_fifo_empty <= not pixel_axi_stream_mosi.tvalid;
 
     -- CDC into the pixelclk domain
     axi_stream_xpm_fifo_wrapper_inst : entity work.axi_stream_xpm_fifo_wrapper
@@ -232,8 +295,24 @@ begin
             prog_full                  => pixel_fifo_prog_full
         );
 
+    xpm_cdc_gray_to_dma_clk_inst : xpm_cdc_gray
+    generic map(
+        DEST_SYNC_FF          => 2, -- DECIMAL; range: 2-10
+        REG_OUTPUT            => 0, -- DECIMAL; 0=disable registered output, 1=enable registered output
+        SIM_LOSSLESS_GRAY_CHK => 0, -- DECIMAL; 0=disable lossless check, 1=enable lossless check
+        WIDTH                 => 32 -- DECIMAL; range: 2-32
+    )
+    port map(
+        dest_out_bin => pixel_underflow_count_dma_clk_out, -- WIDTH-bit output: Binary input bus (src_in_bin) syncd to dest_clk
+        dest_clk     => dma_clk_in,                        -- 1-bit input: Destination clock.
+        src_clk      => pixelclk_in,                       -- 1-bit input: Source clock.
+        src_in_bin   => pixel_underflow_count              -- WIDTH-bit input: Binary input bus that will be synchronized to the
+        -- destination clock domain.
+
+    );
+
     --! Note: everything here is registered
-    pixel_out_proc : process (pixelclk_in)
+    pixel_readout_proc : process (pixelclk_in)
     begin
         if rising_edge(pixelclk_in) then
             if pixelclk_reset_in = '1' then

@@ -46,8 +46,8 @@ architecture rtl of dma_axi3_read is
     signal dma_start_addr  : integer;
 
     -- queue counters
-    signal num_cmd : integer := 0;
-    signal num_rsp : integer := 0;
+    signal num_cmd          : integer := 0;
+    signal num_rsp          : integer := 0;
     signal outstanding_cmds : integer;
 begin
     -- set ARCACHE[1] = '1' to allow DDR3 controller to pack into 64b transactions for better performance
@@ -71,19 +71,17 @@ begin
     axi_stream_mosi_out.tvalid <= dma_axi_hp_miso_in.rvalid;
     axi_stream_mosi_out.tlast  <= dma_axi_hp_miso_in.rlast;
     dma_axi_hp_mosi_out.rready <= axi_stream_miso_in.tready;
-
-
-    outstanding_cmds <= num_cmd - num_rsp;
+    outstanding_cmds           <= num_cmd - num_rsp;
 
     dma_read : process (axi_clk)
-        variable v_burst_size       : integer; -- intermediate value
+        variable v_burst_size : integer; -- intermediate value
     begin
         if rising_edge(axi_clk) then
             if axi_reset = '1' then
                 state                       <= IDLE;
                 num_cmd                     <= 0;
                 dma_axi_hp_mosi_out.arvalid <= '0';
-                dma_done_out <= '1';
+                dma_done_out                <= '1';
             else
                 case(state) is
                     ---------------------------------
@@ -92,7 +90,7 @@ begin
                     when IDLE =>
 
                     if dma_start_in = '1' then
-                        dma_done_out <= '0';
+                        dma_done_out    <= '0';
                         words_remaining <= slv2uint(dma_num_words_in);
                         dma_start_addr  <= slv2uint(dma_start_addr_in);
                         dma_addr_offset <= 0;
@@ -166,8 +164,14 @@ begin
                     when WAIT_DONE =>
                     if outstanding_cmds = 0 then
                         dma_done_out <= '1';
-                        state <= IDLE;
-                        end if;
+                        state        <= IDLE;
+                    end if;
+
+                    when others =>
+                    state                       <= IDLE;
+                    num_cmd                     <= 0;
+                    dma_axi_hp_mosi_out.arvalid <= '0';
+                    dma_done_out                <= '1';
                 end case;
             end if;
         end if;
