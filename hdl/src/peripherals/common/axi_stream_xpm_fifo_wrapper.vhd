@@ -48,6 +48,8 @@ end entity axi_stream_xpm_fifo_wrapper;
 
 architecture rtl of axi_stream_xpm_fifo_wrapper is
 
+    signal input_clk_resetn : std_logic;
+
     function get_dual_clock_mode_string(param : boolean) return string is
     begin
         if param = true then
@@ -75,6 +77,8 @@ architecture rtl of axi_stream_xpm_fifo_wrapper is
         end if;
     end function;
 begin
+input_clk_resetn <= input_clk_reset;
+
     xpm_fifo_axis_inst : xpm_fifo_axis
     generic map(
         CASCADE_HEIGHT      => 0,                                        -- DECIMAL
@@ -100,7 +104,7 @@ begin
 
         -- input AXI-Stream Slave port
         s_aclk        => input_clk,
-        s_aresetn     => not input_clk_reset, -- 1-bit input: Active low asynchronous reset.
+        s_aresetn     => input_clk_resetn, -- 1-bit input: Active low asynchronous reset.
         s_axis_tdata  => input_axi_stream_mosi_in.tdata,
         s_axis_tvalid => input_axi_stream_mosi_in.tvalid,
         s_axis_tlast  => input_axi_stream_mosi_in.tlast,

@@ -69,8 +69,8 @@ entity axi3_vdma is
         start_of_frame_dma_clk_out        : out std_logic;                     --! (dma_clk) to clear next_frame_ready/CPU interrupt
         buffer_sel_dma_clk_in             : in std_logic                       --! (dma_clk) From CPU/GPU logic - choose which buffer to use next
 
-        );
-    end entity axi3_vdma;
+    );
+end entity axi3_vdma;
 
 architecture rtl of axi3_vdma is
     constant G_END_FPORCH_X : integer := G_END_ACTIVE_X + G_FRONT_PORCH_X;
@@ -99,8 +99,6 @@ architecture rtl of axi3_vdma is
     signal pixel_axi_stream_miso : t_axi_stream32_miso;
     type t_state is (WAIT_FOR_FLUSH, WAIT_FOR_VSYNC, LINE_DMA_START, LINE_DMA_WAIT);
     signal state : t_state := WAIT_FOR_FLUSH;
-
-
     -- framebuffer parameters (default 640x480)
     -- needs to be power of 2 larger than G_END_ACTIVE_X so we can avoid multiplication for address calculation.
     -- This uses about 2MB per frame for 640x480 @32bpp, which gives us loads of room in the Zynq DDR3
@@ -111,9 +109,8 @@ architecture rtl of axi3_vdma is
     -- So line 0 has an offset of 0
     -- line 1 has an word offset of 1024 (byte 4096)
 
-    signal dma_line_count               : integer range 0 to G_END_ACTIVE_Y - 1;
-    signal dma_line_addr_offset         : integer;
-    signal dma_frame_addr_offset        : integer;
+    signal dma_line_count               : unsigned(31 downto 0);
+    signal dma_frame_addr_offset        : unsigned(31 downto 0);
     signal vga_vsync                    : std_logic;
     signal vga_vsync_dma_clk            : std_logic;
     signal pixel_fifo_prog_full         : std_logic;
@@ -121,8 +118,11 @@ architecture rtl of axi3_vdma is
     signal pixel_fifo_empty             : std_logic;
     signal pixel_fifo_empty_dma_clk     : std_logic; -- cdc so we know when the flush is completed
     -- status reporting
-    signal pixel_underflow_count : integer;
-    signal frame_skip_count      : integer;
+    signal pixel_underflow_count : unsigned(31 downto 0);
+    signal frame_skip_count      : unsigned(31 downto 0);
+
+    -- splitting up after CDC in an array (XPM)
+    signal cdc_to_dma_clk_arr : std_logic_vector(31 downto 0);
 
 begin
 
@@ -182,7 +182,7 @@ begin
         );
 
     dma_ctrl_proc : process (dma_clk_in)
-        variable v_dma_line_addr_offset : integer;
+        variable v_dma_line_addr_offset : unsigned(31 downto 0);
     begin
         if rising_edge(dma_clk_in) then
             if dma_reset_in = '1' then
@@ -215,11 +215,10 @@ begin
                         -- when we get a VSYNC, we can then get ready for the next frame
                         ----------------------------------------------------------------
                         if vga_vsync_dma_clk = '1' then
-                            start_of_frame_dma_clk_out    <= '1';
-                            dma_line_count        <= 0;
-                            dma_line_addr_offset  <= 0;
-                            dma_frame_addr_offset <= slv2uint(buffer1_start) when buffer_sel_dma_clk_in = '1' else slv2uint(buffer0_start);
-                            state                 <= LINE_DMA_START;
+                            start_of_frame_dma_clk_out <= '1';
+                            dma_line_count             <= (others => '0');
+                            dma_frame_addr_offset      <= unsigned(buffer1_start) when buffer_sel_dma_clk_in = '1' else unsigned(buffer0_start);
+                            state                      <= LINE_DMA_START;
                         end if;
 
                     when LINE_DMA_START =>
@@ -228,7 +227,7 @@ begin
                         --------------------------------------------------------
                         dma_start <= '1';
                         v_dma_line_addr_offset := shift_left(dma_line_count, LINE_ADDR_SHIFT_AMOUNT);
-                        dma_start_addr <= uint2slv(dma_frame_addr_offset + v_dma_line_addr_offset);
+                        dma_start_addr <= std_logic_vector(dma_frame_addr_offset + v_dma_line_addr_offset);
                         dma_num_words  <= uint2slv(G_END_ACTIVE_X); -- number of horizontal pixels
                         state          <= LINE_DMA_START;
 
@@ -243,7 +242,7 @@ begin
                             if dma_line_count = G_END_ACTIVE_Y - 1 then
                                 state <= WAIT_FOR_VSYNC;
                             else -- read out the next line
-                                dma_line_count <= dma_line_count + 1;
+                                dma_line_count <= dma_line_count + to_unsigned(1, dma_line_count'length);
                                 state          <= LINE_DMA_START;
                             end if;
                         end if;
@@ -263,10 +262,15 @@ begin
     -----------------------------------------------------------------
 
     -- CDC back to the dma_clk domain (all bits must be independent)
+
+    pixel_fifo_empty_dma_clk <= cdc_to_dma_clk_arr(2);
+    pixel_fifo_prog_full_dma_clk <= cdc_to_dma_clk_arr(1);
+    vga_vsync_dma_clk <= cdc_to_dma_clk_arr(0);
+
     xpm_cdc_to_dma_clk_inst : xpm_cdc_array_single
     generic map(DEST_SYNC_FF => 2, WIDTH => 3)
     port map(
-        dest_out => (pixel_fifo_empty_dma_clk, pixel_fifo_prog_full_dma_clk, vga_vsync_dma_clk),
+        dest_out => cdc_to_dma_clk_arr(2 downto 0),
         dest_clk => dma_clk_in,
         src_clk  => pixelclk_in,
         src_in   => (pixel_fifo_empty, pixel_fifo_prog_full, vga_vsync)
@@ -278,8 +282,8 @@ begin
     axi_stream_xpm_fifo_wrapper_inst : entity work.axi_stream_xpm_fifo_wrapper
         generic map(
             G_DUAL_CLOCK       => true,
-            G_RELATED_CLOCKS   => true,
-            G_FIFO_DEPTH       => 512, -- experiment to find how small a FIFO we can get away with
+            G_RELATED_CLOCKS   => false,    -- technically true, but lets see if this works with GHDL
+            G_FIFO_DEPTH       => G_PIXEL_FIFO_DEPTH, -- experiment to find how small a FIFO we can get away with
             G_DATA_WIDTH       => 32,
             G_FULL_PACKET      => false,
             G_PROG_FULL_THRESH => G_PIXEL_FIFO_DEPTH - 16
@@ -303,10 +307,10 @@ begin
         WIDTH                 => 32 -- DECIMAL; range: 2-32
     )
     port map(
-        dest_out_bin => pixel_underflow_count_dma_clk_out, -- WIDTH-bit output: Binary input bus (src_in_bin) syncd to dest_clk
-        dest_clk     => dma_clk_in,                        -- 1-bit input: Destination clock.
-        src_clk      => pixelclk_in,                       -- 1-bit input: Source clock.
-        src_in_bin   => pixel_underflow_count              -- WIDTH-bit input: Binary input bus that will be synchronized to the
+        dest_out_bin => pixel_underflow_count_dma_clk_out,      -- WIDTH-bit output: Binary input bus (src_in_bin) syncd to dest_clk
+        dest_clk     => dma_clk_in,                             -- 1-bit input: Destination clock.
+        src_clk      => pixelclk_in,                            -- 1-bit input: Source clock.
+        src_in_bin   => std_logic_vector(pixel_underflow_count) -- WIDTH-bit input: Binary input bus that will be synchronized to the
         -- destination clock domain.
 
     );
@@ -316,7 +320,7 @@ begin
     begin
         if rising_edge(pixelclk_in) then
             if pixelclk_reset_in = '1' then
-                pixel_underflow_count <= 0;
+                pixel_underflow_count <= (others => '0');
             else
                 -- if no new pixel is available, increase underflow count
 
@@ -330,7 +334,7 @@ begin
                         vga_pixel_out.green <= pixel_axi_stream_mosi.tdata(15 downto 8);
                         vga_pixel_out.blue  <= pixel_axi_stream_mosi.tdata(7 downto 0);
                     else -- if no pixel preset
-                        pixel_underflow_count <= pixel_underflow_count + 1;
+                        pixel_underflow_count <= pixel_underflow_count + to_unsigned(1, pixel_underflow_count'length);
                         -- underflow colour is "deep pink" for debug
                         vga_pixel_out.red   <= x"E6";
                         vga_pixel_out.green <= x"00";
