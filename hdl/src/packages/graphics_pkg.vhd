@@ -16,4 +16,18 @@ package graphics_pkg is
         blue: std_logic_vector(7 downto 0);
     end record;
 
+
+    function func_combine_pixel_or(a : t_pixel; b : t_pixel) return t_pixel;
+
+
 end package;
+
+package body graphics_pkg is
+    function func_combine_pixel_or(a : t_pixel; b : t_pixel) return t_pixel is
+        variable v_pixel : t_pixel;
+    begin
+        v_pixel := (red => a.red or b.red, green => a.green or b.green, blue => a.blue or b.blue);
+        return v_pixel;
+    end function;
+
+end package body;

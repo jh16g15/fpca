@@ -4,6 +4,7 @@ use IEEE.NUMERIC_STD.all;
 
 use work.axi_pkg.all;
 use work.wb_pkg.all;
+use work.graphics_pkg.all;
 
 entity pynq_top is
     generic (
@@ -63,7 +64,7 @@ architecture rtl of pynq_top is
     signal S_AXI_HP0_MISO : t_axi_miso;
 
     signal pixelclk : std_logic;
-    signal tmdsclk  : std_logic;
+    signal dma_clk  : std_logic;
     signal dvi_clk  : std_logic;
     signal dvi_clkn : std_logic;
 
@@ -86,6 +87,19 @@ architecture rtl of pynq_top is
 
     signal gpio_led : std_logic_vector(31 downto 0);
 
+    signal bitmap_pixel  : t_pixel                       := (red => x"00", green => x"00", blue => x"00");
+    signal txt_pixel     : t_pixel                       := (red => x"00", green => x"00", blue => x"00");
+    signal comb_pixel    : t_pixel                       := (red => x"00", green => x"00", blue => x"00"); -- combined pixel
+
+    -- VDMA control and status
+    signal buffer0_start : std_logic_vector(31 downto 0) := x"0010_0000";
+    signal buffer1_start : std_logic_vector(31 downto 0) := x"0030_0000";
+    signal buffer_sel_dma_clk : std_logic := '0';
+    signal start_of_frame_dma_clk : std_logic;
+    signal pixel_underflow_count_dma_clk : std_logic_vector(31 downto 0) := x"0030_0000";
+
+
+
     component clk_wiz_0
         port (
             clk_out1            : out std_logic;
@@ -103,7 +117,9 @@ architecture rtl of pynq_top is
     attribute mark_debug           : boolean;
     attribute mark_debug of locked : signal is true;
     attribute mark_debug of reset  : signal is true;
-    -- attribute mark_debug of locked : signal is true;
+    attribute mark_debug of pixel_underflow_count_dma_clk : signal is true;
+    attribute mark_debug of buffer_sel_dma_clk : signal is true;
+
 begin
 
     led4_b <= sw(0);
@@ -117,7 +133,7 @@ begin
     port map(
         clk_out1            => open,     -- 100MHz
         pixelclk_out        => pixelclk, -- 25MHz
-        hdmi_serdes_clk_out => tmdsclk,  -- 250MHz (unused)
+        hdmi_serdes_clk_out => dma_clk,  -- 250MHz (unused)
         dvi_clk_out         => dvi_clk,  -- 125MHz
         dvi_clkn_out        => dvi_clkn, -- 125MHz, 180deg phase shift
         locked              => locked,
@@ -131,9 +147,9 @@ begin
                 dvi_clk      => dvi_clk,
                 dvi_clkn     => dvi_clkn,
                 vga_pixelclk => pixelclk,
-                vga_red      => red_pixel,
-                vga_green    => green_pixel,
-                vga_blue     => blue_pixel,
+                vga_red      => comb_pixel.red,
+                vga_green    => comb_pixel.green,
+                vga_blue     => comb_pixel.blue,
                 vga_blank    => blank,
                 vga_hsync    => hsync,
                 vga_vsync    => vsync,
@@ -144,26 +160,60 @@ begin
             );
     end generate;
 
-    wb_display_text_controller_inst : entity work.wb_display_text_controller
+    -- wb_display_text_controller_inst : entity work.wb_display_text_controller
+    --     port map(
+    --         pixelclk                 => pixelclk,
+    --         areset_n                 => locked,
+    --         vga_hs                   => hsync,
+    --         vga_vs                   => vsync,
+    --         vga_blank                => blank,
+    --         vga_r                    => red_pixel(7 downto 4),
+    --         vga_g                    => green_pixel(7 downto 4),
+    --         vga_b                    => blue_pixel(7 downto 4),
+    --         text_display_wb_mosi_in  => text_display_wb_mosi,
+    --         text_display_wb_miso_out => text_display_wb_miso
+    --     );
+
+    axi3_vdma_inst : entity work.axi3_vdma
+        generic map(
+            G_PIXEL_FIFO_DEPTH => 512,
+            G_ILA => true
+        )
         port map(
-            pixelclk                 => pixelclk,
-            areset_n                 => locked,
-            vga_hs                   => hsync,
-            vga_vs                   => vsync,
-            vga_blank                => blank,
-            vga_r                    => red_pixel(7 downto 4),
-            vga_g                    => green_pixel(7 downto 4),
-            vga_b                    => blue_pixel(7 downto 4),
-            text_display_wb_mosi_in  => text_display_wb_mosi,
-            text_display_wb_miso_out => text_display_wb_miso
+            dma_clk_in                        => dma_clk,
+            pixelclk_in                       => pixelclk,
+            pixelclk_reset_in                 => not locked,
+            dma_reset_in                      => not locked,
+            dma_axi_hp_mosi_out               => S_AXI_HP0_MOSI,
+            dma_axi_hp_miso_in                => S_AXI_HP0_MISO,
+            vga_pixel_out                     => bitmap_pixel,
+            vga_hsync_out                     => hsync,
+            vga_vsync_out                     => vsync,
+            vga_blank_out                     => blank,
+            buffer0_start_in                  => buffer0_start,
+            buffer1_start_in                  => buffer1_start,
+            pixel_underflow_count_dma_clk_out => pixel_underflow_count_dma_clk,
+            start_of_frame_dma_clk_out        => start_of_frame_dma_clk,
+            buffer_sel_dma_clk_in             => buffer_sel_dma_clk
         );
+
+    buffer_flip : process(dma_clk) is
+    begin
+        if rising_edge(dma_clk) then
+            if start_of_frame_dma_clk = '1' then
+                buffer_sel_dma_clk <= not buffer_sel_dma_clk;
+            end if;
+        end if;
+    end process;
+
+    comb_pixel <= func_combine_pixel_or(bitmap_pixel, txt_pixel);
 
     ps_block_custom_wrapper_inst : entity work.ps_block_custom_wrapper
         generic map(G_S_AXI_GP0_DEBUG => false)
         port map(
             M_AXI_GP0_ACLK_IN => pixelclk,
             S_AXI_GP0_ACLK_IN => pixelclk,
-            S_AXI_HP0_ACLK_IN => pixelclk,
+            S_AXI_HP0_ACLK_IN => dma_clk,
             DDR               => DDR,
             FCLK_CLK0_100     => FCLK_CLK0_100,
             FCLK_RESET0_N     => FCLK_RESET0_N, -- reset out

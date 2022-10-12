@@ -9,7 +9,8 @@ use work.joe_common_pkg.all;
 --! only supports word-aligned transfers of whole words
 entity dma_axi3_read is
     generic (
-        G_SIM_MSGS : boolean := false
+        G_SIM_MSGS : boolean := false;
+        G_ILA      : boolean := false
     );
     port (
         axi_clk   : in std_logic;
@@ -52,6 +53,15 @@ architecture rtl of dma_axi3_read is
     signal num_cmd          : integer := 0;
     signal num_rsp          : integer := 0;
     signal outstanding_cmds : integer;
+
+    attribute mark_debug                     : boolean;
+    attribute mark_debug of state            : signal is G_ILA;
+    attribute mark_debug of words_remaining  : signal is G_ILA;
+    attribute mark_debug of dma_addr_offset  : signal is G_ILA;
+    attribute mark_debug of dma_start_addr   : signal is G_ILA;
+    attribute mark_debug of num_cmd          : signal is G_ILA;
+    attribute mark_debug of num_rsp          : signal is G_ILA;
+    attribute mark_debug of outstanding_cmds : signal is G_ILA;
 begin
     -- set ARCACHE[1] = '1' to allow DDR3 controller to pack into 64b transactions for better performance
     -- write channels not used

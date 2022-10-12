@@ -40,7 +40,8 @@ entity axi3_vdma is
         G_ACTIVE_HS     : std_logic := '0';
         G_ACTIVE_VS     : std_logic := '0';
 
-        G_PIXEL_FIFO_DEPTH : integer := 512 --! Experiment to see how big this needs to be
+        G_PIXEL_FIFO_DEPTH : integer := 512; --! Experiment to see how big this needs to be
+        G_ILA              : boolean := false
     );
     port (
         dma_clk_in  : in std_logic; -- AXI_S_HP clock: 150MHz (up to 250MHz?)
@@ -124,6 +125,13 @@ architecture rtl of axi3_vdma is
     -- splitting up after CDC in an array (XPM)
     signal cdc_to_dma_clk_arr : std_logic_vector(31 downto 0) := (others => '0');
 
+    attribute mark_debug                                 : boolean;
+    attribute mark_debug of dma_line_count               : signal is G_ILA;
+    attribute mark_debug of dma_frame_addr_offset        : signal is G_ILA;
+    attribute mark_debug of pixel_fifo_prog_full_dma_clk : signal is G_ILA;
+    attribute mark_debug of pixel_fifo_empty_dma_clk     : signal is G_ILA;
+    attribute mark_debug of state                        : signal is G_ILA;
+
 begin
 
     -----------------------------------------------------------------
@@ -171,6 +179,7 @@ begin
     -----------------------------------------------------------------
     -- 32b pixel data
     dma_axi3_read_inst : entity work.dma_axi3_read
+        generic map(G_ILA => G_ILA)
         port map(
             axi_clk               => dma_clk_in,
             axi_reset             => dma_reset_in,
