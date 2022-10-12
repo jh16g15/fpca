@@ -60,8 +60,8 @@ entity axi3_vdma is
         vga_blank_out : out std_logic;
 
         -- double buffering
-        buffer0_start : in std_logic_vector(31 downto 0);
-        buffer1_start : in std_logic_vector(31 downto 0);
+        buffer0_start_in : in std_logic_vector(31 downto 0);
+        buffer1_start_in : in std_logic_vector(31 downto 0);
 
         -- status and control
         -- frame_skip_count_out      : out std_logic_vector(31 downto 0);  --! count of when we have to display an old frame as the new one isn't ready yet
@@ -81,8 +81,8 @@ architecture rtl of axi3_vdma is
     constant G_END_SYNC_Y   : integer := G_END_FPORCH_Y + G_SYNC_PULSE_Y;
     constant G_END_BPORCH_Y : integer := G_END_SYNC_Y + G_BACK_PORCH_Y; -- 525
 
-    signal h_count : integer range 0 to G_END_BPORCH_X;
-    signal v_count : integer range 0 to G_END_BPORCH_Y;
+    signal h_count : integer range 0 to G_END_BPORCH_X := G_END_ACTIVE_X;
+    signal v_count : integer range 0 to G_END_BPORCH_Y := G_END_ACTIVE_Y;
 
     signal data_enable        : std_logic;
     signal dma_start          : std_logic;
@@ -118,11 +118,11 @@ architecture rtl of axi3_vdma is
     signal pixel_fifo_empty             : std_logic;
     signal pixel_fifo_empty_dma_clk     : std_logic; -- cdc so we know when the flush is completed
     -- status reporting
-    signal pixel_underflow_count : unsigned(31 downto 0);
-    signal frame_skip_count      : unsigned(31 downto 0);
+    signal pixel_underflow_count : unsigned(31 downto 0) := (others => '0');
+    signal frame_skip_count      : unsigned(31 downto 0) := (others => '0');
 
     -- splitting up after CDC in an array (XPM)
-    signal cdc_to_dma_clk_arr : std_logic_vector(31 downto 0);
+    signal cdc_to_dma_clk_arr : std_logic_vector(31 downto 0) := (others => '0');
 
 begin
 
@@ -146,8 +146,14 @@ begin
                 data_enable <= '0';
             else
                 -- counters
-                h_count <= 0 when h_count >= G_END_BPORCH_X else h_count + 1;
-                v_count <= 0 when v_count >= G_END_BPORCH_Y else v_count + 1;
+                -- h_count <= 0 when h_count >= G_END_BPORCH_X else h_count + 1;
+
+                if h_count >= G_END_BPORCH_X then
+                    h_count <= 0;
+                    v_count <= 0 when v_count >= G_END_BPORCH_Y else v_count + 1;
+                else
+                    h_count <= h_count + 1;
+                end if;
 
                 --blanking signal
                 data_enable <= '1' when ((h_count < G_END_ACTIVE_X) and (h_count < G_END_ACTIVE_X)) else '0';
@@ -217,7 +223,7 @@ begin
                         if vga_vsync_dma_clk = '1' then
                             start_of_frame_dma_clk_out <= '1';
                             dma_line_count             <= (others => '0');
-                            dma_frame_addr_offset      <= unsigned(buffer1_start) when buffer_sel_dma_clk_in = '1' else unsigned(buffer0_start);
+                            dma_frame_addr_offset      <= unsigned(buffer1_start_in) when buffer_sel_dma_clk_in = '1' else unsigned(buffer0_start_in);
                             state                      <= LINE_DMA_START;
                         end if;
 
@@ -263,9 +269,9 @@ begin
 
     -- CDC back to the dma_clk domain (all bits must be independent)
 
-    pixel_fifo_empty_dma_clk <= cdc_to_dma_clk_arr(2);
+    pixel_fifo_empty_dma_clk     <= cdc_to_dma_clk_arr(2);
     pixel_fifo_prog_full_dma_clk <= cdc_to_dma_clk_arr(1);
-    vga_vsync_dma_clk <= cdc_to_dma_clk_arr(0);
+    vga_vsync_dma_clk            <= cdc_to_dma_clk_arr(0);
 
     xpm_cdc_to_dma_clk_inst : xpm_cdc_array_single
     generic map(DEST_SYNC_FF => 2, WIDTH => 3)
@@ -282,7 +288,7 @@ begin
     axi_stream_xpm_fifo_wrapper_inst : entity work.axi_stream_xpm_fifo_wrapper
         generic map(
             G_DUAL_CLOCK       => true,
-            G_RELATED_CLOCKS   => false,    -- technically true, but lets see if this works with GHDL
+            G_RELATED_CLOCKS   => false,              -- technically true, but lets see if this works with GHDL
             G_FIFO_DEPTH       => G_PIXEL_FIFO_DEPTH, -- experiment to find how small a FIFO we can get away with
             G_DATA_WIDTH       => 32,
             G_FULL_PACKET      => false,

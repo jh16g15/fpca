@@ -53,6 +53,8 @@ architecture bench of axi3_vdma_tb is
     signal buffer_sel_dma_clk_in             : std_logic;
 
 begin
+    test_runner_watchdog(runner, 35 ms);
+
     -- DUT
     axi3_vdma_inst : entity work.axi3_vdma
         generic map(
@@ -79,14 +81,14 @@ begin
             vga_hsync_out                     => vga_hsync_out,
             vga_vsync_out                     => vga_vsync_out,
             vga_blank_out                     => vga_blank_out,
-            buffer0_start                     => buffer0_start,
-            buffer1_start                     => buffer1_start,
+            buffer0_start_in                  => buffer0_start,
+            buffer1_start_in                  => buffer1_start,
             pixel_underflow_count_dma_clk_out => pixel_underflow_count_dma_clk_out,
             start_of_frame_dma_clk_out        => start_of_frame_dma_clk_out,
             buffer_sel_dma_clk_in             => buffer_sel_dma_clk_in
         );
 
-        vunit_axi_slave_inst : entity work.vunit_axi_slave
+    vunit_axi_slave_inst : entity work.vunit_axi_slave
         generic map(G_NAME => "DDR3", G_BASE_ADDR => x"0000_0000", G_BYTES => MEM_WORDS * 4, G_DEBUG_PRINT => false)
         port map(
             axi_clk        => dma_clk_in,
@@ -99,9 +101,29 @@ begin
     begin
         test_runner_setup(runner, runner_cfg);
         while test_suite loop
-            if run("test_alive") then
-                info("Hello world test_alive");
+            if run("frame_gen test") then
+                info("frame_gen test alive");
+                buffer0_start <= x"0000_0000"; -- 2MB buffers
+                buffer1_start <= x"0020_0000";
+
+                -- set up intial contents for buffer 0
+                for i in 0 to 2 ** 10 - 1 loop
+                    write_integer(mem, address => i * 4, word => i);
+                end loop;
+
+                buffer_sel_dma_clk_in <= '0'; -- select buffer 0
+
+                -- reset sequencing
+                dma_reset_in      <= '1';
+                pixelclk_reset_in <= '1';
+                wait for 10 * pixelclk_period;
+                wait until rising_edge(dma_clk_in);
+                dma_reset_in <= '0';
+                wait until rising_edge(pixelclk_in);
+                pixelclk_reset_in <= '0';
                 wait for 100 * dma_clk_period;
+                wait until start_of_frame_dma_clk_out = '1';
+                wait until start_of_frame_dma_clk_out = '1';
                 test_runner_cleanup(runner);
             end if;
         end loop;

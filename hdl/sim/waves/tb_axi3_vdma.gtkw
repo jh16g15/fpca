@@ -1,0 +1,100 @@
+[*]
+[*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
+[*] Tue Oct 11 23:56:15 2022
+[*]
+[dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.axi3_vdma_tb.frame_gen_test_5bf7afd9320847e55e8c06f87ac95261635ffad5/ghdl/wave.ghw"
+[dumpfile_mtime] "Tue Oct 11 23:53:25 2022"
+[dumpfile_size] 171396316
+[savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_axi3_vdma.gtkw"
+[timestart] 0
+[size] 2560 1377
+[pos] -191 -191
+*-25.000000 570000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.axi3_vdma_tb.
+[treeopen] top.axi3_vdma_tb.axi3_vdma_inst.
+[sst_width] 470
+[signals_width] 431
+[sst_expanded] 1
+[sst_vpaned_height] 896
+@200
+-VDMA Ports
+@22
+#{top.axi3_vdma_tb.buffer0_start[31:0]} top.axi3_vdma_tb.buffer0_start[31] top.axi3_vdma_tb.buffer0_start[30] top.axi3_vdma_tb.buffer0_start[29] top.axi3_vdma_tb.buffer0_start[28] top.axi3_vdma_tb.buffer0_start[27] top.axi3_vdma_tb.buffer0_start[26] top.axi3_vdma_tb.buffer0_start[25] top.axi3_vdma_tb.buffer0_start[24] top.axi3_vdma_tb.buffer0_start[23] top.axi3_vdma_tb.buffer0_start[22] top.axi3_vdma_tb.buffer0_start[21] top.axi3_vdma_tb.buffer0_start[20] top.axi3_vdma_tb.buffer0_start[19] top.axi3_vdma_tb.buffer0_start[18] top.axi3_vdma_tb.buffer0_start[17] top.axi3_vdma_tb.buffer0_start[16] top.axi3_vdma_tb.buffer0_start[15] top.axi3_vdma_tb.buffer0_start[14] top.axi3_vdma_tb.buffer0_start[13] top.axi3_vdma_tb.buffer0_start[12] top.axi3_vdma_tb.buffer0_start[11] top.axi3_vdma_tb.buffer0_start[10] top.axi3_vdma_tb.buffer0_start[9] top.axi3_vdma_tb.buffer0_start[8] top.axi3_vdma_tb.buffer0_start[7] top.axi3_vdma_tb.buffer0_start[6] top.axi3_vdma_tb.buffer0_start[5] top.axi3_vdma_tb.buffer0_start[4] top.axi3_vdma_tb.buffer0_start[3] top.axi3_vdma_tb.buffer0_start[2] top.axi3_vdma_tb.buffer0_start[1] top.axi3_vdma_tb.buffer0_start[0]
+#{top.axi3_vdma_tb.buffer1_start[31:0]} top.axi3_vdma_tb.buffer1_start[31] top.axi3_vdma_tb.buffer1_start[30] top.axi3_vdma_tb.buffer1_start[29] top.axi3_vdma_tb.buffer1_start[28] top.axi3_vdma_tb.buffer1_start[27] top.axi3_vdma_tb.buffer1_start[26] top.axi3_vdma_tb.buffer1_start[25] top.axi3_vdma_tb.buffer1_start[24] top.axi3_vdma_tb.buffer1_start[23] top.axi3_vdma_tb.buffer1_start[22] top.axi3_vdma_tb.buffer1_start[21] top.axi3_vdma_tb.buffer1_start[20] top.axi3_vdma_tb.buffer1_start[19] top.axi3_vdma_tb.buffer1_start[18] top.axi3_vdma_tb.buffer1_start[17] top.axi3_vdma_tb.buffer1_start[16] top.axi3_vdma_tb.buffer1_start[15] top.axi3_vdma_tb.buffer1_start[14] top.axi3_vdma_tb.buffer1_start[13] top.axi3_vdma_tb.buffer1_start[12] top.axi3_vdma_tb.buffer1_start[11] top.axi3_vdma_tb.buffer1_start[10] top.axi3_vdma_tb.buffer1_start[9] top.axi3_vdma_tb.buffer1_start[8] top.axi3_vdma_tb.buffer1_start[7] top.axi3_vdma_tb.buffer1_start[6] top.axi3_vdma_tb.buffer1_start[5] top.axi3_vdma_tb.buffer1_start[4] top.axi3_vdma_tb.buffer1_start[3] top.axi3_vdma_tb.buffer1_start[2] top.axi3_vdma_tb.buffer1_start[1] top.axi3_vdma_tb.buffer1_start[0]
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.pixelclk_reset_in
+top.axi3_vdma_tb.axi3_vdma_inst.pixelclk_in
+@22
+#{top.axi3_vdma_tb.vga_pixel_out.blue[7:0]} top.axi3_vdma_tb.vga_pixel_out.blue[7] top.axi3_vdma_tb.vga_pixel_out.blue[6] top.axi3_vdma_tb.vga_pixel_out.blue[5] top.axi3_vdma_tb.vga_pixel_out.blue[4] top.axi3_vdma_tb.vga_pixel_out.blue[3] top.axi3_vdma_tb.vga_pixel_out.blue[2] top.axi3_vdma_tb.vga_pixel_out.blue[1] top.axi3_vdma_tb.vga_pixel_out.blue[0]
+#{top.axi3_vdma_tb.vga_pixel_out.green[7:0]} top.axi3_vdma_tb.vga_pixel_out.green[7] top.axi3_vdma_tb.vga_pixel_out.green[6] top.axi3_vdma_tb.vga_pixel_out.green[5] top.axi3_vdma_tb.vga_pixel_out.green[4] top.axi3_vdma_tb.vga_pixel_out.green[3] top.axi3_vdma_tb.vga_pixel_out.green[2] top.axi3_vdma_tb.vga_pixel_out.green[1] top.axi3_vdma_tb.vga_pixel_out.green[0]
+#{top.axi3_vdma_tb.vga_pixel_out.red[7:0]} top.axi3_vdma_tb.vga_pixel_out.red[7] top.axi3_vdma_tb.vga_pixel_out.red[6] top.axi3_vdma_tb.vga_pixel_out.red[5] top.axi3_vdma_tb.vga_pixel_out.red[4] top.axi3_vdma_tb.vga_pixel_out.red[3] top.axi3_vdma_tb.vga_pixel_out.red[2] top.axi3_vdma_tb.vga_pixel_out.red[1] top.axi3_vdma_tb.vga_pixel_out.red[0]
+#{top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[31:0]} top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[31] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[30] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[29] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[28] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[27] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[26] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[25] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[24] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[23] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[22] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[21] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[20] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[19] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[18] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[17] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[16] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[15] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[14] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[13] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[12] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[11] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[10] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[9] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[8] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[7] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[6] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[5] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[4] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[3] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[2] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[1] top.axi3_vdma_tb.pixel_underflow_count_dma_clk_out[0]
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.vga_blank_out
+top.axi3_vdma_tb.axi3_vdma_inst.vga_hsync_out
+@420
+top.axi3_vdma_tb.axi3_vdma_inst.h_count
+top.axi3_vdma_tb.axi3_vdma_inst.v_count
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.vga_vsync_out
+@200
+-Pixelclk Pixel AXI Stream
+@22
+#{top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[31:0]} top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[31] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[30] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[29] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[28] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[27] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[26] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[25] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[24] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[23] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[22] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[21] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[20] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[19] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[18] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[17] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[16] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[15] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[14] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[13] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[12] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[11] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[10] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[9] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[8] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[7] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[6] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[5] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[4] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[3] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[2] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[1] top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tdata[0]
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tlast
+top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_mosi.tvalid
+top.axi3_vdma_tb.axi3_vdma_inst.pixel_axi_stream_miso.tready
+@200
+-DMA Clk Pixel stream
+@22
+#{top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[31:0]} top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[31] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[30] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[29] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[28] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[27] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[26] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[25] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[24] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[23] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[22] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[21] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[20] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[19] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[18] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[17] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[16] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[15] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[14] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[13] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[12] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[11] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[10] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[9] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[8] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[7] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[6] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[5] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[4] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[3] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[2] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[1] top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tdata[0]
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tlast
+top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tvalid
+top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_miso.tready
+@200
+-DMA AXI Interface to DDR3
+-AXI Read Address
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.dma_clk_in
+@22
+#{top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[31:0]} top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[31] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[30] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[29] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[28] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[27] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[26] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[25] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[24] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[23] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[22] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[21] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[20] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[19] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[18] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[17] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[16] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[15] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[14] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[13] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[12] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[11] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[10] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[9] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[8] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[7] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[6] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[5] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[4] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[3] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[2] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[1] top.axi3_vdma_tb.dma_axi_hp_mosi_out.araddr[0]
+@28
+top.axi3_vdma_tb.dma_axi_hp_mosi_out.arvalid
+top.axi3_vdma_tb.dma_axi_hp_miso_in.arready
+top.axi3_vdma_tb.dma_axi_hp_miso_in.rvalid
+top.axi3_vdma_tb.dma_axi_hp_mosi_out.rready
+@22
+#{top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[31:0]} top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[31] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[30] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[29] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[28] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[27] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[26] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[25] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[24] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[23] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[22] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[21] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[20] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[19] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[18] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[17] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[16] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[15] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[14] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[13] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[12] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[11] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[10] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[9] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[8] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[7] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[6] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[5] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[4] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[3] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[2] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[1] top.axi3_vdma_tb.dma_axi_hp_miso_in.rdata[0]
+@28
+#{top.axi3_vdma_tb.dma_axi_hp_miso_in.rresp[1:0]} top.axi3_vdma_tb.dma_axi_hp_miso_in.rresp[1] top.axi3_vdma_tb.dma_axi_hp_miso_in.rresp[0]
+top.axi3_vdma_tb.dma_axi_hp_miso_in.rlast
+#{top.axi3_vdma_tb.dma_axi_hp_mosi_out.arburst[1:0]} top.axi3_vdma_tb.dma_axi_hp_mosi_out.arburst[1] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arburst[0]
+#{top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[3:0]} top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[3] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[2] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[1] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[0]
+@201
+-AXI Read Data
+@28
+#{top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[3:0]} top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[3] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[2] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[1] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[0]
+#{top.axi3_vdma_tb.dma_axi_hp_mosi_out.arsize[2:0]} top.axi3_vdma_tb.dma_axi_hp_mosi_out.arsize[2] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arsize[1] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arsize[0]
+@200
+-VDMA State Machine
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.dma_clk_in
+top.axi3_vdma_tb.axi3_vdma_inst.dma_reset_in
+top.axi3_vdma_tb.axi3_vdma_inst.state
+top.axi3_vdma_tb.axi3_vdma_inst.dma_stall
+top.axi3_vdma_tb.axi3_vdma_inst.dma_done
+top.axi3_vdma_tb.axi3_vdma_inst.dma_start
+top.axi3_vdma_tb.axi3_vdma_inst.data_enable
+@24
+top.axi3_vdma_tb.axi3_vdma_inst.h_count
+top.axi3_vdma_tb.axi3_vdma_inst.v_count
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.buffer_sel_dma_clk_in
+top.axi3_vdma_tb.axi3_vdma_inst.start_of_frame_dma_clk_out
+top.axi3_vdma_tb.axi3_vdma_inst.dma_clk_in
+top.axi3_vdma_tb.axi3_vdma_inst.dma_clk_in
+[pattern_trace] 1
+[pattern_trace] 0
