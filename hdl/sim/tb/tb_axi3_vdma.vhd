@@ -17,7 +17,8 @@ end;
 architecture bench of axi3_vdma_tb is
     signal mem : memory_t; -- get from vunit_axi_slave
 
-    constant MEM_WORDS : integer := 2048;
+    constant MEM_WORDS : integer := 2**21;  -- a single 2MB buffer would be ideal, but crashes GHDL
+    -- constant MEM_WORDS : integer := 2**18;  -- a single 256 KB buffer
 
     -- Clock period
     constant pixelclk_period : time := 40 ns;    -- 25MHz
@@ -107,10 +108,10 @@ begin
                 buffer1_start <= x"0020_0000";
 
                 -- set up intial contents for buffer 0
-                for i in 0 to 2 ** 10 - 1 loop
+                for i in 0 to MEM_WORDS - 1 loop
                     write_integer(mem, address => i * 4, word => i);
                 end loop;
-
+                info("finished setting up buffer memory");
                 buffer_sel_dma_clk_in <= '0'; -- select buffer 0
 
                 -- reset sequencing
@@ -121,9 +122,12 @@ begin
                 dma_reset_in <= '0';
                 wait until rising_edge(pixelclk_in);
                 pixelclk_reset_in <= '0';
+                -- wait for 100 * dma_clk_period;
+                wait until start_of_frame_dma_clk_out = '1';
+                info("started frame 0 output");
+                wait until start_of_frame_dma_clk_out = '1';
+                info("started frame 1 output");
                 wait for 100 * dma_clk_period;
-                wait until start_of_frame_dma_clk_out = '1';
-                wait until start_of_frame_dma_clk_out = '1';
                 test_runner_cleanup(runner);
             end if;
         end loop;

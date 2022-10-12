@@ -13,10 +13,12 @@ The most minimal VUnit VHDL project covering the basics of the
 :ref:`User Guide <user_guide>`.
 """
 
+from importlib import resources
 from pathlib import Path
 from vunit import VUnit
 import os
 from glob import glob
+import resource
 
 def add_some_files_to_vunit(vunit_obj, dir, exclude_patterns, library):
     """Adds a list of all VHDL files in a directory structure to Vunit, excluding those in EXCLUDE"""
@@ -44,6 +46,11 @@ def add_some_files_to_vunit(vunit_obj, dir, exclude_patterns, library):
 
 
 def main():
+
+    # increase stack size to prevent GHDL crashing
+    resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+
+
     VU = VUnit.from_argv()
     VU.add_verification_components()
 

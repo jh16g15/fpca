@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
-[*] Wed Oct 12 00:13:53 2022
+[*] Wed Oct 12 20:35:55 2022
 [*]
 [dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.axi3_vdma_tb.frame_gen_test_5bf7afd9320847e55e8c06f87ac95261635ffad5/ghdl/wave.ghw"
-[dumpfile_mtime] "Wed Oct 12 00:04:28 2022"
-[dumpfile_size] 311336660
+[dumpfile_mtime] "Wed Oct 12 20:34:08 2022"
+[dumpfile_size] 68267513
 [savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_axi3_vdma.gtkw"
-[timestart] 0
+[timestart] 6562800000000
 [size] 2560 1377
-[pos] -295 -295
-*-41.000000 4280000000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -243 -243
+*-37.000000 6888500000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.axi3_vdma_tb.
 [treeopen] top.axi3_vdma_tb.axi3_vdma_inst.
@@ -17,6 +17,8 @@
 [signals_width] 431
 [sst_expanded] 1
 [sst_vpaned_height] 896
+@29
+top.axi3_vdma_tb.start_of_frame_dma_clk_out
 @200
 -VDMA Ports
 @22
@@ -56,7 +58,7 @@ top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tvalid
 top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_miso.tready
 @200
 -DMA AXI Interface to DDR3
-@421
+@420
 top.axi3_vdma_tb.axi3_vdma_inst.dma_axi3_read_inst.state
 @200
 -AXI Read Address

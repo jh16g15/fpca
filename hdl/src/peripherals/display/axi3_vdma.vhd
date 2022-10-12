@@ -235,7 +235,7 @@ begin
                         v_dma_line_addr_offset := shift_left(dma_line_count, LINE_ADDR_SHIFT_AMOUNT);
                         dma_start_addr <= std_logic_vector(dma_frame_addr_offset + v_dma_line_addr_offset);
                         dma_num_words  <= uint2slv(G_END_ACTIVE_X); -- number of horizontal pixels
-                        state          <= LINE_DMA_START;
+                        state          <= LINE_DMA_WAIT;
 
                     when LINE_DMA_WAIT =>
                         --------------------------------------------------------
