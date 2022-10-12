@@ -77,7 +77,7 @@ architecture rtl of axi_stream_xpm_fifo_wrapper is
         end if;
     end function;
 begin
-input_clk_resetn <= input_clk_reset;
+input_clk_resetn <= not input_clk_reset;
 
     xpm_fifo_axis_inst : xpm_fifo_axis
     generic map(
