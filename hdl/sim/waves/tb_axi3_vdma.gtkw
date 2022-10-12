@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
-[*] Tue Oct 11 23:56:15 2022
+[*] Wed Oct 12 00:13:53 2022
 [*]
 [dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.axi3_vdma_tb.frame_gen_test_5bf7afd9320847e55e8c06f87ac95261635ffad5/ghdl/wave.ghw"
-[dumpfile_mtime] "Tue Oct 11 23:53:25 2022"
-[dumpfile_size] 171396316
+[dumpfile_mtime] "Wed Oct 12 00:04:28 2022"
+[dumpfile_size] 311336660
 [savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_axi3_vdma.gtkw"
 [timestart] 0
 [size] 2560 1377
-[pos] -191 -191
-*-25.000000 570000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -295 -295
+*-41.000000 4280000000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.axi3_vdma_tb.
 [treeopen] top.axi3_vdma_tb.axi3_vdma_inst.
@@ -56,6 +56,9 @@ top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_mosi.tvalid
 top.axi3_vdma_tb.axi3_vdma_inst.dma_axi_stream_miso.tready
 @200
 -DMA AXI Interface to DDR3
+@421
+top.axi3_vdma_tb.axi3_vdma_inst.dma_axi3_read_inst.state
+@200
 -AXI Read Address
 @28
 top.axi3_vdma_tb.axi3_vdma_inst.dma_clk_in
@@ -73,7 +76,7 @@ top.axi3_vdma_tb.dma_axi_hp_mosi_out.rready
 top.axi3_vdma_tb.dma_axi_hp_miso_in.rlast
 #{top.axi3_vdma_tb.dma_axi_hp_mosi_out.arburst[1:0]} top.axi3_vdma_tb.dma_axi_hp_mosi_out.arburst[1] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arburst[0]
 #{top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[3:0]} top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[3] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[2] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[1] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arcache[0]
-@201
+@200
 -AXI Read Data
 @28
 #{top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[3:0]} top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[3] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[2] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[1] top.axi3_vdma_tb.dma_axi_hp_mosi_out.arlen[0]

@@ -288,7 +288,7 @@ begin
     axi_stream_xpm_fifo_wrapper_inst : entity work.axi_stream_xpm_fifo_wrapper
         generic map(
             G_DUAL_CLOCK       => true,
-            G_RELATED_CLOCKS   => false,              -- technically true, but lets see if this works with GHDL
+            G_RELATED_CLOCKS   => false,              -- technically "true", but only "false" works with XPM_GHDL
             G_FIFO_DEPTH       => G_PIXEL_FIFO_DEPTH, -- experiment to find how small a FIFO we can get away with
             G_DATA_WIDTH       => 32,
             G_FULL_PACKET      => false,

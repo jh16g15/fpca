@@ -8,6 +8,9 @@ use work.joe_common_pkg.all;
 --! Generates AXI Read transactions and outputs the Rdata over an AXI-Stream
 --! only supports word-aligned transfers of whole words
 entity dma_axi3_read is
+    generic (
+        G_SIM_MSGS : boolean := false
+    );
     port (
         axi_clk   : in std_logic;
         axi_reset : in std_logic;
@@ -110,8 +113,10 @@ begin
                     else -- else just finish with a partially full burst
                         v_burst_size := words_remaining;
                     end if;
-                    report "words_remaining = " & to_string(words_remaining);
-                    report "burst size      = " & to_string(v_burst_size);
+                    if G_SIM_MSGS = true then
+                        report "words_remaining = " & to_string(words_remaining);
+                        report "burst size      = " & to_string(v_burst_size);
+                    end if;
 
                     dma_axi_hp_mosi_out.arlen <= uint2slv(v_burst_size - 1, dma_axi_hp_mosi_out.arlen'length);
                     words_remaining           <= words_remaining - v_burst_size;
@@ -138,7 +143,9 @@ begin
                         dma_axi_hp_mosi_out.arvalid <= '0';
 
                         -- decide if we stall or issue another burst
-                        report "outstanding cmds = " & to_string(outstanding_cmds);
+                        if G_SIM_MSGS = true then
+                            report "outstanding cmds = " & to_string(outstanding_cmds);
+                        end if;
                         if outstanding_cmds >= slv2uint(dma_queue_limit_in) or dma_stall_in = '1' then
                             state <= STALL;
                         else
