@@ -179,14 +179,14 @@ begin
     -----------------------------------------------------------------
     -- 32b pixel data
     dma_axi3_read_inst : entity work.dma_axi3_read
-        generic map(G_ILA => G_ILA)
+        generic map(G_NUM_WORDS_W => 16, G_ILA => G_ILA)
         port map(
             axi_clk               => dma_clk_in,
             axi_reset             => dma_reset_in,
             dma_start_in          => dma_start,
             dma_start_addr_in     => dma_start_addr,
             dma_axi_burst_mode_in => AXI_BURST_INCR,
-            dma_num_words_in      => dma_num_words,
+            dma_num_words_in      => dma_num_words(16 - 1 downto 0),
             dma_queue_limit_in    => uint2slv(4),
             dma_stall_in          => dma_stall,
             dma_done_out          => dma_done,

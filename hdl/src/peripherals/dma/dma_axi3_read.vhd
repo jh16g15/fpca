@@ -9,8 +9,9 @@ use work.joe_common_pkg.all;
 --! only supports word-aligned transfers of whole words
 entity dma_axi3_read is
     generic (
-        G_SIM_MSGS : boolean := false;
-        G_ILA      : boolean := false
+        G_NUM_WORDS_W : integer := 16;
+        G_SIM_MSGS    : boolean := false;
+        G_ILA         : boolean := false
     );
     port (
         axi_clk   : in std_logic;
@@ -19,7 +20,7 @@ entity dma_axi3_read is
         dma_start_in          : in std_logic;                                      -- start a new dma transfer
         dma_start_addr_in     : in std_logic_vector(31 downto 0);                  -- dma start address
         dma_axi_burst_mode_in : in std_logic_vector(1 downto 0) := AXI_BURST_INCR; -- AXI_BURST_FIXED for fifo mode
-        dma_num_words_in      : in std_logic_vector(31 downto 0);                  -- max 16 words per AXI3 transaction, split into multiple
+        dma_num_words_in      : in std_logic_vector(G_NUM_WORDS_W - 1 downto 0);   -- max 16 words per AXI3 transaction, split into multiple
         dma_queue_limit_in    : in std_logic_vector(31 downto 0);                  -- how many outstanding AXI3 transactions we can queue before auto-stalling
 
         dma_stall_in : in std_logic; -- stall issuing of future transactions in a multi transaction dma transfer (rudimentary backpressure)
@@ -41,18 +42,18 @@ architecture rtl of dma_axi3_read is
     signal state : t_state := IDLE;
 
     -- for AXI3, max 16 transfers per burst
-    constant MAX_TRANSACTIONS : integer := 16;
+    constant MAX_TRANSACTIONS : unsigned(G_NUM_WORDS_W - 1 downto 0) := to_unsigned(16, G_NUM_WORDS_W);
 
     constant BYTES_PER_WORD : integer := 4;
 
-    signal words_remaining : integer;
+    signal words_remaining : unsigned(G_NUM_WORDS_W - 1 downto 0);
     signal dma_addr_offset : integer;
     signal dma_start_addr  : integer;
 
     -- queue counters
-    signal num_cmd          : integer := 0;
-    signal num_rsp          : integer := 0;
-    signal outstanding_cmds : integer;
+    signal num_cmd          : unsigned(G_NUM_WORDS_W - 1 downto 0) := (others => '0');
+    signal num_rsp          : unsigned(G_NUM_WORDS_W - 1 downto 0) := (others => '0');
+    signal outstanding_cmds : unsigned(G_NUM_WORDS_W - 1 downto 0);
 
     attribute mark_debug                     : boolean;
     attribute mark_debug of state            : signal is G_ILA;
@@ -87,12 +88,13 @@ begin
     outstanding_cmds           <= num_cmd - num_rsp;
 
     dma_read : process (axi_clk)
-        variable v_burst_size : integer; -- intermediate value
+        variable v_burst_size : unsigned(G_NUM_WORDS_W - 1 downto 0); -- intermediate value
+        variable v_arlen : unsigned(G_NUM_WORDS_W - 1 downto 0); -- intermediate value
     begin
         if rising_edge(axi_clk) then
             if axi_reset = '1' then
                 state                       <= IDLE;
-                num_cmd                     <= 0;
+                num_cmd                     <= (others => '0');
                 dma_axi_hp_mosi_out.arvalid <= '0';
                 dma_done_out                <= '1';
             else
@@ -104,7 +106,7 @@ begin
 
                     if dma_start_in = '1' then
                         dma_done_out    <= '0';
-                        words_remaining <= slv2uint(dma_num_words_in);
+                        words_remaining <= unsigned(dma_num_words_in(G_NUM_WORDS_W - 1 downto 0));
                         dma_start_addr  <= slv2uint(dma_start_addr_in);
                         dma_addr_offset <= 0;
 
@@ -128,7 +130,8 @@ begin
                         report "burst size      = " & to_string(v_burst_size);
                     end if;
 
-                    dma_axi_hp_mosi_out.arlen <= uint2slv(v_burst_size - 1, dma_axi_hp_mosi_out.arlen'length);
+                    v_arlen := v_burst_size - to_unsigned(1, G_NUM_WORDS_W);
+                    dma_axi_hp_mosi_out.arlen <= std_logic_vector(v_arlen(3 downto 0));
                     words_remaining           <= words_remaining - v_burst_size;
 
                     dma_axi_hp_mosi_out.araddr  <= uint2slv(dma_start_addr + dma_addr_offset); -- set up burst address
@@ -142,7 +145,7 @@ begin
                     if dma_axi_burst_mode_in = AXI_BURST_FIXED then
                         dma_addr_offset <= 0;
                     else
-                        dma_addr_offset <= dma_addr_offset + (BYTES_PER_WORD * v_burst_size);
+                        dma_addr_offset <= dma_addr_offset + (BYTES_PER_WORD * to_integer(v_burst_size));
                     end if;
 
                     -------------------------------------------
@@ -159,7 +162,7 @@ begin
                         if outstanding_cmds >= slv2uint(dma_queue_limit_in) or dma_stall_in = '1' then
                             state <= STALL;
                         else
-                            if words_remaining = 0 then
+                            if words_remaining = to_unsigned(0, words_remaining'length) then
                                 state <= WAIT_DONE;
                             else
                                 state <= READ_SETUP;
@@ -172,21 +175,21 @@ begin
                     -----------------------------------------------------------------
                     when STALL =>
                     if outstanding_cmds < slv2uint(dma_queue_limit_in) and dma_stall_in = '0' then
-                        if words_remaining = 0 then
+                        if words_remaining = to_unsigned(0, words_remaining'length) then
                             state <= WAIT_DONE;
                         else
                             state <= READ_SETUP;
                         end if;
                     end if;
-                    when WAIT_DONE =>
-                    if outstanding_cmds = 0 then
+                    when WAIT_DONE                =>
+                    if outstanding_cmds = to_unsigned(0, outstanding_cmds'length) then
                         dma_done_out <= '1';
                         state        <= IDLE;
                     end if;
 
                     when others =>
                     state                       <= IDLE;
-                    num_cmd                     <= 0;
+                    num_cmd                     <= (others => '0');
                     dma_axi_hp_mosi_out.arvalid <= '0';
                     dma_done_out                <= '1';
                 end case;
@@ -198,10 +201,10 @@ begin
     begin
         if rising_edge(axi_clk) then
             if axi_reset = '1' then
-                num_rsp <= 0;
+                num_rsp <= (others => '0');
             else
                 if dma_axi_hp_miso_in.rvalid = '1' and dma_axi_hp_miso_in.rlast = '1' and dma_axi_hp_mosi_out.rready = '1' then
-                    num_rsp <= num_rsp + 1;
+                    num_rsp <= num_rsp + to_unsigned(1, num_rsp'length);
                 end if;
             end if;
         end if;

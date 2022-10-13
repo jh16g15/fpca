@@ -48,7 +48,7 @@ begin
             dma_done_out          => dma_done_out,
             dma_start_addr_in     => dma_start_addr_in,
             dma_axi_burst_mode_in => dma_axi_burst_mode_in,
-            dma_num_words_in      => dma_num_words_in,
+            dma_num_words_in      => dma_num_words_in(15 downto 0),
             dma_queue_limit_in    => dma_queue_limit_in,
             dma_stall_in          => dma_stall_in,
             dma_axi_hp_mosi_out   => dma_axi_hp_mosi_out,

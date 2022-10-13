@@ -104,7 +104,7 @@ architecture rtl of pynq_top is
         port (
             clk_out1            : out std_logic;
             pixelclk_out        : out std_logic;
-            hdmi_serdes_clk_out : out std_logic;
+            axi_hp_clk_out      : out std_logic;
             dvi_clk_out         : out std_logic;
             dvi_clkn_out        : out std_logic;
             locked              : out std_logic;
@@ -133,7 +133,7 @@ begin
     port map(
         clk_out1            => open,     -- 100MHz
         pixelclk_out        => pixelclk, -- 25MHz
-        hdmi_serdes_clk_out => dma_clk,  -- 250MHz (unused)
+        axi_hp_clk_out      => dma_clk,  -- 200MHz
         dvi_clk_out         => dvi_clk,  -- 125MHz
         dvi_clkn_out        => dvi_clkn, -- 125MHz, 180deg phase shift
         locked              => locked,
@@ -252,7 +252,7 @@ begin
             G_BOOT_INIT_FILE     => G_BOOT_INIT_FILE,
             G_SOC_FREQ           => 25_000_000,
             G_DEFAULT_BAUD       => 9600,
-            G_INCLUDE_JTAG_DEBUG => true -- connect AXI JTAG to the wishbone bus
+            G_INCLUDE_JTAG_DEBUG => false -- connect AXI JTAG to the wishbone bus
         )
         port map(
             clk          => pixelclk,
