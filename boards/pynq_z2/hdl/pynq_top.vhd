@@ -182,8 +182,8 @@ begin
         port map(
             dma_clk_in                        => dma_clk,
             pixelclk_in                       => pixelclk,
-            pixelclk_reset_in                 => not locked,
-            dma_reset_in                      => not locked,
+            pixelclk_reset_in                 => reset,
+            dma_reset_in                      => reset,
             dma_axi_hp_mosi_out               => S_AXI_HP0_MOSI,
             dma_axi_hp_miso_in                => S_AXI_HP0_MISO,
             vga_pixel_out                     => bitmap_pixel,
