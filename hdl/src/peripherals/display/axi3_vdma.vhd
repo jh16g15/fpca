@@ -131,6 +131,21 @@ architecture rtl of axi3_vdma is
     attribute mark_debug of pixel_fifo_prog_full_dma_clk : signal is G_ILA;
     attribute mark_debug of pixel_fifo_empty_dma_clk     : signal is G_ILA;
     attribute mark_debug of state                        : signal is G_ILA;
+    -- AXI-S FIFO
+    attribute mark_debug of dma_reset_in                 : signal is G_ILA;
+    attribute mark_debug of dma_axi_stream_mosi          : signal is G_ILA;
+    attribute mark_debug of dma_axi_stream_miso          : signal is G_ILA; -- why does putting ILAs on the TREADY here cause multi-driven nets?
+    attribute mark_debug of pixel_axi_stream_mosi        : signal is G_ILA;
+    attribute mark_debug of pixel_axi_stream_miso        : signal is G_ILA;
+    attribute mark_debug of pixel_fifo_prog_full         : signal is G_ILA;   -- not the issue
+    attribute mark_debug of vga_pixel_out                : signal is G_ILA;
+    -- VGA signals
+    attribute mark_debug of vga_hsync_out                : signal is G_ILA;
+    attribute mark_debug of vga_vsync_out                : signal is G_ILA;
+    attribute mark_debug of vga_blank_out                : signal is G_ILA;
+    attribute mark_debug of h_count                : signal is G_ILA;
+    attribute mark_debug of v_count                : signal is G_ILA;
+
 
 begin
 
@@ -164,7 +179,7 @@ begin
                 end if;
 
                 --blanking signal
-                data_enable <= '1' when ((h_count < G_END_ACTIVE_X) and (h_count < G_END_ACTIVE_X)) else '0';
+                data_enable <= '1' when ((h_count < G_END_ACTIVE_X) and (v_count < G_END_ACTIVE_Y)) else '0';
 
                 --sync signals
                 vga_hsync_out <= G_ACTIVE_HS when ((h_count >= G_END_FPORCH_X) and (h_count < G_END_SYNC_X)) else not G_ACTIVE_HS;
@@ -179,14 +194,14 @@ begin
     -----------------------------------------------------------------
     -- 32b pixel data
     dma_axi3_read_inst : entity work.dma_axi3_read
-        generic map(G_NUM_WORDS_W => 16, G_ILA => G_ILA)
+        generic map(G_NUM_WORDS_W => 12, G_ILA => G_ILA)
         port map(
             axi_clk               => dma_clk_in,
             axi_reset             => dma_reset_in,
             dma_start_in          => dma_start,
             dma_start_addr_in     => dma_start_addr,
             dma_axi_burst_mode_in => AXI_BURST_INCR,
-            dma_num_words_in      => dma_num_words(16 - 1 downto 0),
+            dma_num_words_in      => dma_num_words(12 - 1 downto 0),
             dma_queue_limit_in    => uint2slv(4),
             dma_stall_in          => dma_stall,
             dma_done_out          => dma_done,
@@ -229,7 +244,7 @@ begin
                         ----------------------------------------------------------------
                         -- when we get a VSYNC, we can then get ready for the next frame
                         ----------------------------------------------------------------
-                        if vga_vsync_dma_clk = '1' then
+                        if vga_vsync_dma_clk = G_ACTIVE_VS then
                             start_of_frame_dma_clk_out <= '1';
                             dma_line_count             <= (others => '0');
                             dma_frame_addr_offset      <= unsigned(buffer1_start_in) when buffer_sel_dma_clk_in = '1' else unsigned(buffer0_start_in);
@@ -340,7 +355,7 @@ begin
                 -- if no new pixel is available, increase underflow count
 
                 -- while in the active display area
-                if ((h_count < G_END_ACTIVE_X) and (h_count < G_END_ACTIVE_X)) then
+                if ((h_count < G_END_ACTIVE_X) and (v_count < G_END_ACTIVE_Y)) then
                     -- ACK current pixel from FIFO
                     pixel_axi_stream_miso.tready <= '1';
 
