@@ -197,14 +197,15 @@ begin
             buffer_sel_dma_clk_in             => buffer_sel_dma_clk
         );
 
-    buffer_flip : process(dma_clk) is
-    begin
-        if rising_edge(dma_clk) then
-            if start_of_frame_dma_clk = '1' then
-                buffer_sel_dma_clk <= not buffer_sel_dma_clk;
-            end if;
-        end if;
-    end process;
+-- remove to prevent flickering until we are writing to the framebuffer
+--    buffer_flip : process(dma_clk) is
+--    begin
+--        if rising_edge(dma_clk) then
+--            if start_of_frame_dma_clk = '1' then
+--                buffer_sel_dma_clk <= not buffer_sel_dma_clk;
+--            end if;
+--        end if;
+--    end process;
 
     comb_pixel <= func_combine_pixel_or(bitmap_pixel, txt_pixel);
 
