@@ -32,7 +32,7 @@ entity dma_axi3_read is
         dma_axi_hp_miso_in  : in t_axi_miso;
 
         axi_stream_mosi_out : out t_axi_stream32_mosi;
-        axi_stream_miso_in  : out t_axi_stream32_miso
+        axi_stream_miso_in  : in t_axi_stream32_miso
     );
 end entity dma_axi3_read;
 
