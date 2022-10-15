@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
-[*] Wed Oct 12 20:35:55 2022
+[*] Fri Oct 14 23:59:56 2022
 [*]
 [dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.axi3_vdma_tb.frame_gen_test_5bf7afd9320847e55e8c06f87ac95261635ffad5/ghdl/wave.ghw"
-[dumpfile_mtime] "Wed Oct 12 20:34:08 2022"
-[dumpfile_size] 68267513
+[dumpfile_mtime] "Fri Oct 14 23:58:58 2022"
+[dumpfile_size] 263148247
 [savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_axi3_vdma.gtkw"
-[timestart] 6562800000000
+[timestart] 16005000000000
 [size] 2560 1377
-[pos] -243 -243
-*-37.000000 6888500000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -191 -191
+*-38.000000 1456582940000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.axi3_vdma_tb.
 [treeopen] top.axi3_vdma_tb.axi3_vdma_inst.
@@ -17,7 +17,7 @@
 [signals_width] 431
 [sst_expanded] 1
 [sst_vpaned_height] 896
-@29
+@28
 top.axi3_vdma_tb.start_of_frame_dma_clk_out
 @200
 -VDMA Ports
@@ -91,7 +91,9 @@ top.axi3_vdma_tb.axi3_vdma_inst.dma_reset_in
 top.axi3_vdma_tb.axi3_vdma_inst.state
 top.axi3_vdma_tb.axi3_vdma_inst.dma_stall
 top.axi3_vdma_tb.axi3_vdma_inst.dma_done
+@29
 top.axi3_vdma_tb.axi3_vdma_inst.dma_start
+@28
 top.axi3_vdma_tb.axi3_vdma_inst.data_enable
 @24
 top.axi3_vdma_tb.axi3_vdma_inst.h_count
@@ -101,5 +103,24 @@ top.axi3_vdma_tb.axi3_vdma_inst.buffer_sel_dma_clk_in
 top.axi3_vdma_tb.axi3_vdma_inst.start_of_frame_dma_clk_out
 top.axi3_vdma_tb.axi3_vdma_inst.dma_clk_in
 top.axi3_vdma_tb.axi3_vdma_inst.dma_clk_in
+@24
+#{top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[31:0]} top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[31] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[30] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[29] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[28] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[27] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[26] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[25] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[24] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[23] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[22] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[21] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[20] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[19] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[18] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[17] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[16] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[15] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[14] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[13] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[12] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[11] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[10] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[9] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[8] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[7] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[6] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[5] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[4] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[3] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[2] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[1] top.axi3_vdma_tb.axi3_vdma_inst.dma_line_count[0]
+@200
+-Counters
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.vga_vsync
+@420
+top.axi3_vdma_tb.axi3_vdma_inst.dma_pixel_count
+top.axi3_vdma_tb.axi3_vdma_inst.pixel_pixel_count
+@200
+-VGA
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.data_enable
+@420
+top.axi3_vdma_tb.axi3_vdma_inst.v_count
+top.axi3_vdma_tb.axi3_vdma_inst.h_count
+@28
+top.axi3_vdma_tb.axi3_vdma_inst.vga_hsync_out
+top.axi3_vdma_tb.axi3_vdma_inst.vga_vsync_out
 [pattern_trace] 1
 [pattern_trace] 0

@@ -55,14 +55,14 @@ architecture rtl of dma_axi3_read is
     signal num_rsp          : unsigned(G_NUM_WORDS_W - 1 downto 0) := (others => '0');
     signal outstanding_cmds : unsigned(G_NUM_WORDS_W - 1 downto 0);
 
-    attribute mark_debug                     : boolean;
-    attribute mark_debug of state            : signal is G_ILA;
-    attribute mark_debug of words_remaining  : signal is G_ILA;
-    attribute mark_debug of dma_addr_offset  : signal is G_ILA;
-    attribute mark_debug of dma_start_addr   : signal is G_ILA;
-    attribute mark_debug of num_cmd          : signal is G_ILA;
-    attribute mark_debug of num_rsp          : signal is G_ILA;
-    attribute mark_debug of outstanding_cmds : signal is G_ILA;
+    -- attribute mark_debug                     : boolean;
+    -- attribute mark_debug of state            : signal is G_ILA;
+    -- attribute mark_debug of words_remaining  : signal is G_ILA;
+    -- attribute mark_debug of dma_addr_offset  : signal is G_ILA;
+    -- attribute mark_debug of dma_start_addr   : signal is G_ILA;
+    -- attribute mark_debug of num_cmd          : signal is G_ILA;
+    -- attribute mark_debug of num_rsp          : signal is G_ILA;
+    -- attribute mark_debug of outstanding_cmds : signal is G_ILA;
 begin
     -- set ARCACHE[1] = '1' to allow DDR3 controller to pack into 64b transactions for better performance
     -- write channels not used

@@ -121,32 +121,35 @@ architecture rtl of axi3_vdma is
     -- status reporting
     signal pixel_underflow_count : unsigned(31 downto 0) := (others => '0');
     signal frame_skip_count      : unsigned(31 downto 0) := (others => '0');
+    signal dma_pixel_count       : integer               := 0;
+    signal pixel_pixel_count     : integer               := 0;
 
     -- splitting up after CDC in an array (XPM)
     signal cdc_to_dma_clk_arr : std_logic_vector(31 downto 0) := (others => '0');
 
-    attribute mark_debug                                 : boolean;
-    attribute mark_debug of dma_line_count               : signal is G_ILA;
-    attribute mark_debug of dma_frame_addr_offset        : signal is G_ILA;
-    attribute mark_debug of pixel_fifo_prog_full_dma_clk : signal is G_ILA;
-    attribute mark_debug of pixel_fifo_empty_dma_clk     : signal is G_ILA;
-    attribute mark_debug of state                        : signal is G_ILA;
-    -- AXI-S FIFO
-    attribute mark_debug of dma_reset_in                 : signal is G_ILA;
-    attribute mark_debug of dma_axi_stream_mosi          : signal is G_ILA;
-    attribute mark_debug of dma_axi_stream_miso          : signal is G_ILA; -- why does putting ILAs on the TREADY here cause multi-driven nets?
-    attribute mark_debug of pixel_axi_stream_mosi        : signal is G_ILA;
-    attribute mark_debug of pixel_axi_stream_miso        : signal is G_ILA;
-    attribute mark_debug of pixel_fifo_prog_full         : signal is G_ILA;   -- not the issue
-    attribute mark_debug of vga_pixel_out                : signal is G_ILA;
-    -- VGA signals
-    attribute mark_debug of vga_hsync_out                : signal is G_ILA;
-    attribute mark_debug of vga_vsync_out                : signal is G_ILA;
-    attribute mark_debug of vga_blank_out                : signal is G_ILA;
-    attribute mark_debug of h_count                : signal is G_ILA;
-    attribute mark_debug of v_count                : signal is G_ILA;
-
-
+    -- attribute mark_debug                                 : boolean;
+    -- attribute mark_debug of dma_line_count               : signal is G_ILA;
+    -- attribute mark_debug of dma_frame_addr_offset        : signal is G_ILA;
+    -- attribute mark_debug of pixel_fifo_prog_full_dma_clk : signal is G_ILA;
+    -- attribute mark_debug of pixel_fifo_empty_dma_clk     : signal is G_ILA;
+    -- attribute mark_debug of state                        : signal is G_ILA;
+    -- -- AXI-S FIFO
+    -- attribute mark_debug of dma_reset_in          : signal is G_ILA;
+    -- attribute mark_debug of dma_axi_stream_mosi   : signal is G_ILA;
+    -- attribute mark_debug of dma_axi_stream_miso   : signal is G_ILA; -- why does putting ILAs on the TREADY here cause multi-driven nets?
+    -- attribute mark_debug of pixel_axi_stream_mosi : signal is G_ILA;
+    -- attribute mark_debug of pixel_axi_stream_miso : signal is G_ILA;
+    -- attribute mark_debug of pixel_fifo_prog_full  : signal is G_ILA; -- not the issue
+    -- attribute mark_debug of vga_pixel_out         : signal is G_ILA;
+    -- -- VGA signals
+    -- attribute mark_debug of vga_hsync_out : signal is G_ILA;
+    -- attribute mark_debug of vga_vsync_out : signal is G_ILA;
+    -- attribute mark_debug of vga_blank_out : signal is G_ILA;
+    -- attribute mark_debug of h_count       : signal is G_ILA;
+    -- attribute mark_debug of v_count       : signal is G_ILA;
+    -- -- FIFO counters
+    -- attribute mark_debug of dma_pixel_count   : signal is G_ILA;
+    -- attribute mark_debug of pixel_pixel_count : signal is G_ILA;
 begin
 
     -----------------------------------------------------------------
@@ -202,7 +205,7 @@ begin
             dma_start_addr_in     => dma_start_addr,
             dma_axi_burst_mode_in => AXI_BURST_INCR,
             dma_num_words_in      => dma_num_words(12 - 1 downto 0),
-            dma_queue_limit_in    => uint2slv(4),
+            dma_queue_limit_in    => uint2slv(1),
             dma_stall_in          => dma_stall,
             dma_done_out          => dma_done,
             dma_axi_hp_mosi_out   => dma_axi_hp_mosi_out,
@@ -255,11 +258,13 @@ begin
                         --------------------------------------------------------
                         -- Start a DMA
                         --------------------------------------------------------
-                        dma_start <= '1';
-                        v_dma_line_addr_offset := shift_left(dma_line_count, LINE_ADDR_SHIFT_AMOUNT);
-                        dma_start_addr <= std_logic_vector(dma_frame_addr_offset + v_dma_line_addr_offset);
-                        dma_num_words  <= uint2slv(G_END_ACTIVE_X); -- number of horizontal pixels
-                        state          <= LINE_DMA_WAIT;
+                        if dma_done = '1' then
+                            dma_start <= '1';
+                            v_dma_line_addr_offset := shift_left(dma_line_count, LINE_ADDR_SHIFT_AMOUNT);
+                            dma_start_addr <= std_logic_vector(dma_frame_addr_offset + v_dma_line_addr_offset);
+                            dma_num_words  <= uint2slv(G_END_ACTIVE_X); -- number of horizontal pixels
+                            state          <= LINE_DMA_WAIT;
+                        end if;
 
                     when LINE_DMA_WAIT =>
                         --------------------------------------------------------
@@ -286,6 +291,34 @@ begin
 
     -- we will use the prog_full flag to stall the DMA transfer until we have room for another burst
     dma_stall <= pixel_fifo_prog_full_dma_clk;
+
+    -- count the number of pixels accepted into the FIFO per frame
+    process (dma_clk_in)
+    begin
+        if rising_edge(dma_clk_in) then
+            if start_of_frame_dma_clk_out = '1' then
+                dma_pixel_count <= 0;
+            else
+                if dma_axi_stream_mosi.tvalid = '1' and dma_axi_stream_miso.tready = '1' then
+                    dma_pixel_count <= dma_pixel_count + 1;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    -- count the number of pixels read out of the FIFO per frame
+    process (pixelclk_in)
+    begin
+        if rising_edge(pixelclk_in) then
+            if vga_vsync = G_ACTIVE_VS then
+                pixel_pixel_count <= 0;
+            else
+                if pixel_axi_stream_mosi.tvalid = '1' and pixel_axi_stream_miso.tready = '1' then
+                    pixel_pixel_count <= pixel_pixel_count + 1;
+                end if;
+            end if;
+        end if;
+    end process;
 
     -----------------------------------------------------------------
     -- 3. Read Data CDC FIFO and pixel readout
@@ -316,7 +349,7 @@ begin
             G_FIFO_DEPTH       => G_PIXEL_FIFO_DEPTH, -- experiment to find how small a FIFO we can get away with
             G_DATA_WIDTH       => 32,
             G_FULL_PACKET      => false,
-            G_PROG_FULL_THRESH => G_PIXEL_FIFO_DEPTH - 16
+            G_PROG_FULL_THRESH => G_PIXEL_FIFO_DEPTH - 64 -- plenty of room for prog_full to CDC over and stop the issuing of more transactions
         )
         port map(
             input_clk                  => dma_clk_in,
