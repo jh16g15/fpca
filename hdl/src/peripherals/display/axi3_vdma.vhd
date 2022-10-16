@@ -112,6 +112,7 @@ architecture rtl of axi3_vdma is
 
     signal dma_line_count               : unsigned(31 downto 0);
     signal dma_frame_addr_offset        : unsigned(31 downto 0);
+    signal vga_hsync                    : std_logic;
     signal vga_vsync                    : std_logic;
     signal vga_vsync_dma_clk            : std_logic;
     signal pixel_fifo_prog_full         : std_logic;
@@ -157,10 +158,6 @@ begin
     -----------------------------------------------------------------
     -- the point of these counters is to schedule the DMA operations to keep the FIFOs topped off.
     -- and also to generate the HSYNC, VSYNC and BLANK signals
-
-    vga_blank_out <= not data_enable;
-    vga_vsync_out <= vga_vsync;
-
     -- NOTE: these control signals are registered, so are asserted one cycle after the counter reaches that value
     sync_counters : process (pixelclk_in)
     begin
@@ -185,9 +182,12 @@ begin
                 data_enable <= '1' when ((h_count < G_END_ACTIVE_X) and (v_count < G_END_ACTIVE_Y)) else '0';
 
                 --sync signals
-                vga_hsync_out <= G_ACTIVE_HS when ((h_count >= G_END_FPORCH_X) and (h_count < G_END_SYNC_X)) else not G_ACTIVE_HS;
-                vga_vsync     <= G_ACTIVE_VS when ((v_count >= G_END_FPORCH_Y) and (v_count < G_END_SYNC_Y)) else not G_ACTIVE_VS;
-
+                vga_hsync <= G_ACTIVE_HS when ((h_count >= G_END_FPORCH_X) and (h_count < G_END_SYNC_X)) else not G_ACTIVE_HS;
+                vga_vsync <= G_ACTIVE_VS when ((v_count >= G_END_FPORCH_Y) and (v_count < G_END_SYNC_Y)) else not G_ACTIVE_VS;
+                -- register all these again to add an extra cycle of delay to match up with TREADY on the pixel fifo
+                vga_blank_out <= not data_enable;
+                vga_vsync_out <= vga_vsync;
+                vga_hsync_out <= vga_hsync;
             end if;
         end if;
     end process;
