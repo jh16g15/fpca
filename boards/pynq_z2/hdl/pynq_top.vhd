@@ -62,6 +62,8 @@ architecture rtl of pynq_top is
     signal S_AXI_GP0_MISO : t_axi_miso;
     signal S_AXI_HP0_MOSI : t_axi_mosi;
     signal S_AXI_HP0_MISO : t_axi_miso;
+    signal S_AXI_HP1_MOSI : t_axi_mosi;
+    signal S_AXI_HP1_MISO : t_axi_miso;
 
     signal pixelclk : std_logic;
     signal dma_clk  : std_logic;
@@ -82,43 +84,43 @@ architecture rtl of pynq_top is
 
     signal text_display_wb_mosi        : t_wb_mosi;
     signal text_display_wb_miso        : t_wb_miso;
+    signal ext_mem_wb_mosi             : t_wb_mosi;
+    signal ext_mem_wb_miso             : t_wb_miso;
     signal zynq_ps_peripherals_wb_mosi : t_wb_mosi;
     signal zynq_ps_peripherals_wb_miso : t_wb_miso;
 
     signal gpio_led : std_logic_vector(31 downto 0);
 
-    signal bitmap_pixel  : t_pixel                       := (red => x"00", green => x"00", blue => x"00");
-    signal txt_pixel     : t_pixel                       := (red => x"00", green => x"00", blue => x"00");
-    signal comb_pixel    : t_pixel                       := (red => x"00", green => x"00", blue => x"00"); -- combined pixel
+    signal bitmap_pixel : t_pixel := (red => x"00", green => x"00", blue => x"00");
+    signal txt_pixel    : t_pixel := (red => x"00", green => x"00", blue => x"00");
+    signal comb_pixel   : t_pixel := (red => x"00", green => x"00", blue => x"00"); -- combined pixel
 
     -- VDMA control and status
-    signal buffer0_start : std_logic_vector(31 downto 0) := x"0010_0000";
-    signal buffer1_start : std_logic_vector(31 downto 0) := x"0030_0000";
-    signal buffer_sel_dma_clk : std_logic := '0';
-    signal start_of_frame_dma_clk : std_logic;
-    signal pixel_underflow_count_dma_clk : std_logic_vector(31 downto 0) := x"0030_0000";
-
-
+    signal buffer0_start                 : std_logic_vector(31 downto 0) := x"1000_0000";
+    signal buffer1_start                 : std_logic_vector(31 downto 0) := x"1020_0000";
+    signal buffer_sel_dma_clk            : std_logic                     := '0';
+    signal start_of_frame_dma_clk        : std_logic;
+    signal pixel_underflow_count_dma_clk : std_logic_vector(31 downto 0);
 
     component clk_wiz_0
         port (
-            clk_out1            : out std_logic;
-            pixelclk_out        : out std_logic;
-            axi_hp_clk_out      : out std_logic;
-            dvi_clk_out         : out std_logic;
-            dvi_clkn_out        : out std_logic;
-            locked              : out std_logic;
+            clk_out1       : out std_logic;
+            pixelclk_out   : out std_logic;
+            axi_hp_clk_out : out std_logic;
+            dvi_clk_out    : out std_logic;
+            dvi_clkn_out   : out std_logic;
+            locked         : out std_logic;
 
             reset     : in std_logic;
             clk_in100 : in std_logic
         );
     end component;
 
-    attribute mark_debug           : boolean;
-    attribute mark_debug of locked : signal is true;
-    attribute mark_debug of reset  : signal is true;
+    attribute mark_debug                                  : boolean;
+    attribute mark_debug of locked                        : signal is true;
+    attribute mark_debug of reset                         : signal is true;
     attribute mark_debug of pixel_underflow_count_dma_clk : signal is true;
-    attribute mark_debug of buffer_sel_dma_clk : signal is true;
+    attribute mark_debug of buffer_sel_dma_clk            : signal is true;
 
 begin
 
@@ -131,14 +133,14 @@ begin
 
     pll : clk_wiz_0
     port map(
-        clk_out1            => open,     -- 100MHz
-        pixelclk_out        => pixelclk, -- 25MHz
-        axi_hp_clk_out      => dma_clk,  -- 200MHz
-        dvi_clk_out         => dvi_clk,  -- 125MHz
-        dvi_clkn_out        => dvi_clkn, -- 125MHz, 180deg phase shift
-        locked              => locked,
-        reset               => '0',
-        clk_in100           => FCLK_CLK0_100
+        clk_out1       => open,     -- 100MHz
+        pixelclk_out   => pixelclk, -- 25MHz
+        axi_hp_clk_out => dma_clk,  -- 200MHz
+        dvi_clk_out    => dvi_clk,  -- 125MHz
+        dvi_clkn_out   => dvi_clkn, -- 125MHz, 180deg phase shift
+        locked         => locked,
+        reset          => '0',
+        clk_in100      => FCLK_CLK0_100
 
     );
     gen_hamsterworks : if G_DVI = "hamsterworks" generate
@@ -177,7 +179,7 @@ begin
     axi3_vdma_inst : entity work.axi3_vdma
         generic map(
             G_PIXEL_FIFO_DEPTH => 512,
-            G_ILA => true
+            G_ILA              => true
         )
         port map(
             dma_clk_in                        => dma_clk,
@@ -197,15 +199,15 @@ begin
             buffer_sel_dma_clk_in             => buffer_sel_dma_clk
         );
 
--- remove to prevent flickering until we are writing to the framebuffer
---    buffer_flip : process(dma_clk) is
---    begin
---        if rising_edge(dma_clk) then
---            if start_of_frame_dma_clk = '1' then
---                buffer_sel_dma_clk <= not buffer_sel_dma_clk;
---            end if;
---        end if;
---    end process;
+    -- remove to prevent flickering until we are writing to the framebuffer
+    --    buffer_flip : process(dma_clk) is
+    --    begin
+    --        if rising_edge(dma_clk) then
+    --            if start_of_frame_dma_clk = '1' then
+    --                buffer_sel_dma_clk <= not buffer_sel_dma_clk;
+    --            end if;
+    --        end if;
+    --    end process;
 
     comb_pixel <= func_combine_pixel_or(bitmap_pixel, txt_pixel);
 
@@ -215,6 +217,7 @@ begin
             M_AXI_GP0_ACLK_IN => pixelclk,
             S_AXI_GP0_ACLK_IN => pixelclk,
             S_AXI_HP0_ACLK_IN => dma_clk,
+            S_AXI_HP1_ACLK_IN => pixelclk,
             DDR               => DDR,
             FCLK_CLK0_100     => FCLK_CLK0_100,
             FCLK_RESET0_N     => FCLK_RESET0_N, -- reset out
@@ -230,7 +233,9 @@ begin
             S_AXI_GP0_MOSI    => S_AXI_GP0_MOSI,
             S_AXI_GP0_MISO    => S_AXI_GP0_MISO,
             S_AXI_HP0_MOSI    => S_AXI_HP0_MOSI,
-            S_AXI_HP0_MISO    => S_AXI_HP0_MISO
+            S_AXI_HP0_MISO    => S_AXI_HP0_MISO,
+            S_AXI_HP1_MOSI    => S_AXI_HP1_MOSI,
+            S_AXI_HP1_MISO    => S_AXI_HP1_MISO
         );
 
     led <= gpio_led(3 downto 0);
@@ -244,6 +249,17 @@ begin
             wb_miso_out  => zynq_ps_peripherals_wb_miso,
             axi_mosi_out => S_AXI_GP0_MOSI,
             axi_miso_in  => S_AXI_GP0_MISO
+        );
+
+    -- connect the FPCA SoC to the Zynq DDR3. This could use a cache at some point
+    wb_to_axi3_shim_inst2 : entity work.wb_to_axi3_shim
+        port map(
+            wb_clk       => pixelclk,
+            wb_reset     => reset,
+            wb_mosi_in   => ext_mem_wb_mosi,
+            wb_miso_out  => ext_mem_wb_miso,
+            axi_mosi_out => S_AXI_HP1_MOSI,
+            axi_miso_in  => S_AXI_HP1_MISO
         );
 
     -- FPCA RISC-V SoC and peripherals
@@ -269,6 +285,8 @@ begin
             i2c_sda_out                     => open,
             text_display_wb_mosi_out        => text_display_wb_mosi,
             text_display_wb_miso_in         => text_display_wb_miso,
+            ext_mem_wb_mosi_out             => ext_mem_wb_mosi,
+            ext_mem_wb_miso_in              => ext_mem_wb_miso,
             zynq_ps_peripherals_wb_mosi_out => zynq_ps_peripherals_wb_mosi,
             zynq_ps_peripherals_wb_miso_in  => zynq_ps_peripherals_wb_miso
         );

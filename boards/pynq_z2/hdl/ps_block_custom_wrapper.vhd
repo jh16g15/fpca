@@ -2,8 +2,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
 use work.axi_pkg.all;
-
-
 -- ps_block_custom_wrapper.vhd
 --
 -- A wrapper around a block diagram containing a Zynq PS block
@@ -19,7 +17,8 @@ entity ps_block_custom_wrapper is
         M_AXI_GP0_ACLK_IN : in std_logic;
         S_AXI_GP0_ACLK_IN : in std_logic;
         S_AXI_HP0_ACLK_IN : in std_logic;
-        DDR        : inout t_ddr;
+        S_AXI_HP1_ACLK_IN : in std_logic;
+        DDR               : inout t_ddr;
 
         FCLK_CLK0_100     : out std_logic;
         FCLK_RESET0_N     : out std_logic;
@@ -31,35 +30,39 @@ entity ps_block_custom_wrapper is
         FIXED_IO_ps_srstb : inout std_logic;
         IRQ_P2F_UART0     : out std_logic;
         -- Control PL peripherals from Zynq
-        M_AXI_GP0_MOSI    : out t_axi_mosi;
-        M_AXI_GP0_MISO    : in t_axi_miso;
+        M_AXI_GP0_MOSI : out t_axi_mosi;
+        M_AXI_GP0_MISO : in t_axi_miso;
         -- Control PS peripherals from PL
         S_AXI_GP0_MOSI : in t_axi_mosi;
         S_AXI_GP0_MISO : out t_axi_miso;
 
         -- Access DDR3 from PL
         S_AXI_HP0_MOSI : in t_axi_mosi;
-        S_AXI_HP0_MISO : out t_axi_miso
+        S_AXI_HP0_MISO : out t_axi_miso;
+        -- Access DDR3 from PL
+        S_AXI_HP1_MOSI : in t_axi_mosi;
+        S_AXI_HP1_MISO : out t_axi_miso
 
     );
 end ps_block_custom_wrapper;
 
 architecture STRUCTURE of ps_block_custom_wrapper is
-    attribute mark_debug : boolean;
+    attribute mark_debug                   : boolean;
     attribute mark_debug of M_AXI_GP0_MOSI : signal is G_M_AXI_GP0_DEBUG;
     attribute mark_debug of M_AXI_GP0_MISO : signal is G_M_AXI_GP0_DEBUG;
     attribute mark_debug of S_AXI_GP0_MOSI : signal is G_S_AXI_GP0_DEBUG;
     attribute mark_debug of S_AXI_GP0_MISO : signal is G_S_AXI_GP0_DEBUG;
     attribute mark_debug of S_AXI_HP0_MOSI : signal is G_S_AXI_HP0_DEBUG;
     attribute mark_debug of S_AXI_HP0_MISO : signal is G_S_AXI_HP0_DEBUG;
-    
+
 begin
     u_ps_block_wrapper : entity work.ps_block_wrapper
         port map(
             M_AXI_GP0_ACLK => M_AXI_GP0_ACLK_IN,
             S_AXI_GP0_ACLK => S_AXI_GP0_ACLK_IN,
             S_AXI_HP0_ACLK => S_AXI_HP0_ACLK_IN,
-            
+            S_AXI_HP1_ACLK => S_AXI_HP1_ACLK_IN,
+
             DDR_addr(14 downto 0)         => DDR.addr(14 downto 0),
             DDR_ba(2 downto 0)            => DDR.ba(2 downto 0),
             DDR_cas_n                     => DDR.cas_n,
@@ -122,6 +125,7 @@ begin
             M_AXI_GP0_wready              => M_AXI_GP0_MISO.wready,
             M_AXI_GP0_wstrb(3 downto 0)   => M_AXI_GP0_MOSI.wstrb(3 downto 0),
             M_AXI_GP0_wvalid              => M_AXI_GP0_MOSI.wvalid,
+
             S_AXI_GP0_araddr(31 downto 0) => S_AXI_GP0_MOSI.araddr(31 downto 0),
             S_AXI_GP0_arburst(1 downto 0) => S_AXI_GP0_MOSI.arburst(1 downto 0),
             S_AXI_GP0_arcache(3 downto 0) => S_AXI_GP0_MOSI.arcache(3 downto 0),
@@ -160,6 +164,7 @@ begin
             S_AXI_GP0_wready              => S_AXI_GP0_MISO.wready,
             S_AXI_GP0_wstrb(3 downto 0)   => S_AXI_GP0_MOSI.wstrb(3 downto 0),
             S_AXI_GP0_wvalid              => S_AXI_GP0_MOSI.wvalid,
+
             S_AXI_HP0_araddr(31 downto 0) => S_AXI_HP0_MOSI.araddr(31 downto 0),
             S_AXI_HP0_arburst(1 downto 0) => S_AXI_HP0_MOSI.arburst(1 downto 0),
             S_AXI_HP0_arcache(3 downto 0) => S_AXI_HP0_MOSI.arcache(3 downto 0),
@@ -197,6 +202,45 @@ begin
             S_AXI_HP0_wlast               => S_AXI_HP0_MOSI.wlast,
             S_AXI_HP0_wready              => S_AXI_HP0_MISO.wready,
             S_AXI_HP0_wstrb(3 downto 0)   => S_AXI_HP0_MOSI.wstrb(3 downto 0),
-            S_AXI_HP0_wvalid              => S_AXI_HP0_MOSI.wvalid
+            S_AXI_HP0_wvalid              => S_AXI_HP0_MOSI.wvalid,
+
+            S_AXI_HP1_araddr(31 downto 0) => S_AXI_HP1_MOSI.araddr(31 downto 0),
+            S_AXI_HP1_arburst(1 downto 0) => S_AXI_HP1_MOSI.arburst(1 downto 0),
+            S_AXI_HP1_arcache(3 downto 0) => S_AXI_HP1_MOSI.arcache(3 downto 0),
+            S_AXI_HP1_arid(5 downto 0)    => S_AXI_HP1_MOSI.arid(5 downto 0),
+            S_AXI_HP1_arlen(3 downto 0)   => S_AXI_HP1_MOSI.arlen(3 downto 0),
+            S_AXI_HP1_arlock(1 downto 0)  => S_AXI_HP1_MOSI.arlock(1 downto 0),
+            S_AXI_HP1_arprot(2 downto 0)  => S_AXI_HP1_MOSI.arprot(2 downto 0),
+            S_AXI_HP1_arqos(3 downto 0)   => S_AXI_HP1_MOSI.arqos(3 downto 0),
+            S_AXI_HP1_arready             => S_AXI_HP1_MISO.arready,
+            S_AXI_HP1_arsize(2 downto 0)  => S_AXI_HP1_MOSI.arsize(2 downto 0),
+            S_AXI_HP1_arvalid             => S_AXI_HP1_MOSI.arvalid,
+            S_AXI_HP1_awaddr(31 downto 0) => S_AXI_HP1_MOSI.awaddr(31 downto 0),
+            S_AXI_HP1_awburst(1 downto 0) => S_AXI_HP1_MOSI.awburst(1 downto 0),
+            S_AXI_HP1_awcache(3 downto 0) => S_AXI_HP1_MOSI.awcache(3 downto 0),
+            S_AXI_HP1_awid(5 downto 0)    => S_AXI_HP1_MOSI.awid(5 downto 0),
+            S_AXI_HP1_awlen(3 downto 0)   => S_AXI_HP1_MOSI.awlen(3 downto 0),
+            S_AXI_HP1_awlock(1 downto 0)  => S_AXI_HP1_MOSI.awlock(1 downto 0),
+            S_AXI_HP1_awprot(2 downto 0)  => S_AXI_HP1_MOSI.awprot(2 downto 0),
+            S_AXI_HP1_awqos(3 downto 0)   => S_AXI_HP1_MOSI.awqos(3 downto 0),
+            S_AXI_HP1_awready             => S_AXI_HP1_MISO.awready,
+            S_AXI_HP1_awsize(2 downto 0)  => S_AXI_HP1_MOSI.awsize(2 downto 0),
+            S_AXI_HP1_awvalid             => S_AXI_HP1_MOSI.awvalid,
+            S_AXI_HP1_bid(5 downto 0)     => S_AXI_HP1_MISO.bid(5 downto 0),
+            S_AXI_HP1_bready              => S_AXI_HP1_MOSI.bready,
+            S_AXI_HP1_bresp(1 downto 0)   => S_AXI_HP1_MISO.bresp(1 downto 0),
+            S_AXI_HP1_bvalid              => S_AXI_HP1_MISO.bvalid,
+            S_AXI_HP1_rdata(31 downto 0)  => S_AXI_HP1_MISO.rdata(31 downto 0),
+            S_AXI_HP1_rid(5 downto 0)     => S_AXI_HP1_MISO.rid(5 downto 0),
+            S_AXI_HP1_rlast               => S_AXI_HP1_MISO.rlast,
+            S_AXI_HP1_rready              => S_AXI_HP1_MOSI.rready,
+            S_AXI_HP1_rresp(1 downto 0)   => S_AXI_HP1_MISO.rresp(1 downto 0),
+            S_AXI_HP1_rvalid              => S_AXI_HP1_MISO.rvalid,
+            S_AXI_HP1_wdata(31 downto 0)  => S_AXI_HP1_MOSI.wdata(31 downto 0),
+            S_AXI_HP1_wid(5 downto 0)     => S_AXI_HP1_MOSI.wid(5 downto 0),
+            S_AXI_HP1_wlast               => S_AXI_HP1_MOSI.wlast,
+            S_AXI_HP1_wready              => S_AXI_HP1_MISO.wready,
+            S_AXI_HP1_wstrb(3 downto 0)   => S_AXI_HP1_MOSI.wstrb(3 downto 0),
+            S_AXI_HP1_wvalid              => S_AXI_HP1_MOSI.wvalid
         );
 end STRUCTURE;

@@ -41,6 +41,10 @@ entity simple_soc is
         text_display_wb_mosi_out : out t_wb_mosi;
         text_display_wb_miso_in  : in t_wb_miso;
 
+        -- Wishbone to external memory (DDR3)
+        ext_mem_wb_mosi_out : out t_wb_mosi;
+        ext_mem_wb_miso_in  : in t_wb_miso;
+
         -- To Zynq PS Peripherals
         zynq_ps_peripherals_wb_mosi_out : out t_wb_mosi;
         zynq_ps_peripherals_wb_miso_in  : in t_wb_miso
@@ -253,13 +257,25 @@ begin
             sseg_an         => sseg_an_out
         );
 
-    gen_unmapped : for i in 5 to 13 generate
+    gen_unmapped : for i in 5 to 12 generate
         wb_unmapped_slv_inst : entity work.wb_unmapped_slv
             port map(
                 wb_mosi_in  => wb_slave_mosi_arr(i),
                 wb_miso_out => wb_slave_miso_arr(i)
             );
     end generate;
+
+    -- 0xD000_0000 External memory (Zynq DDR3, upper 256MB)
+    -- (remap to 0x1---_---- to match Zynq memory map)
+    ext_mem_wb_mosi_out.adr(31 downto 28) <= x"1";
+    ext_mem_wb_mosi_out.adr(27 downto 0)  <= wb_slave_mosi_arr(13).adr(27 downto 0);
+
+    ext_mem_wb_mosi_out.wdat <= wb_slave_mosi_arr(13).wdat;
+    ext_mem_wb_mosi_out.we   <= wb_slave_mosi_arr(13).we;
+    ext_mem_wb_mosi_out.sel  <= wb_slave_mosi_arr(13).sel;
+    ext_mem_wb_mosi_out.stb  <= wb_slave_mosi_arr(13).stb;
+
+    wb_slave_miso_arr(13) <= ext_mem_wb_miso_in;
 
     -- 0xE000_0000 Zynq PS Peripheral registers
     zynq_ps_peripherals_wb_mosi_out <= wb_slave_mosi_arr(14);

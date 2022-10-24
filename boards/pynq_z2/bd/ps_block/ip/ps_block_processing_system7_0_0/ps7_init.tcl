@@ -229,6 +229,8 @@ proc ps7_post_config_3_0 {} {
     mask_write 0XF8000240 0xFFFFFFFF 0x00000000
     mask_write 0XF8008000 0x00000001 0x00000001
     mask_write 0XF8008014 0x00000001 0x00000001
+    mask_write 0XF8009000 0x00000001 0x00000001
+    mask_write 0XF8009014 0x00000001 0x00000001
     mwr -force 0XF8000004 0x0000767B
 }
 proc ps7_debug_3_0 {} {
@@ -468,6 +470,8 @@ proc ps7_post_config_2_0 {} {
     mask_write 0XF8000240 0xFFFFFFFF 0x00000000
     mask_write 0XF8008000 0x00000001 0x00000001
     mask_write 0XF8008014 0x00000001 0x00000001
+    mask_write 0XF8009000 0x00000001 0x00000001
+    mask_write 0XF8009014 0x00000001 0x00000001
     mwr -force 0XF8000004 0x0000767B
 }
 proc ps7_debug_2_0 {} {
@@ -705,6 +709,8 @@ proc ps7_post_config_1_0 {} {
     mask_write 0XF8000240 0xFFFFFFFF 0x00000000
     mask_write 0XF8008000 0x00000001 0x00000001
     mask_write 0XF8008014 0x00000001 0x00000001
+    mask_write 0XF8009000 0x00000001 0x00000001
+    mask_write 0XF8009014 0x00000001 0x00000001
     mwr -force 0XF8000004 0x0000767B
 }
 proc ps7_debug_1_0 {} {
