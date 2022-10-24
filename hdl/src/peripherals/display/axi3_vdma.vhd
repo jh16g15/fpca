@@ -24,6 +24,9 @@ use xpm.vcomponents.all;
 --
 -- 32 bits per pixel
 -- Note: uses Xilinx XPMs for CDC
+--
+--  TODO:
+--  There is a bug where the final pixel on each row is not displayed (black instead)
 
 entity axi3_vdma is
     generic (

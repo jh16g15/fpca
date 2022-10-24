@@ -108,9 +108,13 @@ begin
                 buffer1_start <= x"0020_0000";
 
                 -- set up intial contents for buffer 0
-                for i in 0 to MEM_WORDS - 1 loop
-                    write_integer(mem, address => i * 4, word => i);
-                end loop;
+                -- for i in 0 to MEM_WORDS - 1 loop
+                --     write_integer(mem, address => i * 4, word => i);
+                -- end loop;
+                write_integer(mem, address => 0, word => 255);
+                write_integer(mem, address => 638, word => 638);    -- we expect this
+                write_integer(mem, address => 639, word => 639);    -- final pixel
+                write_integer(mem, address => 640, word => 640);    -- this should not be displayed
                 info("finished setting up buffer memory");
                 buffer_sel_dma_clk_in <= '0'; -- select buffer 0
 
