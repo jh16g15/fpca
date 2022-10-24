@@ -17,6 +17,7 @@
 #include "ssd1306_i2c.h"
 #include "terminal.h"
 #include "text_display.h"
+#include "pixel_display.h"
 #include "zynq_ps_uart.h"
 
 
@@ -47,18 +48,23 @@ void main(void)
     int counter = 0;
 
     zynq_ps_uart_setup();
-    zynq_ps_uart_putc('J');
-    zynq_ps_uart_puts(" Hello there");
+    zynq_ps_uart_puts("\r\n==== RESTART ====\r\n");
 
     GPIO_LED = 0xF;
     text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);
-    while (1)
-    {
+
+    // fill the screen CYAN
+    for (int x = 0; x < PIXELS_X;x++){
+        for (int y = 0; y < PIXELS_Y;y++){
+            pixel_set(x, y, COL_CYAN);
+        }
+    }
+
+    while (1) {
         uart_puts("Hello there, this acts as a delay\n");
         char fg_colour = 5;
         char bg_colour = 1;
         char charcode = 'c';
-
 
         // text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);
 
@@ -72,10 +78,12 @@ void main(void)
         text_string(1, 8, "Colour Test:                          ", 38, WHITE, GREY);
 
         // add smiley
+        text_set(0, 0, CHAR_SMILEY_INV, YELLOW, BLUE);
         text_set(39, 2, CHAR_SMILEY_INV, YELLOW, GREY);
 
         // colour test
-        for (char i = 0; i < 8; i++){
+        for (char i = 0; i < 8; i++)
+        {
             text_set(14 + i, 8, 0, BLACK, i);
         }
         text_set(22, 8, CHAR_SMILEY, RED, GREEN);
