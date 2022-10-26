@@ -41,3 +41,40 @@ void delay_ms(int dly_ms)
     }
 }
 #endif
+
+/// @brief  Converts a u32 to a fixed length hex string
+/// @param data u32 to convert
+/// @param buf pointer to character buffer
+/// @param buf_len length of character buffer
+void u32_to_hstring(u32 data, u8 *buf, u8 buf_len){
+
+    // psuedocode:
+
+    // fill with null chars (end of string)
+    u8 i;
+    for (i = 0; i < buf_len - 1; i++)
+    {
+        buf[i] = '\0';
+    }
+    // Add "0x" prefix
+    buf[0] = '0';
+    buf[1] = 'x';
+    const u8 start = 2;
+    const u8 chars = 8; // bits/4
+    // for each 4 bits, convert to hex char
+    for (i = 0; i < chars; i++)
+    {
+        u32 mask = 0xF << (i * 4);
+        u8 nibble = (data & mask) >> (i * 4);
+        buf[start+chars-1-i] = nibble_to_hex_char(nibble);
+    }
+}
+
+char nibble_to_hex_char(u8 nibble){
+    nibble = nibble & 0xF;  // select bottom 4 bits only
+    if (nibble > 9) {   // A (65) to F (70)
+        return nibble + 55;
+    }
+    // 0 (48) to 9 (57)
+    return nibble + 48;
+}

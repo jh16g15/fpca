@@ -52,4 +52,7 @@ static inline u8 read_u8(u32 addr){
     return *(volatile u8*)addr;
 }
 
+void u32_to_hstring(u32 data, u8 *buf, u8 buf_len);
+char nibble_to_hex_char(u8 nibble);
+
 #endif // _DELAY_H_
