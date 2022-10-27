@@ -78,3 +78,32 @@ char nibble_to_hex_char(u8 nibble){
     // 0 (48) to 9 (57)
     return nibble + 48;
 }
+
+/// @brief Converts a u32 to a fixed length decimal string (right-aligned)
+/// @param data u32 to convert
+/// @param buf pointer to character buffer
+/// @param buf_len length of character buffer
+void u32_to_string(u32 data, u8* buf, u8 buf_len){
+    // max value of u32 = 4,294,967,295
+    u32 digit_val;
+    u32 digit;
+    u32 next_place_val = 10;
+    u32 place_val = 1;
+    u32 digit_pos = 0;
+    // fill the buf with spaces
+    for (u32 i = 0; i < buf_len; i++){
+        buf[i] = ' ';
+    }
+
+    buf[buf_len - 1] = '\0'; // end the string
+    while(data != 0){
+        digit_val = data % next_place_val;   // get the value in that place (eg 40)
+        data = data - digit_val;        // subtract this from the value left to convert
+        digit = digit_val / place_val;  // get the digit in that place
+        buf[buf_len - 2 - digit_pos] = digit + 48;  // convert to ASCII
+        // move to next place
+        place_val *= 10;
+        next_place_val *= 10;
+        digit_pos++;
+    }
+}

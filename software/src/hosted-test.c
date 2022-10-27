@@ -1,7 +1,16 @@
 #include <stdio.h>
+#include <stdint.h>
 
 #define CURSOR_MAX_X 16
 #define CURSOR_MAX_Y 4
+
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint8_t u8;
+
+typedef int32_t s32;
+typedef int16_t s16;
+typedef int8_t s8;
 
 // pass x and y by reference to modify
 void ssd1306_advance_cursor(char *x_ptr, char *y_ptr)
@@ -24,28 +33,36 @@ void ssd1306_advance_cursor(char *x_ptr, char *y_ptr)
     printf("Done\n");
 }
 
+void u32_to_string(u32 data, u8* buf, u8 buf_len){
+    // max value of u32 = 4,294,967,295
+    u32 digit_val;
+    u32 digit;
+    u32 next_place_val = 10;
+    u32 place_val = 1;
+    u32 digit_pos = 0;
+    // fill the buf with spaces
+    for (u32 i = 0; i < buf_len; i++){
+        buf[i] = ' ';
+    }
+
+    buf[buf_len - 1] = '\0'; // end the string
+    while(data != 0){
+        digit_val = data % next_place_val;   // get the value in that place (eg 40)
+        data = data - digit_val;        // subtract this from the value left to convert
+        digit = digit_val / place_val;  // get the digit in that place
+        buf[buf_len - 2 - digit_pos] = digit + 48;  // convert to ASCII
+        // move to next place
+        place_val *= 10;
+        next_place_val *= 10;
+        digit_pos++;
+    }
+}
+
 int main(void)
 {
-    char x = 0;
-    char y = 0;
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
-    ssd1306_advance_cursor(&x, &y);
+    u8 buf[20];
+    u32_to_string(473589345, buf, 12);
+    printf("\r\n=== OUTPUT ===\r\n");
+    printf("%s", buf);
+    printf("\r\n=== DONE ===\r\n");
 }
