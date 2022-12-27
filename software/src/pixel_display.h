@@ -1,6 +1,8 @@
 #ifndef _PIXEL_DISPLAY_H_
 #define _PIXEL_DISPLAY_H_
 
+#include "utils.h"
+
 // temp, remove after debug done
 #include "zynq_ps_uart.h"
 
@@ -25,12 +27,31 @@
 #define CLOG2_X_PIXELS 12
 
 void pixel_set(int x, int y, int col){
-    unsigned int addr = FRAMEBUF_BASE_ADDR + x * 4 + (y << CLOG2_X_PIXELS);
+    u32 addr = FRAMEBUF_BASE_ADDR + x * 4 + (y << CLOG2_X_PIXELS);
     // zynq_ps_uart_puts("addr:\r\n");
-    volatile unsigned long *pixel_loc = (volatile unsigned long *)addr; // cast to pointer
-    *pixel_loc = col;
+
+    write_u32(addr, col);
+
+    // volatile unsigned long *pixel_loc = (volatile unsigned long *)addr; // cast to pointer
+    // *pixel_loc = col;
 }
 
+// from working Zynq code
+u32 pixel_address_calc(u32 x, u32 y){
+	u32 addr = FRAMEBUF_BASE_ADDR + x*4 + (y << CLOG2_X_PIXELS);
+	return addr;
+}
+
+// from working Zynq code
+void clear_screen(void){
+	for(int y =0; y<PIXELS_Y;y++){
+		for(int x =0; x<PIXELS_X;x++){
+			write_u32(pixel_address_calc(x, y), COL_GREY);
+			// write_u32(pixel_address_calc(x, y), COL_BLUE);
+			// write_u32(pixel_address_calc(x, y), COL_BLACK);
+		}
+	}
+}
 
 
 #endif //_PIXEL_DISPLAY_H_
