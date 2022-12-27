@@ -11,7 +11,8 @@ entity ps_block_custom_wrapper is
     generic (
         G_M_AXI_GP0_DEBUG : boolean := false;
         G_S_AXI_GP0_DEBUG : boolean := false;
-        G_S_AXI_HP0_DEBUG : boolean := false
+        G_S_AXI_HP0_DEBUG : boolean := false;
+        G_S_AXI_HP1_DEBUG : boolean := false
     );
     port (
         M_AXI_GP0_ACLK_IN : in std_logic;
@@ -54,6 +55,8 @@ architecture STRUCTURE of ps_block_custom_wrapper is
     attribute mark_debug of S_AXI_GP0_MISO : signal is G_S_AXI_GP0_DEBUG;
     attribute mark_debug of S_AXI_HP0_MOSI : signal is G_S_AXI_HP0_DEBUG;
     attribute mark_debug of S_AXI_HP0_MISO : signal is G_S_AXI_HP0_DEBUG;
+    attribute mark_debug of S_AXI_HP1_MOSI : signal is G_S_AXI_HP1_DEBUG;
+    attribute mark_debug of S_AXI_HP1_MISO : signal is G_S_AXI_HP1_DEBUG;
 
 begin
     u_ps_block_wrapper : entity work.ps_block_wrapper

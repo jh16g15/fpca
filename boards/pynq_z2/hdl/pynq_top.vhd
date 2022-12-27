@@ -56,14 +56,15 @@ architecture rtl of pynq_top is
     signal resetn : std_logic;
 
     signal IRQ_P2F_UART0  : std_logic;
-    signal M_AXI_GP0_MOSI : t_axi_mosi;
-    signal M_AXI_GP0_MISO : t_axi_miso;
-    signal S_AXI_GP0_MOSI : t_axi_mosi;
-    signal S_AXI_GP0_MISO : t_axi_miso;
-    signal S_AXI_HP0_MOSI : t_axi_mosi;
-    signal S_AXI_HP0_MISO : t_axi_miso;
-    signal S_AXI_HP1_MOSI : t_axi_mosi;
-    signal S_AXI_HP1_MISO : t_axi_miso;
+    -- initialise for simulation
+    signal M_AXI_GP0_MOSI : t_axi_mosi := AXI_MOSI_ZERO;
+    signal M_AXI_GP0_MISO : t_axi_miso := AXI_MISO_ZERO;
+    signal S_AXI_GP0_MOSI : t_axi_mosi := AXI_MOSI_ZERO;
+    signal S_AXI_GP0_MISO : t_axi_miso := AXI_MISO_ZERO;
+    signal S_AXI_HP0_MOSI : t_axi_mosi := AXI_MOSI_ZERO;
+    signal S_AXI_HP0_MISO : t_axi_miso := AXI_MISO_ZERO;
+    signal S_AXI_HP1_MOSI : t_axi_mosi := AXI_MOSI_ZERO;
+    signal S_AXI_HP1_MISO : t_axi_miso := AXI_MISO_ZERO;
 
     signal pixelclk : std_logic;
     signal dma_clk  : std_logic;
@@ -115,7 +116,16 @@ architecture rtl of pynq_top is
             clk_in100 : in std_logic
         );
     end component;
-
+    
+    component vio_0
+        port (
+            clk : in std_logic;
+            probe_out0 : out std_logic_vector(0 downto 0);
+            probe_out1 : out std_logic_vector(31 downto 0);
+            probe_out2 : out std_logic_vector(31 downto 0)
+        );
+    end component;
+        
     attribute mark_debug                                  : boolean;
     attribute mark_debug of locked                        : signal is true;
     attribute mark_debug of reset                         : signal is true;
@@ -130,6 +140,14 @@ begin
 
     reset  <= (not locked) or btn(3) or (not FCLK_RESET0_N);
     resetn <= not reset;
+    
+    vio : vio_0
+    port map (
+            clk => dma_clk,
+            probe_out0(0) => buffer_sel_dma_clk,
+            probe_out1 => buffer0_start,
+            probe_out2 => buffer1_start
+    );
 
     pll : clk_wiz_0
     port map(
@@ -212,7 +230,7 @@ begin
     comb_pixel <= func_combine_pixel_or(bitmap_pixel, txt_pixel);
 
     ps_block_custom_wrapper_inst : entity work.ps_block_custom_wrapper
-        generic map(G_S_AXI_GP0_DEBUG => false)
+        generic map(G_S_AXI_HP0_DEBUG => false) -- use ILAs inside block diagram instead
         port map(
             M_AXI_GP0_ACLK_IN => pixelclk,
             S_AXI_GP0_ACLK_IN => pixelclk,

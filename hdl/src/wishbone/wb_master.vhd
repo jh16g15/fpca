@@ -105,7 +105,7 @@ begin
                             wb_stb <= '0'; -- only deassert STB once transaction accepted
                         end if;
 
-                        if rsp_valid_out then -- end bus cycle
+                        if rsp_valid_out = '1' then -- end bus cycle
                             state     <= WB_IDLE;
                             cmd_stall <= '0';
                             wb_cyc    <= '0';

@@ -32,7 +32,7 @@ begin
 
     axi_mosi_out.araddr  <= wb_mosi_in.adr;
     axi_mosi_out.arburst <= b"00";   -- FIXED
-    axi_mosi_out.arcache <= b"0000"; -- Non bufferable, non-cacheable, no read-allocate, no write-allocate
+    axi_mosi_out.arcache <= b"0010"; -- Non bufferable, non-cacheable, modifiable (so can upsize to 64b in Zynq DDR3 controller)
     axi_mosi_out.arid    <= x"000";  -- ID = 0 (all transactions must be in order)
     axi_mosi_out.arlen   <= x"0";    -- burst length = 1 transfer
     axi_mosi_out.arlock  <= b"00";   -- normal transaction
@@ -41,7 +41,7 @@ begin
     axi_mosi_out.arsize  <= b"010";  -- 4 bytes per transfer
     axi_mosi_out.awaddr  <= wb_mosi_in.adr;
     axi_mosi_out.awburst <= b"00";   -- FIXED
-    axi_mosi_out.awcache <= b"0000"; -- Non bufferable, non-cacheable, no read-allocate, no write-allocate
+    axi_mosi_out.awcache <= b"0010"; -- Non bufferable, non-cacheable, modifiable (so can upsize to 64b in Zynq DDR3 controller)
     axi_mosi_out.awid    <= x"000";  -- ID = 0 (all transactions must be in order)
     axi_mosi_out.awlen   <= x"0";    -- burst length = 1 transfer
     axi_mosi_out.awlock  <= b"00";   -- normal transaction

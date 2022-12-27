@@ -75,7 +75,7 @@ begin
                     wb_miso_out.ack <= '1';
 
                     byte_sel : for i in 0 to 3 loop
-                        if wb_mosi_in.sel(i) then
+                        if wb_mosi_in.sel(i) = '1' then
                             -- report("Received transaction with BANK_SEL bit (" & to_string(C_BANK_SEL_BIT_INDEX) & ") = " & to_string(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX)));
                             -- report("Address Index = " & to_hstring(wb_mosi_in.adr(C_BANK_SEL_BIT_INDEX-1 downto 2)));
                             if wb_mosi_in.we = '1' then

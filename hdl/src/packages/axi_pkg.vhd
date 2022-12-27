@@ -38,6 +38,36 @@ package axi_pkg is
         wstrb   : std_logic_vector (3 downto 0);
         wvalid  : std_logic;
     end record;
+    
+    constant AXI_MOSI_ZERO : t_axi_mosi := (
+        araddr  => (others => '0'), --: std_logic_vector (31 downto 0);
+        arburst => (others => '0'), --: std_logic_vector (1 downto 0);
+        arcache => (others => '0'), --: std_logic_vector (3 downto 0);
+        arid    => (others => '0'), --: std_logic_vector (11 downto 0);
+        arlen   => (others => '0'), --: std_logic_vector (3 downto 0);
+        arlock  => (others => '0'), --: std_logic_vector (1 downto 0);
+        arprot  => (others => '0'), --: std_logic_vector (2 downto 0);
+        arqos   => (others => '0'), --: std_logic_vector (3 downto 0);
+        arsize  => (others => '0'), --: std_logic_vector (2 downto 0);
+        arvalid => '0', --: std_logic;
+        awaddr  => (others => '0'), --: std_logic_vector (31 downto 0);
+        awburst => (others => '0'), --: std_logic_vector (1 downto 0);
+        awcache => (others => '0'), --: std_logic_vector (3 downto 0);
+        awid    => (others => '0'), --: std_logic_vector (11 downto 0);
+        awlen   => (others => '0'), --: std_logic_vector (3 downto 0);
+        awlock  => (others => '0'), --: std_logic_vector (1 downto 0);
+        awprot  => (others => '0'), --: std_logic_vector (2 downto 0);
+        awqos   => (others => '0'), --: std_logic_vector (3 downto 0);
+        awsize  => (others => '0'), --: std_logic_vector (2 downto 0);
+        awvalid => '0', --: std_logic;
+        bready  => '0', --: std_logic;
+        rready  => '0', --: std_logic;
+        wdata   => (others => '0'), --: std_logic_vector (31 downto 0);
+        wid     => (others => '0'), --: std_logic_vector (11 downto 0);
+        wlast   => '0', --: std_logic;
+        wstrb   => (others => '0'), --: std_logic_vector (3 downto 0);
+        wvalid  => '0' --: std_logic;
+    );
 
     type t_axi_miso is record
         arready : std_logic;
@@ -52,6 +82,20 @@ package axi_pkg is
         rvalid  : std_logic;
         wready  : std_logic;
     end record;
+
+    constant AXI_MISO_ZERO : t_axi_miso := ( 
+        arready => '0',
+        awready => '0',
+        bid     => (others => '0'),
+        bresp   => (others => '0'),
+        bvalid  => '0',
+        rdata   => (others => '0'),
+        rid     => (others => '0'),
+        rlast   => '0',
+        rresp   => (others => '0'),
+        rvalid  => '0',
+        wready  => '0'
+    );
 
     type t_axi64_mosi is record
         araddr  : std_logic_vector (31 downto 0);

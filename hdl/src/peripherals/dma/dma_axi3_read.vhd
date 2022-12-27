@@ -75,10 +75,14 @@ begin
     dma_axi_hp_mosi_out.awprot  <= (others => '0');
     dma_axi_hp_mosi_out.awqos   <= (others => '0');
     dma_axi_hp_mosi_out.awsize  <= (others => '0');
+    dma_axi_hp_mosi_out.awvalid <= '0';
+    
     dma_axi_hp_mosi_out.wdata   <= (others => '0');
     dma_axi_hp_mosi_out.wid     <= (others => '0');
     dma_axi_hp_mosi_out.wlast   <= '0';
     dma_axi_hp_mosi_out.wstrb   <= (others => '0');
+    dma_axi_hp_mosi_out.wvalid  <= '0';
+    
     dma_axi_hp_mosi_out.bready  <= '0';
     -- connect R channel straight to AXI stream output
     axi_stream_mosi_out.tdata  <= dma_axi_hp_miso_in.rdata;

@@ -81,7 +81,7 @@ begin
                 -- assume CYC asserted by master for STB to be high
                 if wb_mosi_in.stb = '1' and wb_miso_out.stall = '0' then
                     for i in 0 to 3 loop
-                        if wb_mosi_in.sel(i) then -- if this byte is selected
+                        if wb_mosi_in.sel(i) = '1' then -- if this byte is selected
                             if wb_mosi_in.we = '1' then
                                 -- synchronous write logic
                                 mem32(slv2uint(wb_mosi_in.adr(C_WORD_ADR_H downto C_WORD_ADR_L)))(8 * (i + 1) - 1 downto 8 * i) <= wb_mosi_in.wdat(8 * (i + 1) - 1 downto 8 * i); -- write byte

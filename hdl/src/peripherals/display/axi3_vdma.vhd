@@ -54,7 +54,7 @@ entity axi3_vdma is
         dma_reset_in      : in std_logic;
 
         -- connect to Zynq HP AXI3 ports for DDR3 access
-        dma_axi_hp_mosi_out : out t_axi_mosi;
+        dma_axi_hp_mosi_out : out t_axi_mosi := AXI_MOSI_ZERO;
         dma_axi_hp_miso_in  : in t_axi_miso;
 
         -- to VGA/DVI out
@@ -417,5 +417,6 @@ begin
             end if;
         end if;
     end process;
+   
 
 end architecture;
