@@ -1,0 +1,8 @@
+{
+    "start_address": "0x00000000",
+    "min_size": "0",
+    "segments": {
+        "prog_mem": {"size": "64K"},
+        "boot_mem": {"size": "64K"}
+    }
+  }
