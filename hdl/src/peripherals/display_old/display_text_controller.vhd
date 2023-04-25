@@ -145,7 +145,7 @@ begin
     -------------------------------------------------------------------
     -- Stage 1: Hcount and Vcount counters, CharAddress calculation
     -------------------------------------------------------------------
-    sync_counters : process (pixelclk)
+    sync_counters : process (pixelclk, areset_n)
     begin
         if areset_n = '0' then
             h_count <= 0;

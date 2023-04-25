@@ -27,7 +27,23 @@ entity basys3_simple_soc_wrapper is
         JB : out std_logic_vector(0 downto 0);
         
         -- I2C SCL (0) / SDA (1)
-        JC : out std_logic_vector(1 downto 0)
+        JC : out std_logic_vector(1 downto 0);
+        
+        -- SD Card (Native interface) -- SPI Interface
+        SD_CLK : out std_logic; -- SCLK
+        SD_CMD : inout std_logic; -- DI
+        SD_D0 : inout std_logic; -- DO
+        SD_D1 : inout std_logic; 
+        SD_D2 : inout std_logic;
+        SD_D3 : inout std_logic; -- CS
+        
+        -- VGA Display
+        vgaRed : out std_logic_vector(3 downto 0);
+        vgaGreen : out std_logic_vector(3 downto 0);
+        vgaBlue : out std_logic_vector(3 downto 0);
+        Hsync : out std_logic;
+        Vsync : out std_logic
+        
 
     );
 end entity basys3_simple_soc_wrapper;
@@ -47,7 +63,7 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal ext_reset : std_logic;
     signal reset : std_logic;
 
-    signal clk50      : std_logic;
+    signal clk25      : std_logic;
     signal pll_locked : std_logic;
     signal sseg_ca    : std_logic_vector(7 downto 0);
     signal sseg_an    : std_logic_vector(3 downto 0);
@@ -57,10 +73,15 @@ architecture rtl of basys3_simple_soc_wrapper is
     
     signal i2c_scl : std_logic;
     signal i2c_sda : std_logic;
+    
+    signal spi_sck : std_logic;
+    signal spi_miso : std_logic;
+    signal spi_mosi : std_logic;
+    signal spi_ss : std_logic;
 
     component clk_wiz_0 is
         port (
-            clk_out50 : out std_logic;
+            clk_out25 : out std_logic;
             reset     : in std_logic;
             locked    : out std_logic;
             clk_in1   : in std_logic
@@ -69,10 +90,10 @@ architecture rtl of basys3_simple_soc_wrapper is
 
 begin
 
-    -- 100MHz to 50MHz free running
+    -- 100MHz to 25MHz free running
     pll_inst : clk_wiz_0
     port map(
-        clk_out50 => clk50,
+        clk_out25 => clk25,
         reset     => '0',
         locked    => pll_locked,
         clk_in1   => clk
@@ -86,47 +107,47 @@ begin
     gpio_btn(31 downto 4) <= (others => '0');
 
     btn_raw <= (btnC, btnU, btnL, btnR, btnD);
-    gen_btn_debounce : for i in 4 downto 0 generate
-        debounce_inst : entity work.debounce
+
+    debounce_btn_inst : entity work.debounce
         generic map (
-          REFCLK_FREQ => 50_000_000
+          REFCLK_FREQ => 25_000_000,
+          WIDTH => 5
         )
         port map (
-          clk => clk50,
-          val_in => btn_raw(i),
-          val_out => btn_debounced(i)
+          clk => clk25,
+          val_in => btn_raw,
+          val_out => btn_debounced
         );
-    end generate;
     gpio_btn(3 downto 0)  <= btn_debounced(3 downto 0);
 
 
     gpio_sw(31 downto 16) <= (others => '0');
     -- gpio_sw(15 downto 0)  <= sw;
-    gen_sw_debounce : for i in 15 downto 0 generate
-        debounce_inst : entity work.debounce
+    debounce_sw_inst : entity work.debounce
         generic map (
-          REFCLK_FREQ => 50_000_000
+          REFCLK_FREQ => 25_000_000,
+          WIDTH => 16
         )
         port map (
-          clk => clk50,
-          val_in => sw(i),
-          val_out => gpio_sw(i)
+          clk => clk25,
+          val_in => sw,
+          val_out => gpio_sw(15 downto 0)
         );
-    end generate;
+
 
     seg <= sseg_ca(6 downto 0);
     dp  <= sseg_ca(7);
 
     an <= sseg_an;
 
-    simple_soc_inst : entity work.simple_soc
+    soc_inst : entity work.basys3_soc
         generic map(
             G_MEM_INIT_FILE => G_MEM_INIT_FILE,
             G_BOOT_INIT_FILE => G_BOOT_INIT_FILE,
             G_SOC_FREQ      => 50_000_000
         )
         port map(
-            clk          => clk50,
+            clk          => clk25,
             reset        => reset,
             gpio_led_out => gpio_led,
             gpio_btn_in  => gpio_btn,
@@ -136,8 +157,16 @@ begin
             uart_tx_out  => uart_tx,
             uart_rx_in   => uart_rx,
             i2c_scl_out => i2c_scl,
-            i2c_sda_out => i2c_sda
-
+            i2c_sda_out => i2c_sda,
+            spi_sck_out => spi_sck,
+            spi_miso_in => spi_miso,
+            spi_mosi_out => spi_mosi,
+            spi_ss_out => spi_ss,
+            vga_hs_out => Hsync,
+            vga_vs_out => Vsync,
+            vga_r => vgaRed,
+            vga_g => vgaGreen,
+            vga_b => vgaBlue
         );
         -- UART TX OUT
         RsTx <= uart_tx;

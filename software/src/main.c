@@ -1,8 +1,5 @@
-
-//#define SIM
 #include "cpu.h"
 
-// get the bit values for each switch
 #ifdef BASYS3
 #define BTN_U 3
 #define BTN_L 2
@@ -10,18 +7,12 @@
 #define BTN_D 0
 #endif
 
-
 #include "uart.h"
 #include "gpio.h"
 #include "utils.h"
 #include "ssd1306_i2c.h"
 #include "terminal.h"
 #include "text_display.h"
-#include "pixel_display.h"
-#include "zynq_ps_uart.h"
-
-
-// function prototypes
 
 void main(void)
 {
@@ -37,116 +28,36 @@ void main(void)
 
     Q_SSEG = 0xc0de;
     uart_set_baud(9600);
-
-    ssd1306_display_sleep();
-    // Enable the charge pump and turn the display on
-    ssd1306_display_init();
-    ssd1306_whole_display_on();
-    ssd1306_resume_ram_content();
-    ssd1306_clear_screen();
-
-    int counter = 0;
-
-    zynq_ps_uart_setup();
-    zynq_ps_uart_puts("\r\n==== RESTART ====\r\n");
-
     GPIO_LED = 0xF;
+
     text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);
 
-    // fill the screen CYAN
-    for (int x = 0; x < PIXELS_X;x++){
-        for (int y = 0; y < PIXELS_Y;y++){
-            pixel_set(x, y, COL_CYAN);
-        }
-    }
-
-    while (1) {
-        uart_puts("Hello there, this acts as a delay\n");
-        char fg_colour = 5;
-        char bg_colour = 1;
-        char charcode = 'c';
-
-        // text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);
-
-        text_string(1, 1, "=======================================", 39, WHITE, GREY);
-        text_string(1, 2, "Friendly Programmable Computing Asset  ", 39, WHITE, GREY);
-        text_string(1, 3, "=======================================", 39, WHITE, GREY);
-        text_string(1, 4, "Architecture: RISC-V RV32I            ", 38, WHITE, GREY);
-        text_string(1, 5, "Frequency: 25MHz                      ", 38, WHITE, GREY);
-        text_string(1, 6, "Memory: 16KB                          ", 38, WHITE, GREY);
-        text_string(1, 7, "Font Test:                            ", 38, WHITE, GREY);
-        text_string(1, 8, "Colour Test:                          ", 38, WHITE, GREY);
-
-        // add smiley
-        text_set(0, 0, CHAR_SMILEY_INV, YELLOW, BLUE);
-        text_set(39, 2, CHAR_SMILEY_INV, YELLOW, GREY);
-
-        // colour test
-        for (char i = 0; i < 8; i++)
-        {
-            text_set(14 + i, 8, 0, BLACK, i);
-        }
-        text_set(22, 8, CHAR_SMILEY, RED, GREEN);
-        text_set(23, 8, CHAR_SMILEY_INV, BLUE, WHITE);
-
-        // font test
-        counter++;
-        if (counter > 128)
-        {
-            counter = 0;
-        }
-        text_set(12, 7, counter, BLACK, GREY);
-        delay_ms(100);
-        // uart_putc(charcode);
-    }
-
-    // int tmp=0;
-    // while (1)
-    // {
-    //     Q_SSEG = tmp;
-    //     terminal_write_char(oled_term, tmp, 1);
-    //     ssd1306_refresh(oled_term);
-    //     tmp++;
-    // }
-
-    //*/
-
-    /*     SSD1306 Font Test
-    char x = 0;
-    char y = 0;
-    ssd1306_set_cursor(x, y);
-    for (int i = 0; i < 64; i++){
-        // ssd1306_write_glyph(y * 16 + x);
-        ssd1306_write_glyph(i);
-        ssd1306_advance_cursor(&x, &y);
-        Q_SSEG_UPPER = x;
-        Q_SSEG_LOWER = y;
-        delay_ms(10);
-    }
-    delay_ms(1000);
-    ssd1306_clear_screen();
-    x = 0;
-    y = 0;
-    ssd1306_set_cursor(x, y);
-    for (int i = 65; i < 128; i++){
-        ssd1306_write_glyph(i);
-        ssd1306_advance_cursor(&x, &y);
-        Q_SSEG_UPPER = x;
-        Q_SSEG_LOWER = y;
-        delay_ms(10);
-    }
-    delay_ms(1000);
-    ssd1306_clear_screen();
-    x = 0;
-    y = 0;
-    ssd1306_set_cursor(x, y);
-    ssd1306_puts("The FPCA has booted!", &x, &y);
-    ssd1306_newline(&x, &y);
-    ssd1306_putc(0x1, &x, &y);
-    while (1)
+    for (u32 i = 0; i < 16; i++)
     {
+        write_u32((u32)0x10000000, i); // GPIO_LED
+        uart_puts("Hello there, this acts as a delay\n");
+        uart_puts("Hello there, this acts as a delay\n");
+        uart_puts("Hello there, this acts as a delay\n");
+        uart_puts("Hello there, this acts as a delay\n");
+        uart_puts("Hello there, this acts as a delay\n");
+        uart_puts("Hello there, this acts as a delay\n");
+        uart_puts("Hello there, this acts as a delay\n");
+        uart_puts("Hello there, this acts as a delay\n");
     }
-    //*/
 
-    uart_puts("ERR: Should never get here!");
+    text_string(1, 1, "=======================================", 39, WHITE, GREY);
+    text_string(1, 2, "Friendly Programmable Computing Asset  ", 39, WHITE, GREY);
+    text_string(1, 3, "=======================================", 39, WHITE, GREY);
+    text_string(1, 4, "Architecture: RISC-V RV32I            ", 38, WHITE, GREY);
+    text_string(1, 5, "Frequency: 25MHz                      ", 38, WHITE, GREY);
+    text_string(1, 6, "Memory: 16KB                          ", 38, WHITE, GREY);
+    text_string(1, 7, "Font Test:                            ", 38, WHITE, GREY);
+    text_string(1, 8, "Colour Test:                          ", 38, WHITE, GREY);
+
+    while(1){
+        uart_puts("A\n");
+        Q_SSEG = 0xc001;
+        uart_puts("B\n");
+        Q_SSEG = 0xc0de;
+    }
 }

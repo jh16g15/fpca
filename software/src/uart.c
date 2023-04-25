@@ -8,9 +8,9 @@
 #define UART_RX_VALID (*((volatile unsigned long *)0x20000010))
 
 // define in main.c
-#ifndef REFCLK
-#define REFCLK 50000000
-#endif
+// #ifndef REFCLK
+// #define REFCLK 50000000
+// #endif
 
 int uart_tx_ready(void){
     return UART_TX_IDLE;

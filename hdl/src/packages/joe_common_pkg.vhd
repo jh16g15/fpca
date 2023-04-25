@@ -11,12 +11,36 @@ package joe_common_pkg is
     type t_slv32_arr is array (integer range <>) of std_logic_vector(31 downto 0);
     type t_slv16_arr is array (integer range <>) of std_logic_vector(15 downto 0);
     type t_slv8_arr is array (integer range <>) of std_logic_vector(7 downto 0);
-    
+
+    function ascii2nibble(ascii:std_logic_vector(7 downto 0)) return std_logic_vector;
+    function nibble2ascii(nibble:std_logic_vector(3 downto 0)) return std_logic_vector;
+
+    --! Simple stream types (ready is optional and can be implemented separately)
+    type t_stream8 is record
+        data : std_logic_vector(7 downto 0);
+        valid : std_logic;
+    end record;
+    type t_stream16 is record
+        data : std_logic_vector(15 downto 0);
+        valid : std_logic;
+    end record;
+    type t_stream32 is record
+        data : std_logic_vector(31 downto 0);
+        valid : std_logic;
+    end record;
+
+    type t_stream8_arr is array (integer range <>) of t_stream8;
+    type t_stream16_arr is array (integer range <>) of t_stream16;
+    type t_stream32_arr is array (integer range <>) of t_stream32;
+    constant NULL_STREAM8 : t_stream8 := (data => (others => 'X'), valid => '0');
+    constant NULL_STREAM16 : t_stream16 := (data => (others => 'X'), valid => '0');
+    constant NULL_STREAM32 : t_stream32 := (data => (others => 'X'), valid => '0');
+
     --! Sign Extends a std_logic_vector
     function extend_slv(in_vec : std_logic_vector; new_len : integer := 32; sign_ext : std_logic := '1') return std_logic_vector;
-    --! converts integer to "signed" slv 
+    --! converts integer to "signed" slv
     function int2slv(in_int : integer; new_len : integer := 32) return std_logic_vector;
-    --! converts integer to "unsigned" slv 
+    --! converts integer to "unsigned" slv
     function uint2slv(in_uint : integer; new_len : integer := 32) return std_logic_vector;
     --! converts "unsigned" slv to integer
     function slv2uint(in_vec : std_logic_vector) return integer;
@@ -39,11 +63,60 @@ package joe_common_pkg is
     --! Initialise an 8-bit wide RAM from the contents of a file containing 32bit wide data
     -- impure function init_mem32_bytes(filepath : string; depth: integer := 2048; byte_index : integer := 0; hex_mode : std_logic := '1') return t_slv8_arr;
 
-    function test_bit(in_vec : std_logic_vector; i : integer) return boolean;    
+    function test_bit(in_vec : std_logic_vector; i : integer) return boolean;
 
 end package;
 
 package body joe_common_pkg is
+
+    --! Converts (lower-case only!) ASCII to a hex nibble
+    function ascii2nibble(ascii:std_logic_vector(7 downto 0)) return std_logic_vector is
+    begin
+        case(ascii) is
+            when x"30" => return x"0";
+            when x"31" => return x"1";
+            when x"32" => return x"2";
+            when x"33" => return x"3";
+            when x"34" => return x"4";
+            when x"35" => return x"5";
+            when x"36" => return x"6";
+            when x"37" => return x"7";
+            when x"38" => return x"8";
+            when x"39" => return x"9";
+            when x"61" => return x"a";
+            when x"62" => return x"b";
+            when x"63" => return x"c";
+            when x"64" => return x"d";
+            when x"65" => return x"e";
+            when x"66" => return x"f";
+            when others => return x"0";
+        end case;
+    end function;
+
+    --! Converts  a hex nibble to lower-case ASCII
+    function nibble2ascii(nibble:std_logic_vector(3 downto 0)) return std_logic_vector is
+    begin
+        case(nibble) is
+            when x"0"  => return x"30";
+            when x"1"  => return x"31";
+            when x"2"  => return x"32";
+            when x"3"  => return x"33";
+            when x"4"  => return x"34";
+            when x"5"  => return x"35";
+            when x"6"  => return x"36";
+            when x"7"  => return x"37";
+            when x"8"  => return x"38";
+            when x"9"  => return x"39";
+            when x"a"  => return x"61";
+            when x"b"  => return x"62";
+            when x"c"  => return x"63";
+            when x"d"  => return x"64";
+            when x"e"  => return x"65";
+            when x"f"  => return x"66";
+            when others => return x"00"; -- unecessary
+        end case;
+    end function;
+
 
     --! Returns the Ceiling of Log2(a)
     function clog2(a : positive) return positive is
@@ -61,12 +134,12 @@ package body joe_common_pkg is
         end if;
     end function;
 
-    --! converts integer to "signed" slv 
+    --! converts integer to "signed" slv
     function int2slv(in_int : integer; new_len : integer := 32) return std_logic_vector is
     begin
         return std_logic_vector(to_signed(in_int, new_len));
     end function;
-    --! converts integer to "unsigned" slv 
+    --! converts integer to "unsigned" slv
     function uint2slv(in_uint : integer; new_len : integer := 32) return std_logic_vector is
     begin
         return std_logic_vector(to_unsigned(in_uint, new_len));
@@ -122,7 +195,7 @@ package body joe_common_pkg is
                 readline(init_file, text_line);
                 case(hex_mode) is
                     when '1' => hread(text_line, mem_contents(i));
-                    when '0' => bread(text_line, mem_contents(i)); 
+                    when '0' => bread(text_line, mem_contents(i));
                     when others => hread(text_line, mem_contents(i));
                 end case;
             end if;
@@ -146,7 +219,7 @@ package body joe_common_pkg is
     --         readline(init_file, text_line);
     --         case(hex_mode) is
     --             when '1' => hread(text_line, line_contents);
-    --             when '0' => bread(text_line, line_contents); 
+    --             when '0' => bread(text_line, line_contents);
     --             when others => hread(text_line, line_contents);
     --         end case;
     --         mem_contents(i) := line_contents( 8*(byte_index+1)-1 downto 8*(byte_index));
@@ -155,7 +228,7 @@ package body joe_common_pkg is
     -- end function;
 
     function test_bit(in_vec : std_logic_vector; i : integer) return boolean is
-    begin 
+    begin
         return (in_vec(i) = '1');   -- True if '1'
     end function;
 
