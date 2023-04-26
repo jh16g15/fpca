@@ -229,7 +229,7 @@ begin
             DATA_W           => FONT_DATA_W,
             DEPTH            => FONT_DEPTH,
             USE_INIT_FILE    => true,
-            INIT_FILE_NAME   => "D:/Documents/vivado/microblaze_vga/tools/font_rom.txt",
+            INIT_FILE_NAME   => "D:/Documents/fpga/fpca/tools/font_rom8x16.txt",
             INIT_FILE_IS_HEX => false
         )
         port map(

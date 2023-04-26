@@ -2,6 +2,7 @@
 #ifndef _TEXT_DISPLAY_H_
 #define _TEXT_DISPLAY_H_
 
+#include "terminal.h"
 /* this support library lets us display characters on the screen (640x480)
 //
 // TODOs:
@@ -42,5 +43,6 @@
 void text_set(int x, int y, char charcode, char fg_col, char bg_col);
 void text_string(int x, int y, char *string, unsigned int length, char fg_col, char bg_col);
 void text_fill(int x1, int y1, int x2, int y2, char col);
+void text_refresh_from_terminal(t_terminal *t);
 
 #endif  //_TEXT_DISPLAY_H_
