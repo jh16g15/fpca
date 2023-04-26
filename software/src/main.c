@@ -57,14 +57,25 @@ void main(void)
     }
 
     // allocate a terminal for the text display
-    t_terminal *t = terminal_create(TEXT_W, TEXT_H);
+    // A) dynamically allocate (currently quite buggy, causes bus error due to misalign)
+    // t_terminal *t = terminal_create(TEXT_W, TEXT_H);
+
+    // B) Statically allocate
+    t_terminal *t;
+    char t_buf[TEXT_W * TEXT_H];
+    t->w = TEXT_W;
+    t->h = TEXT_H;
+    t->x = 0;
+    t->y = 0;
+    t->buf = t_buf;
+
     terminal_clear(t);
     while(1){
         uart_puts("A");
         Q_SSEG = 0xc001;
         uart_puts("B");
         terminal_write_string(t, "Hello there");   // this seems to be adding on an extra space after each string - autoadvancing on the nullchar?
-        // terminal_write_string(t, "This is a str
+        terminal_write_string(t, "This is a str");
         Q_SSEG = 0xbeef;
         text_refresh_from_terminal(t);
     }
