@@ -44,6 +44,8 @@ t_terminal *terminal_create(unsigned int w, unsigned int h)
     // init cursor to 0
     term->x = 0;
     term->y = 0;
+    term->line_at_top = 0;
+    return term;
 }
 
 // free all memory used by terminal
@@ -100,7 +102,6 @@ void terminal_write_char(t_terminal *t, char c, char auto_adv)
     int index = (t->y * t->w) + t->x;
     t->buf[index] = c;
     if (auto_adv && c) // if auto-advance and not null char
-    // if (auto_adv) // if auto-advance and not null char
     {
         terminal_advance_cursor(t);
     }

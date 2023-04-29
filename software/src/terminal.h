@@ -17,6 +17,7 @@ typedef struct
     char *buf;
     unsigned int x;      // cursor x
     unsigned int y;      // cursor y
+    unsigned int line_at_top; // line in buffer that is the currently top of the display
 } t_terminal;
 
 /*
