@@ -35,7 +35,7 @@ COPT = -O0
 CFLAGS= -g -c $(COPT)
 
 # Change the RV extensions here:
-CFLAGS_RV = $(CFLAGS) -march=rv32i -mabi=ilp32 -ffreestanding
+CFLAGS_RV = $(CFLAGS) -march=rv32i -mabi=ilp32 -ffreestanding -mstrict-align
 
 CC_PC=gcc
 CFLAGS_PC= $(CFLAGS)
