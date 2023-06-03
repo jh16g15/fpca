@@ -38,6 +38,9 @@ use IEEE.NUMERIC_STD.all;
 use work.pkg_vga_params_640_480_60hz.all;
 
 entity display_text_controller is
+    generic(
+        G_PROJECT_ROOT : string := ""
+    );
     port (
         pixelclk  : in std_logic;
         areset_n  : in std_logic;
@@ -63,6 +66,10 @@ entity display_text_controller is
 end display_text_controller;
 
 architecture rtl of display_text_controller is
+
+    constant INIT_TEXT_RAM_FILE : string := G_PROJECT_ROOT & "tools/text_ram.txt";
+    constant INIT_FONT_RAM_FILE : string := G_PROJECT_ROOT & "tools/font_rom8x16.txt";
+
     -- font parameters
     constant CHAR_W : integer := 8;
     constant CHAR_H : integer := 16;
@@ -97,8 +104,8 @@ architecture rtl of display_text_controller is
     signal text_dia   : std_logic_vector(TEXT_DATA_W - 1 downto 0);
     signal text_dob   : std_logic_vector(TEXT_DATA_W - 1 downto 0);
 
-    signal h_count     : integer;
-    signal v_count     : integer;
+    signal h_count     : integer := 0;
+    signal v_count     : integer := 0;
     signal h_count_d1  : integer;
     signal v_count_d1  : integer;
     signal h_count_d2  : integer;
@@ -176,8 +183,13 @@ begin
 
     -- Char Address mapping - which char we are in from the mem
     -- this is the first stage in the pipeline so don't use counter delays
-    char_x       <= to_integer(shift_right(to_unsigned(h_count, 32), 3)); -- 8 pixels width per char
-    char_y       <= to_integer(shift_right(to_unsigned(v_count, 32), 4)); -- 16 pixels width per char
+
+    char_x <= h_count / 8;
+    char_y <= v_count / 16;
+
+
+    -- char_x       <= to_integer(shift_right(to_unsigned(h_count, 32), 3)); -- 8 pixels width per char
+    -- char_y       <= to_integer(shift_right(to_unsigned(v_count, 32), 4)); -- 16 pixels height per char
     char_address <= char_y * CHARS_X + char_x;
 
     -------------------------------------------------------------------
@@ -192,7 +204,7 @@ begin
             DATA_W           => TEXT_DATA_W,
             DEPTH            => TEXT_DEPTH,
             USE_INIT_FILE    => true,
-            INIT_FILE_NAME   => "D:/Documents/vivado/microblaze_vga/tools/text_ram.txt",
+            INIT_FILE_NAME   => INIT_TEXT_RAM_FILE,
             INIT_FILE_IS_HEX => false
         )
         port map(
@@ -229,7 +241,7 @@ begin
             DATA_W           => FONT_DATA_W,
             DEPTH            => FONT_DEPTH,
             USE_INIT_FILE    => true,
-            INIT_FILE_NAME   => "D:/Documents/fpga/fpca/tools/font_rom8x16.txt",
+            INIT_FILE_NAME   => INIT_FONT_RAM_FILE,
             INIT_FILE_IS_HEX => false
         )
         port map(

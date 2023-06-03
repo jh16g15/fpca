@@ -17,6 +17,9 @@ use ieee.numeric_std.all;
 use work.wb_pkg.all;
 
 entity wb_display_text_controller is
+    generic(
+        G_PROJECT_ROOT : string := ""
+    );
     port (
         pixelclk  : in std_logic;
         areset_n  : in std_logic;
@@ -75,6 +78,9 @@ begin
     text_enable <= mem_enable and addr_decode_text;
 
     display_text_controller_inst : entity work.display_text_controller
+        generic map(
+            G_PROJECT_ROOT => G_PROJECT_ROOT
+        )
         port map(
             pixelclk       => pixelclk,
             areset_n       => areset_n,

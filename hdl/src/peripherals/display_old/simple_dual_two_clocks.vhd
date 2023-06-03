@@ -2,9 +2,11 @@
 -- Simple Dual-Port Block RAM with Two Clocks
 -- Correct Modelization with a Shared Variable
 -- File: simple_dual_two_clocks.vhd
+
+-- Modified to use numeric_std instead of std_logic_unsigned
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.std_logic_unsigned.all;
+use IEEE.numeric_std.all;
 use IEEE.std_logic_textio.all;
 
 library std;
@@ -74,7 +76,7 @@ begin
 		if clka'event and clka = '1' then
 			if ena = '1' then
 				if wea = '1' then
-					RAM(conv_integer(addra)) := dia;
+					RAM(to_integer(unsigned(addra))) := dia;
 				end if;
 			end if;
 		end if;
@@ -84,7 +86,7 @@ begin
 	begin
 		if clkb'event and clkb = '1' then
 			if enb = '1' then
-				dob <= RAM(conv_integer(addrb));
+				dob <= RAM(to_integer(unsigned(addrb)));
 			end if;
 		end if;
 	end process;
