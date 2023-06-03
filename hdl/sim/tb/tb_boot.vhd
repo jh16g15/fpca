@@ -32,6 +32,8 @@ architecture bench of tb_boot is
     signal text_display_wb_miso        : t_wb_miso;
     signal zynq_ps_peripherals_wb_mosi : t_wb_mosi;
     signal zynq_ps_peripherals_wb_miso : t_wb_miso;
+    signal ext_mem_wb_mosi : t_wb_mosi;
+    signal ext_mem_wb_miso : t_wb_miso;
 
 begin
     -- DUT
@@ -54,7 +56,9 @@ begin
             text_display_wb_mosi_out        => text_display_wb_mosi,
             text_display_wb_miso_in         => text_display_wb_miso,
             zynq_ps_peripherals_wb_mosi_out => zynq_ps_peripherals_wb_mosi,
-            zynq_ps_peripherals_wb_miso_in  => zynq_ps_peripherals_wb_miso
+            zynq_ps_peripherals_wb_miso_in  => zynq_ps_peripherals_wb_miso,
+            ext_mem_wb_mosi_out => ext_mem_wb_mosi,
+            ext_mem_wb_miso_in  => ext_mem_wb_miso
         );
 
     main : process

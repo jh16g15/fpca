@@ -7,16 +7,17 @@ context vunit_lib.vunit_context;
 use work.wb_pkg.all;
 use work.axi_pkg.all;
 
-entity tb_simple_soc is
+entity tb_basys3_soc is
     generic (runner_cfg : string);
-end tb_simple_soc;
+end tb_basys3_soc;
 
-architecture bench of tb_simple_soc is
+architecture bench of tb_basys3_soc is
     -- Clock period
     constant clk_period : time := 5 ns;
     -- Generics
+    constant G_PROJECT_ROOT : string := "/mnt/d/Documents/fpga/fpca/";
     -- constant G_MEM_INIT_FILE : string := "data/blinky.hex"; -- simulation
-    constant G_MEM_INIT_FILE : string := "../../software/hex/main.hex"; -- from toolchain
+    constant G_MEM_INIT_FILE : string := "software/hex/main.hex"; -- from toolchain
 
     -- Ports
     signal clk          : std_logic;
@@ -62,8 +63,9 @@ begin
     --         zynq_ps_peripherals_wb_miso_in  => zynq_ps_peripherals_wb_miso
     --     );
 
-    simple_soc_inst : entity work.simple_soc
+    simple_soc_inst : entity work.basys3_soc
         generic map(
+            G_PROJECT_ROOT => G_PROJECT_ROOT,
             G_MEM_INIT_FILE => G_MEM_INIT_FILE
         )
         port map(
@@ -78,10 +80,9 @@ begin
             uart_rx_in   => '1',
             i2c_scl_out                     => open,
             i2c_sda_out                     => open,
-            text_display_wb_mosi_out        => text_display_wb_mosi,
-            text_display_wb_miso_in         => text_display_wb_miso,
-            zynq_ps_peripherals_wb_mosi_out => zynq_ps_peripherals_wb_mosi,
-            zynq_ps_peripherals_wb_miso_in  => zynq_ps_peripherals_wb_miso
+
+            spi_miso_in => '0'
+
         );
 
     main : process

@@ -81,8 +81,8 @@ architecture rtl of simple_soc is
     attribute mark_debug                : boolean;
     attribute mark_debug of rw_regs_out : signal is true;
     attribute mark_debug of ro_regs_in  : signal is true;
-    attribute mark_debug of ext_mem_wb_mosi_out  : signal is true;
-    attribute mark_debug of ext_mem_wb_miso_in  : signal is true;
+    -- attribute mark_debug of ext_mem_wb_mosi_out  : signal is true;
+    -- attribute mark_debug of ext_mem_wb_miso_in  : signal is true;
     attribute mark_debug of wb_slave_mosi_arr  : signal is true;
     attribute mark_debug of wb_slave_miso_arr  : signal is true;
 

@@ -5,6 +5,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity basys3_simple_soc_wrapper is
+    generic (
+        G_PROJECT_ROOT : string := "D:/Documents/fpga/fpca/"
+    );
     port (
         clk : in std_logic; --! 100MHz
 
@@ -142,9 +145,10 @@ begin
 
     soc_inst : entity work.basys3_soc
         generic map(
+            G_PROJECT_ROOT => G_PROJECT_ROOT,
             G_MEM_INIT_FILE => G_MEM_INIT_FILE,
             G_BOOT_INIT_FILE => G_BOOT_INIT_FILE,
-            G_SOC_FREQ      => 50_000_000
+            G_SOC_FREQ      => 25_000_000
         )
         port map(
             clk          => clk25,

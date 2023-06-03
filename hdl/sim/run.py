@@ -53,8 +53,8 @@ def main():
 
     VU = VUnit.from_argv()
     VU.add_verification_components()
-
-    USE_GOWIN_SIMLIB = True # needed for simple_dual_port RAM block (TODO: replace this!)
+    print(f"Added verification components to library!")
+    USE_GOWIN_SIMLIB = False # needed for simple_dual_port RAM block (TODO: replace this!)
     gowin_simlib = "/mnt/c/Gowin/Gowin_V1.9.8.03_Education/IDE/simlib/gw1n/prim_sim.vhd"
 
     USE_XILINX_UNISIM = False
@@ -65,7 +65,8 @@ def main():
     xilinx_xpm_ghdl_precompiled = "/mnt/c/Xilinx/Vivado/2021.1/data/vhdl/ghdl/xilinx-vivado/xpm/v08/" #xpm-obj08.cf"
     xilinx_exclude = [
         "secureip",
-        "retarget"
+        "retarget",
+        "**/simulation"
     ]
 
 
@@ -76,7 +77,11 @@ def main():
 
     sim_dir = Path(__file__).parent
     sim_exclude = [
+        "./waves",
         "./vunit_out/ghdl/libraries",
+        "./vunit_out",
+        "./project_database",
+        "./preprocessed",
         "./tb_helpers/psram_memory_interface_hs_2ch/temp",
         "./tb_helpers/psram_memory_interface_hs_2ch/",
     ]
@@ -110,6 +115,9 @@ def main():
     else:
         VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08", "-frelaxed-rules"])
 
+    # allow for shared variables without protected types
+    VU.set_sim_option("ghdl.elab_flags", ["-frelaxed-rules"])
+
     if USE_XILINX_UNISIM:
         VU.add_library("unisim")
         add_some_files_to_vunit(VU, xilinx_unisim_dir, xilinx_exclude, "unisim")
@@ -117,6 +125,10 @@ def main():
         VU.add_library("xpm")
         add_some_files_to_vunit(VU, xilinx_xpm_vhdl, xilinx_exclude, "xpm")
         # VU.add_external_library("xpm", xilinx_xpm_ghdl_precompiled)
+
+    # Increase the maximum size  of a single object to get rid of this error
+    # /usr/local/bin/ghdl:error: declaration of a too large object (144 > --max-stack-alloc=128 KB)
+    VU.set_sim_option("ghdl.sim_flags", ["--max-stack-alloc=256"]) # value is in KB
 
     VU.main()
 

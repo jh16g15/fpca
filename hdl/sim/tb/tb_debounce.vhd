@@ -19,6 +19,7 @@ architecture bench of tb_debounce is
   constant REFCLK_FREQ : integer := 100_000_000;
   constant DEBOUNCE_PERIOD_MS : integer := 1;
   constant INIT_OUT : std_logic := '0';
+  constant WIDTH : integer := 1;
 
   -- Ports
   signal clk : std_logic;
@@ -31,12 +32,13 @@ begin
     generic map (
       REFCLK_FREQ => REFCLK_FREQ,
       DEBOUNCE_PERIOD_MS => DEBOUNCE_PERIOD_MS,
-      INIT_OUT => INIT_OUT
+      INIT_OUT => INIT_OUT,
+      WIDTH => WIDTH
     )
     port map (
       clk => clk,
-      val_in => val_in,
-      val_out => val_out
+      val_in(0) => val_in,
+      val_out(0) => val_out
     );
 
   main : process
