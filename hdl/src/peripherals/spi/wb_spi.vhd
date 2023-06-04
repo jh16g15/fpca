@@ -18,6 +18,9 @@ use work.joe_common_pkg.all;
 --
 -- Other registers have a 1-cycle response as normal
 entity wb_spi is
+    generic (
+        G_ILA : boolean := true
+    );
     port (
         wb_clk   : in std_logic;
         wb_reset : in std_logic;
@@ -55,6 +58,13 @@ architecture rtl of wb_spi is
     signal spi_sck_throttle    : std_logic_vector(7 downto 0) := DEFAULT_SPI_SPEED;
     signal spi_byte_to_write   : std_logic_vector(7 downto 0);
     signal spi_byte_read       : std_logic_vector(7 downto 0);
+    
+    attribute mark_debug : boolean;
+    attribute mark_debug of sck_out : signal is G_ILA;
+    attribute mark_debug of cs_n_out : signal is G_ILA;
+    attribute mark_debug of mosi_out : signal is G_ILA;
+    attribute mark_debug of miso_in : signal is G_ILA;
+    
 begin
 
     cs_n_out <= chip_selectn;
@@ -106,7 +116,7 @@ begin
                         if wb_mosi_in.we = '1' then
                             spi_sck_throttle <= wb_mosi_in.wdat(7 downto 0);
                         end if;
-                        wb_miso_out.rdat  <= spi_sck_throttle;
+                        wb_miso_out.rdat  <=  x"0000_00" & spi_sck_throttle;
                         wb_miso_out.ack   <= '1';
                         wb_miso_out.stall <= '0';
                         when others => null;

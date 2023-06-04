@@ -26,8 +26,6 @@ entity basys3_simple_soc_wrapper is
 
         RsTx : out std_logic;
         RsRx : in std_logic;
-        -- mirrored UART_TX for a logic analyser
-        JB : out std_logic_vector(0 downto 0);
         
         -- I2C SCL (0) / SDA (1)
         JC : out std_logic_vector(1 downto 0);
@@ -39,6 +37,13 @@ entity basys3_simple_soc_wrapper is
         SD_D1 : inout std_logic; 
         SD_D2 : inout std_logic;
         SD_D3 : inout std_logic; -- CS
+        
+        -- PMOD B SPI interface
+        SPI_CSN : out std_logic;
+        SPI_MOSI : out std_logic;
+        SPI_MISO : in std_logic;
+        SPI_SCK : out std_logic;
+        SPI_HOLDN : out std_logic;
         
         -- VGA Display
         vgaRed : out std_logic_vector(3 downto 0);
@@ -54,8 +59,8 @@ end entity basys3_simple_soc_wrapper;
 architecture rtl of basys3_simple_soc_wrapper is
 
     -- run location: fpca/boards/basys3/fpca
-    constant G_MEM_INIT_FILE : string := "../../../software/hex/main.hex"; -- from toolchain
-    constant G_BOOT_INIT_FILE : string := "../../../software/hex/boot.hex"; -- from toolchain
+    constant G_MEM_INIT_FILE : string := "software/hex/main.hex"; -- from project root
+    constant G_BOOT_INIT_FILE : string := "software/hex/boot.hex"; -- from project root
     signal gpio_led          : std_logic_vector(31 downto 0);
     signal gpio_sw           : std_logic_vector(31 downto 0);
     signal gpio_btn          : std_logic_vector(31 downto 0);
@@ -77,10 +82,10 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal i2c_scl : std_logic;
     signal i2c_sda : std_logic;
     
-    signal spi_sck : std_logic;
-    signal spi_miso : std_logic;
-    signal spi_mosi : std_logic;
-    signal spi_ss : std_logic;
+--    signal spi_sck : std_logic;
+--    signal spi_miso : std_logic;
+--    signal spi_mosi : std_logic;
+--    signal spi_csn : std_logic;
 
     component clk_wiz_0 is
         port (
@@ -136,13 +141,24 @@ begin
           val_in => sw,
           val_out => gpio_sw(15 downto 0)
         );
-
-
+    -- 7 Seg Display
     seg <= sseg_ca(6 downto 0);
     dp  <= sseg_ca(7);
-
     an <= sseg_an;
 
+    -- UART TX OUT
+    RsTx <= uart_tx;
+
+    -- UART RX IN
+    uart_rx <= RsRx;
+    
+    -- I2C
+    JC(0) <= i2c_scl;
+    JC(1) <= i2c_sda;
+    
+    -- SPI (23LC1024 SRAM)
+    SPI_HOLDN <= '1';
+    
     soc_inst : entity work.basys3_soc
         generic map(
             G_PROJECT_ROOT => G_PROJECT_ROOT,
@@ -162,24 +178,16 @@ begin
             uart_rx_in   => uart_rx,
             i2c_scl_out => i2c_scl,
             i2c_sda_out => i2c_sda,
-            spi_sck_out => spi_sck,
-            spi_miso_in => spi_miso,
-            spi_mosi_out => spi_mosi,
-            spi_ss_out => spi_ss,
+            spi_sck_out => SPI_SCK,
+            spi_miso_in => SPI_MISO,
+            spi_mosi_out => SPI_MOSI,
+            spi_csn_out => SPI_CSN,
             vga_hs_out => Hsync,
             vga_vs_out => Vsync,
             vga_r => vgaRed,
             vga_g => vgaGreen,
             vga_b => vgaBlue
         );
-        -- UART TX OUT
-        RsTx <= uart_tx;
-        JB(0) <= uart_tx;
-        -- UART RX IN
-        uart_rx <= RsRx;
-        
-        -- I2C
-        JC(0) <= i2c_scl;
-        JC(1) <= i2c_sda;
+
 
 end architecture;

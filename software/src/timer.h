@@ -13,6 +13,10 @@
         x8: Timer Threshold Register (32b)
         xC: PWM Threshold Register (32b)
  */
+
+#ifndef _TIMER_H_
+#define _TIMER_H_
+
 #define TIMER1_COUNT (*((volatile unsigned long *)0x30000000))
 #define TIMER1_CTRL (*((volatile unsigned long *)0x30000004))
 #define TIMER1_TOP (*((volatile unsigned long *)0x30000008))
@@ -34,3 +38,5 @@ void timer_set_threshold(unsigned int val);
 unsigned int timer_get_threshold(void);
 void timer_set_pwm_threshold(unsigned int val);
 unsigned int timer_get_pwm_threshold(void);
+
+#endif _TIMER_H_

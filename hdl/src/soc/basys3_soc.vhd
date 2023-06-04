@@ -10,7 +10,7 @@ use work.joe_common_pkg.all;
 
 entity basys3_soc is
     generic (
-        G_PROJECT_ROOT : string := "";
+        G_PROJECT_ROOT       : string  := "";
         G_MEM_INIT_FILE      : string  := "software/hex/main.hex";
         G_BOOT_INIT_FILE     : string  := "software/hex/boot.hex";
         G_SOC_FREQ           : integer := 50_000_000;
@@ -39,10 +39,10 @@ entity basys3_soc is
         i2c_sda_out : out std_logic;
 
         -- SPI (for SD card etc)
-        spi_sck_out : out std_logic;
-        spi_miso_in : in std_logic;
+        spi_sck_out  : out std_logic;
+        spi_miso_in  : in std_logic;
         spi_mosi_out : out std_logic;
-        spi_ss_out : out std_logic;
+        spi_csn_out   : out std_logic;
 
         vga_hs_out : out std_logic;
         vga_vs_out : out std_logic;
@@ -54,7 +54,7 @@ end entity basys3_soc;
 
 architecture rtl of basys3_soc is
 
-    constant MEM_INIT_FILE : string := G_PROJECT_ROOT & G_MEM_INIT_FILE;
+    constant MEM_INIT_FILE  : string := G_PROJECT_ROOT & G_MEM_INIT_FILE;
     constant BOOT_INIT_FILE : string := G_PROJECT_ROOT & G_BOOT_INIT_FILE;
 
     constant G_PC_RESET_ADDR : unsigned(31 downto 0) := x"0000_0000";
@@ -79,18 +79,18 @@ architecture rtl of basys3_soc is
     signal wb_slave_mosi_arr : t_wb_mosi_arr(G_NUM_SLAVES - 1 downto 0);
     signal wb_slave_miso_arr : t_wb_miso_arr(G_NUM_SLAVES - 1 downto 0);
 
--- Wishbone to framebuffer
+    -- Wishbone to framebuffer
     signal text_display_wb_mosi_out : t_wb_mosi;
     signal text_display_wb_miso_in  : t_wb_miso;
 
     signal rw_regs_out : t_slv32_arr(G_NUM_RW_REGS - 1 downto 0);
     signal ro_regs_in  : t_slv32_arr(G_NUM_RO_REGS - 1 downto 0);
 
-    attribute mark_debug                : boolean;
-    attribute mark_debug of rw_regs_out : signal is true;
-    attribute mark_debug of ro_regs_in  : signal is true;
-    attribute mark_debug of wb_cpu_sel_mosi  : signal is true;
-    attribute mark_debug of wb_cpu_sel_miso  : signal is true;
+    attribute mark_debug                    : boolean;
+    attribute mark_debug of rw_regs_out     : signal is true;
+    attribute mark_debug of ro_regs_in      : signal is true;
+    attribute mark_debug of wb_cpu_sel_mosi : signal is true;
+    attribute mark_debug of wb_cpu_sel_miso : signal is true;
 
     -- Seven Segment Display controller
     signal sseg_display_data : std_logic_vector(15 downto 0);
@@ -143,30 +143,30 @@ begin
     end generate;
 
     gen_jtag_true : if G_INCLUDE_JTAG_DEBUG = true generate
---        -- wraps a Xilinx JTAG-AXI master
---        jtag_wb_master_inst : jtag_wb_master
---        generic map(G_ILA => true)
---        port map(
---            clk         => clk,
---            reset       => reset,
---            wb_mosi_out => jtag_wb_mosi,
---            wb_miso_in  => jtag_wb_miso
---        );
---        -- 2:1 arbiter to choose between CPU and JTAG access
---        wb_debug_arbiter_inst : entity work.wb_arbiter
---            generic map(
---                G_ARBITER => "simple" -- most recently used
---            )
---            port map(
---                wb_clk                 => clk,
---                wb_reset               => reset,
---                wb_master_0_mosi_in    => wb_cpu_sel_mosi,
---                wb_master_0_miso_out   => wb_cpu_sel_miso,
---                wb_master_1_mosi_in    => jtag_wb_mosi,
---                wb_master_1_miso_out   => jtag_wb_miso,
---                wb_master_sel_mosi_out => wb_master_sel_mosi,
---                wb_master_sel_miso_in  => wb_master_sel_miso
---            );
+        --        -- wraps a Xilinx JTAG-AXI master
+        --        jtag_wb_master_inst : jtag_wb_master
+        --        generic map(G_ILA => true)
+        --        port map(
+        --            clk         => clk,
+        --            reset       => reset,
+        --            wb_mosi_out => jtag_wb_mosi,
+        --            wb_miso_in  => jtag_wb_miso
+        --        );
+        --        -- 2:1 arbiter to choose between CPU and JTAG access
+        --        wb_debug_arbiter_inst : entity work.wb_arbiter
+        --            generic map(
+        --                G_ARBITER => "simple" -- most recently used
+        --            )
+        --            port map(
+        --                wb_clk                 => clk,
+        --                wb_reset               => reset,
+        --                wb_master_0_mosi_in    => wb_cpu_sel_mosi,
+        --                wb_master_0_miso_out   => wb_cpu_sel_miso,
+        --                wb_master_1_mosi_in    => jtag_wb_mosi,
+        --                wb_master_1_miso_out   => jtag_wb_miso,
+        --                wb_master_sel_mosi_out => wb_master_sel_mosi,
+        --                wb_master_sel_miso_in  => wb_master_sel_miso
+        --            );
 
     end generate;
 
@@ -259,16 +259,16 @@ begin
             G_PROJECT_ROOT => G_PROJECT_ROOT
         )
         port map(
-            pixelclk => clk,
-            areset_n => not reset,
-            vga_hs => vga_hs_out,
-            vga_vs => vga_vs_out,
+            pixelclk  => clk,
+            areset_n  => not reset,
+            vga_hs    => vga_hs_out,
+            vga_vs    => vga_vs_out,
             vga_blank => open,
-            vga_r => vga_r,
-            vga_g => vga_g,
-            vga_b => vga_b,
+            vga_r     => vga_r,
+            vga_g     => vga_g,
+            vga_b     => vga_b,
 
-            text_display_wb_mosi_in => wb_slave_mosi_arr(4),
+            text_display_wb_mosi_in  => wb_slave_mosi_arr(4),
             text_display_wb_miso_out => wb_slave_miso_arr(4)
         );
 
@@ -283,7 +283,20 @@ begin
             sseg_an         => sseg_an_out
         );
 
-    gen_unmapped : for i in 5 to 14 generate
+    -- 0x5000_0000 SPI controller
+    wb_spi_inst : entity work.wb_spi
+        port map(
+            wb_clk      => clk,
+            wb_reset    => reset,
+            wb_mosi_in  => wb_slave_mosi_arr(5),
+            wb_miso_out => wb_slave_miso_arr(5),
+            sck_out     => spi_sck_out,
+            cs_n_out    => spi_csn_out,
+            mosi_out    => spi_mosi_out,
+            miso_in     => spi_miso_in
+        );
+
+    gen_unmapped : for i in 6 to 14 generate
         wb_unmapped_slv_inst : entity work.wb_unmapped_slv
             port map(
                 wb_mosi_in  => wb_slave_mosi_arr(i),

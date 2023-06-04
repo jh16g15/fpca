@@ -72,22 +72,24 @@ set_property -dict {PACKAGE_PIN U17 IOSTANDARD LVCMOS33} [get_ports btnD]
 
 
 ##Pmod Header JA
-set_property -dict {PACKAGE_PIN J1 IOSTANDARD LVCMOS33} [get_ports SD_D3]
-set_property -dict {PACKAGE_PIN L2 IOSTANDARD LVCMOS33} [get_ports SD_CLK]
-set_property -dict {PACKAGE_PIN J2 IOSTANDARD LVCMOS33} [get_ports SD_D1]
+
+#### SD CARD (not standard for PMOD)
+set_property -dict {PACKAGE_PIN J1 IOSTANDARD LVCMOS33} [get_ports SD_D3] ; #JA0    CSn
+set_property -dict {PACKAGE_PIN L2 IOSTANDARD LVCMOS33} [get_ports SD_CLK] ; #JA1   SCLK
+set_property -dict {PACKAGE_PIN J2 IOSTANDARD LVCMOS33} [get_ports SD_D1] ; #JA2
 #set_property -dict { PACKAGE_PIN G2   IOSTANDARD LVCMOS33 } [get_ports {JA[3]}];#Sch name = JA4
-set_property -dict {PACKAGE_PIN H1 IOSTANDARD LVCMOS33} [get_ports SD_D2]
-set_property -dict {PACKAGE_PIN K2 IOSTANDARD LVCMOS33} [get_ports SD_CMD]
-set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports SD_D0]
+set_property -dict {PACKAGE_PIN H1 IOSTANDARD LVCMOS33} [get_ports SD_D2] ; #JA4
+set_property -dict {PACKAGE_PIN K2 IOSTANDARD LVCMOS33} [get_ports SD_CMD] ; #JA5   MISO
+set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports SD_D0] ; #JA6    MOSI
 #set_property -dict { PACKAGE_PIN G3   IOSTANDARD LVCMOS33 } [get_ports {JA[7]}];#Sch name = JA10
 
 ##Pmod Header JB
-set_property -dict {PACKAGE_PIN A14 IOSTANDARD LVCMOS33} [get_ports {JB[0]}]
-#set_property -dict { PACKAGE_PIN A16   IOSTANDARD LVCMOS33 } [get_ports {JB[1]}];#Sch name = JB2
-#set_property -dict { PACKAGE_PIN B15   IOSTANDARD LVCMOS33 } [get_ports {JB[2]}];#Sch name = JB3
-#set_property -dict { PACKAGE_PIN B16   IOSTANDARD LVCMOS33 } [get_ports {JB[3]}];#Sch name = JB4
+set_property -dict {PACKAGE_PIN A14    IOSTANDARD LVCMOS33 } [get_ports SPI_CSN] ;#Sch name = JB1
+set_property -dict { PACKAGE_PIN A16   IOSTANDARD LVCMOS33 } [get_ports SPI_MOSI] ;#Sch name = JB2
+set_property -dict { PACKAGE_PIN B15   IOSTANDARD LVCMOS33 } [get_ports SPI_MISO] ;#Sch name = JB3
+set_property -dict { PACKAGE_PIN B16   IOSTANDARD LVCMOS33 } [get_ports SPI_SCK] ;#Sch name = JB4
 #set_property -dict { PACKAGE_PIN A15   IOSTANDARD LVCMOS33 } [get_ports {JB[4]}];#Sch name = JB7
-#set_property -dict { PACKAGE_PIN A17   IOSTANDARD LVCMOS33 } [get_ports {JB[5]}];#Sch name = JB8
+set_property -dict { PACKAGE_PIN A17   IOSTANDARD LVCMOS33 } [get_ports SPI_HOLDN];#Sch name = JB8
 #set_property -dict { PACKAGE_PIN C15   IOSTANDARD LVCMOS33 } [get_ports {JB[6]}];#Sch name = JB9
 #set_property -dict { PACKAGE_PIN C16   IOSTANDARD LVCMOS33 } [get_ports {JB[7]}];#Sch name = JB10
 
