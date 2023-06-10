@@ -22,7 +22,7 @@ entity wb_display_text_controller is
     );
     port (
         pixelclk  : in std_logic;
-        areset_n  : in std_logic;
+        reset     : in std_logic;
         vga_hs    : out std_logic;
         vga_vs    : out std_logic;
         vga_blank : out std_logic;
@@ -37,8 +37,6 @@ entity wb_display_text_controller is
 end entity wb_display_text_controller;
 
 architecture rtl of wb_display_text_controller is
-    signal reset : std_logic;
-
     signal mem_enable : std_logic;
     signal mem_we     : std_logic;
     signal mem_addr   : std_logic_vector(31 downto 0);
@@ -51,7 +49,6 @@ architecture rtl of wb_display_text_controller is
     signal addr_decode_text : std_logic;
 
 begin
-    reset <= not areset_n;
 
     wb_mem_shim_inst : entity work.wb_mem_shim
         port map(
@@ -83,7 +80,6 @@ begin
         )
         port map(
             pixelclk       => pixelclk,
-            areset_n       => areset_n,
             vga_hs         => vga_hs,
             vga_vs         => vga_vs,
             vga_blank      => vga_blank,

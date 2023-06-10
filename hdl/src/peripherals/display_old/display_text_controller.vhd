@@ -43,7 +43,6 @@ entity display_text_controller is
     );
     port (
         pixelclk  : in std_logic;
-        areset_n  : in std_logic;
         vga_hs    : out std_logic;
         vga_vs    : out std_logic;
         vga_blank : out std_logic;
@@ -152,32 +151,27 @@ begin
     -------------------------------------------------------------------
     -- Stage 1: Hcount and Vcount counters, CharAddress calculation
     -------------------------------------------------------------------
-    sync_counters : process (pixelclk, areset_n)
+    sync_counters : process (pixelclk)
     begin
-        if areset_n = '0' then
-            h_count <= 0;
-            v_count <= 0;
-        else
-            -- TODO: we could add an "early reset" to the delayed h/v_count
-            --       to bring them back to 0 near the end of the back porch
-            --       so we have time to propagate the first char data through
-            --       the pipeline
-            if rising_edge(pixelclk) then
-                -- counters
-                if h_count >= END_BPORCH_X then
-                    h_count <= 0;
-                else
-                    h_count <= h_count + 1;
-                end if;
-                if v_count >= END_BPORCH_Y then
-                    v_count <= 0;
-                else
-                    if h_count >= END_BPORCH_X then
-                        v_count <= v_count + 1;
-                    end if;
-                end if;
-
+        -- TODO: we could add an "early reset" to the delayed h/v_count
+        --       to bring them back to 0 near the end of the back porch
+        --       so we have time to propagate the first char data through
+        --       the pipeline
+        if rising_edge(pixelclk) then
+            -- counters
+            if h_count >= END_BPORCH_X then
+                h_count <= 0;
+            else
+                h_count <= h_count + 1;
             end if;
+            if v_count >= END_BPORCH_Y then
+                v_count <= 0;
+            else
+                if h_count >= END_BPORCH_X then
+                    v_count <= v_count + 1;
+                end if;
+            end if;
+
         end if;
     end process;
 

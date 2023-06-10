@@ -260,7 +260,7 @@ begin
         )
         port map(
             pixelclk  => clk,
-            areset_n  => not reset,
+            reset     => reset,
             vga_hs    => vga_hs_out,
             vga_vs    => vga_vs_out,
             vga_blank => open,
