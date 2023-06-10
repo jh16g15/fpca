@@ -44,7 +44,7 @@ t_terminal *terminal_create(unsigned int w, unsigned int h)
     // init cursor to 0
     term->x = 0;
     term->y = 0;
-    term->line_at_top = 0;
+    term->line_at_top = 1; // text is entered on the bottom visible line, so start of visible area is one more (wraps round)
     return term;
 }
 
@@ -77,6 +77,7 @@ void terminal_advance_cursor(t_terminal *t)
     {                    // if x overflow (max = w-1)
         t->x = 0;        // set x to 0
         t->y = t->y + 1; // inc cursor y
+        terminal_scroll_one_line(t); // as we've increased Y, scroll the screen
         if (t->y >= t->h)
         {             // if y overflow (max = h-1)
             t->y = 0; // set y to 0
@@ -130,6 +131,7 @@ void terminal_write_string(t_terminal *t, char *s)
         {
         case '\n':
             unsigned int y = (t->y + 1) % t->h; // x=0, increment y
+            terminal_scroll_one_line(t); // as we've increased Y, scroll the screen
             terminal_set_cursor(t, 0, y);
             break;
         case '\r':
@@ -144,4 +146,20 @@ void terminal_write_string(t_terminal *t, char *s)
         }
         s++;                           // increment pointer to move through array
     } while (c != '\0');
+}
+
+void terminal_scroll_one_line(t_terminal *t)
+{
+    // clear the line that's about to wrap round
+    unsigned int start_loc = t->line_at_top * t->w;
+    for (int i = 0; i < t->w; i++)
+    {
+        t->buf[start_loc+i] = 0;
+    }
+
+    // move the pointer to the top of the screen
+    t->line_at_top++;
+    if (t->line_at_top >= t->h){
+        t->line_at_top = 0;
+    }
 }

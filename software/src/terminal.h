@@ -40,7 +40,8 @@ void terminal_advance_cursor(t_terminal *t);
 // Set the cursor position (clamp at w, h)
 void terminal_set_cursor(t_terminal *t, unsigned int x, unsigned int y);
 
-
+// scroll the window down one line
+void terminal_scroll_one_line(t_terminal *t);
 
 // write a byte at the current cursor position (optional call to terminal_advance_cursor)
 void terminal_write_char(t_terminal *t, char c, char auto_adv);

@@ -26,11 +26,18 @@ void text_fill(int x1, int y1, int x2, int y2, char col){
 
 // copy text from a buffer to the screen (monochrome)
 void text_refresh_from_terminal(t_terminal *t){
+    unsigned int mem_row = t->line_at_top;
     // for each row of text
     for (int row = 0; row < TEXT_H; row++){
+
+
         // write each character to the display
         for (int col = 0; col < TEXT_W; col++){
-            text_set(col, row, t->buf[(row * TEXT_W) + col], WHITE, BLACK);
+            text_set(col, row, t->buf[(mem_row * TEXT_W) + col], WHITE, BLACK);
+        }
+        mem_row++;
+        if (mem_row >= t->h){
+            mem_row = 0;
         }
     }
 }
