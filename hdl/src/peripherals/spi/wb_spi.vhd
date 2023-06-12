@@ -98,7 +98,7 @@ begin
                     -- combined read and write logic
                     case(wb_mosi_in.adr(3 downto 0)) is
                         when x"0" => -- Trigger a transfer
-                        spi_byte_to_write <= wb_mosi_in.wdat(7 downto 0) when wb_mosi_in.we = '1' else x"00";
+                        spi_byte_to_write <= wb_mosi_in.wdat(7 downto 0) when wb_mosi_in.we = '1' else x"ff";
 
                         spi_start_strb    <= '1';
                         wait_for_transfer <= '1';
@@ -138,6 +138,7 @@ begin
     simple_mspi_inst : entity work.simple_mspi
         port map(
             clk      => wb_clk,
+            sck_throttle_in => spi_sck_throttle,
             byte_in  => spi_byte_to_write,
             strb_in  => spi_start_strb,
             byte_out => spi_byte_read,
