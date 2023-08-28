@@ -31,7 +31,8 @@ EOT = b'\x04'
 ###########################
 
 PROG_MEM_MAX = 4096 * 4 # 16KB
-RESERVED_STACK_HEAP_SPACE = 1024 # warn if less than 1KB stack/heap space
+CONSOLE_RESERVED_SPACE = 80 * 30 * 1 + 512 # width, height, bytes per char, extra room
+RESERVED_STACK_HEAP_SPACE = 1024 + CONSOLE_RESERVED_SPACE # warn if less than 1KB stack/heap space
 
 def send_bin_file(bin_file, uart):
     print(f"Opening {bin_file} binary...")
