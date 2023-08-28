@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 use work.riscv_instructions_pkg.all;
 
--- 
+--
 -- Instruction Decoder
 --
 -- Extracts Register Addresses, assembles and sign-extends immediates
@@ -20,9 +20,9 @@ entity cpu_decode is
         instr_in       : in std_logic_vector(31 downto 0);
 
         -- Register Addresses
-        rs1_addr_out : out std_logic_vector(4 downto 0); -- R, I, S, B
-        rs2_addr_out : out std_logic_vector(4 downto 0); -- R, S, B
-        rd_addr_out  : out std_logic_vector(4 downto 0); -- R, I, U, J
+        rs1_addr_out : out std_logic_vector(4 downto 0) := (others => '0' ); -- R, I, S, B
+        rs2_addr_out : out std_logic_vector(4 downto 0) := (others => '0' ); -- R, S, B
+        rd_addr_out  : out std_logic_vector(4 downto 0) := (others => '0' ); -- R, I, U, J
 
         -- Sign Extended Immediate
         imm_out : out std_logic_vector(31 downto 0); -- I, S, B, U, J

@@ -18,7 +18,7 @@ entity cpu_instr_fetch is
 
         fetch_req_in    : in std_logic;
         instr_valid_out : out std_logic;
-        instr_out       : out std_logic_vector(31 downto 0);
+        instr_out       : out std_logic_vector(31 downto 0) := (others => '0' );
         fetch_err_out   : out std_logic;
         fetch_busy_out  : out std_logic;
 

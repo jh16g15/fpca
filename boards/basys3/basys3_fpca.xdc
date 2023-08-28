@@ -79,7 +79,7 @@ set_property -dict {PACKAGE_PIN L2 IOSTANDARD LVCMOS33} [get_ports SD_CLK] ; #JA
 set_property -dict {PACKAGE_PIN J2 IOSTANDARD LVCMOS33} [get_ports SD_D1] ; #JA2
 #set_property -dict { PACKAGE_PIN G2   IOSTANDARD LVCMOS33 } [get_ports {JA[3]}];#Sch name = JA4
 set_property -dict {PACKAGE_PIN H1 IOSTANDARD LVCMOS33} [get_ports SD_D2] ; #JA4
-set_property -dict {PACKAGE_PIN K2 IOSTANDARD LVCMOS33} [get_ports SD_CMD] ; #JA5   MISO
+set_property -dict {PACKAGE_PIN K2 IOSTANDARD LVCMOS33 PULLUP TRUE} [get_ports SD_CMD] ; #JA5   MISO
 set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports SD_D0] ; #JA6    MOSI
 #set_property -dict { PACKAGE_PIN G3   IOSTANDARD LVCMOS33 } [get_ports {JA[7]}];#Sch name = JA10
 
