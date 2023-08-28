@@ -18,8 +18,9 @@ COM_ID = sys.argv[1]
 
 TEST_COM = "COM6"
 
-
-
+###########################
+# CONTROL CHARACTERS
+###########################
 XON = b'\x11'
 XOFF = b'\x13'
 
@@ -27,7 +28,10 @@ SOH = b'\x01'
 STX = b'\x02'
 ETX = b'\x03'
 EOT = b'\x04'
+###########################
 
+PROG_MEM_MAX = 4096 * 4 # 16KB
+RESERVED_STACK_HEAP_SPACE = 1024 # warn if less than 1KB stack/heap space
 
 def send_bin_file(bin_file, uart):
     print(f"Opening {bin_file} binary...")
@@ -48,7 +52,10 @@ def send_bin_file(bin_file, uart):
                 if (count >= ten_percent):
                     print(".", end="", flush=True)
                     count = 0
-            print(f"sent {lenfile} bytes!")
+            print(f"sent {lenfile} bytes! (max size {PROG_MEM_MAX})")
+            print(f"{PROG_MEM_MAX - lenfile} bytes remaining for the heap/stack")
+            if lenfile + RESERVED_STACK_HEAP_SPACE > PROG_MEM_MAX:
+                print(f"Warning: Program may be too large! Does not meet reserved space of {RESERVED_STACK_HEAP_SPACE} bytes")
 
 
 
