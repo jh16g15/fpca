@@ -6,7 +6,8 @@ use ieee.numeric_std.all;
 
 entity basys3_simple_soc_wrapper is
     generic (
-        G_PROJECT_ROOT : string := "D:/Documents/fpga/fpca/"
+        G_PROJECT_ROOT : string := "D:/Documents/fpga/fpca/";
+        G_SD_CARD_INSTEAD_OF_SPI_SRAM : boolean := true
     );
     port (
         clk : in std_logic; --! 100MHz
@@ -32,7 +33,7 @@ entity basys3_simple_soc_wrapper is
         
         -- SD Card (Native interface) -- SPI Interface
         SD_CLK : out std_logic; -- SCLK
-        SD_CMD : inout std_logic; -- DI
+        SD_CMD : inout std_logic; -- DI (pullup=true)
         SD_D0 : inout std_logic; -- DO
         SD_D1 : inout std_logic; 
         SD_D2 : inout std_logic;
@@ -82,10 +83,10 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal i2c_scl : std_logic;
     signal i2c_sda : std_logic;
     
---    signal spi_sck : std_logic;
---    signal spi_miso : std_logic;
---    signal spi_mosi : std_logic;
---    signal spi_csn : std_logic;
+    signal i_spi_sck : std_logic;
+    signal i_spi_miso : std_logic;
+    signal i_spi_mosi : std_logic;
+    signal i_spi_csn : std_logic;
 
     component clk_wiz_0 is
         port (
@@ -156,8 +157,27 @@ begin
     JC(0) <= i2c_scl;
     JC(1) <= i2c_sda;
     
-    -- SPI (23LC1024 SRAM)
-    SPI_HOLDN <= '1';
+    
+    gen_spi_sel : if G_SD_CARD_INSTEAD_OF_SPI_SRAM = false generate
+        -- SPI (23LC1024 SRAM)
+        SPI_HOLDN <= '1';
+        SPI_SCK <= i_spi_sck;
+        SPI_CSN <= i_spi_csn;
+        SPI_MOSI <= i_spi_mosi;
+        i_spi_miso <= SPI_MISO;
+    end generate;
+    
+    gen_sdcard_sel : if G_SD_CARD_INSTEAD_OF_SPI_SRAM = true generate
+        -- SPI (PMOD-SD Card)
+        SD_CLK <= i_spi_sck;
+        SD_D3 <= i_spi_csn;
+        SD_CMD <= i_spi_mosi; --(pullup=true)
+        i_spi_miso <= SD_D0;
+        -- unused for SD card in SPI mode
+        SD_D1 <= '0';
+        SD_D2 <= '0';
+    end generate;
+
     
     soc_inst : entity work.basys3_soc
         generic map(
@@ -178,10 +198,10 @@ begin
             uart_rx_in   => uart_rx,
             i2c_scl_out => i2c_scl,
             i2c_sda_out => i2c_sda,
-            spi_sck_out => SPI_SCK,
-            spi_miso_in => SPI_MISO,
-            spi_mosi_out => SPI_MOSI,
-            spi_csn_out => SPI_CSN,
+            spi_sck_out => i_spi_sck,
+            spi_miso_in => i_spi_miso,
+            spi_mosi_out => i_spi_mosi,
+            spi_csn_out => i_spi_csn,
             vga_hs_out => Hsync,
             vga_vs_out => Vsync,
             vga_r => vgaRed,

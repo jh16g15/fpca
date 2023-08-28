@@ -12,8 +12,7 @@
 #include "utils.h"
 // #include "ssd1306_i2c.h"
 #include "spi.h"
-#include "terminal.h"
-#include "text_display.h"
+#include "console.h"
 
 void wait_for_btn_press(int btn){
     while(get_bit(GPIO_BTN, btn) != 0){} // wait for 0
@@ -73,16 +72,6 @@ void spi_test(){
 
 void main(void)
 {
-    // if SW0 set on reset, jump to the bootloader
-    // TODO: Move this to the crt0.s Startup script
-    if (get_bit(GPIO_SW, 0))
-    {
-        // Jump to bootloader _start
-        asm(
-            "la t0,0xf0000000;"
-            "jr t0;");
-    }
-
     Q_SSEG = 0xc0de;
     uart_set_baud(9600);
     GPIO_LED = 0xF;
@@ -96,51 +85,51 @@ void main(void)
 
     // initial setup of text framebuffer
     // text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);
-    // text_string(1, 1, "=======================================", 39, WHITE, GREY);
-    // text_string(1, 2, "Friendly Programmable Computing Asset  ", 39, WHITE, GREY);
-    // text_string(1, 3, "=======================================", 39, WHITE, GREY);
-    // text_string(1, 4, "Architecture: RISC-V RV32I            ", 38, WHITE, GREY);
-    // text_string(1, 5, "Frequency: 25MHz                      ", 38, WHITE, GREY);
-    // text_string(1, 6, "Memory: 16KB                          ", 38, WHITE, GREY);
-    // text_string(1, 7, "Font Test:                            ", 38, WHITE, GREY);
-    // text_string(1, 8, "Colour Test:                          ", 38, WHITE, GREY);
 
+    console_init();
+    cls();
+    print("Hello World\n");
 
-    // A) dynamically allocate (currently quite buggy, causes bus error due to misalign)
-    // t_terminal *t = terminal_create(TEXT_W, TEXT_H);
-
-    // B) Statically allocate
-    t_terminal *t;
-    char t_buf[TEXT_W * TEXT_H];
-    t->w = TEXT_W;
-    t->h = TEXT_H;
-    t->x = 0;
-    t->y = 0;
-    t->buf = t_buf;
-    t->line_at_top = 1;
-
-    u8 linebuf[80];
-    u32 count = 0;
-    terminal_clear(t);
-    text_refresh_from_terminal(t);
-    terminal_write_string(t, "Jello");
-    text_refresh_from_terminal(t);
-
-    wait_for_btn_press(BTN_U);
 
     while(1){
-        // add line number at start
-        u32_to_hstring(count, linebuf, 80);
-        terminal_write_string(t, "\n"); // we get a bit more on the screen if we have the \n at the start
-        terminal_write_string(t, linebuf);
-        count++;
-
-        terminal_write_string(t, " This is a string");
-
-        Q_SSEG = 0x1000;
-        wait_for_btn_press(BTN_L);
-        text_refresh_from_terminal(t);
-        Q_SSEG = 0x0001;
-        // wait_for_btn_press(BTN_R);
+        print("console is working!");
+        print("console is working!");
+        print("console is working!");
+        print("console is working!");
+        // cls();
     }
+
+
+    // u8 linebuf[80];
+    // u32 count = 0;
+    // terminal_clear(t);
+    // text_refresh_from_terminal(t);
+    // terminal_write_string(t, "Jello\n");
+
+    // terminal_write_string(t, "=======================================\n");
+    // terminal_write_string(t, "Friendly Programmable Computing Asset  \n");
+    // terminal_write_string(t, "=======================================\n");
+    // terminal_write_string(t, "Architecture: RISC-V RV32I             \n");
+    // terminal_write_string(t, "Frequency: 25MHz                       \n");
+    // terminal_write_string(t, "Memory: 16KB                           \n");
+    // terminal_write_string(t, "Press the UP button to continue\n");
+
+    // text_refresh_from_terminal(t);
+    // wait_for_btn_press(BTN_U);
+
+    // while(1){
+    //     // add line number at start
+    //     u32_to_hstring(count, linebuf, 80);
+    //     terminal_write_string(t, "\n"); // we get a bit more on the screen if we have the \n at the start
+    //     terminal_write_string(t, linebuf);
+    //     count++;
+
+    //     terminal_write_string(t, " This is a string");
+
+    //     Q_SSEG = 0x1000;
+    //     wait_for_btn_press(BTN_L);
+    //     text_refresh_from_terminal(t);
+    //     Q_SSEG = 0x0001;
+    //     // wait_for_btn_press(BTN_R);
+    // }
 }

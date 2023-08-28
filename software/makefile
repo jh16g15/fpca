@@ -17,7 +17,9 @@ build/utils.o \
 build/ssd1306_i2c.o \
 build/terminal.o \
 build/text_display.o \
-build/spi.o
+build/spi.o \
+build/console.o
+
 
 boot_objects = \
 build/minimal_boot.o
@@ -117,6 +119,9 @@ hosted :
 	$(CC_PC) -g src/hosted-test.c -o build/hosted-test
 	./build/hosted-test
 
+build/lib/*/%.o : src/lib/*/%.c
+	@echo building $@ from $<
+	$(CC) $(CFLAGS_RV)  $< -o $@
 
 build/%.o : src/%.c
 	@echo building $@ from $<

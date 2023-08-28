@@ -22,11 +22,14 @@
 
 #define GPIO_LED (*((volatile unsigned long *)0x10000000))
 #define SSEG (*((volatile unsigned long *)0x10000004))
-#define RW2 (*((volatile unsigned long *)0x10000008))
-#define RW3 (*((volatile unsigned long *)0x1000000C))
+#define GPIO_SW (*((volatile unsigned long *)0x10000104))
 
 #define MAIN_RAM_LEN 16384   // bytes
 
+int get_bit(int reg, int bitnum)
+{
+    return (reg >> bitnum) & 0x1;
+}
 
 // prints a char to the UART
 void uart_put_char(char c)
@@ -45,6 +48,17 @@ unsigned char uart_get_char(void){
 
 void main(void)
 {
+
+    // if SW0 set on reset, jump to the main code instead of waiting for new program
+    if (get_bit(GPIO_SW, 0))
+    {
+        // Jump to main _start
+        asm(
+            "la t0,0x00000000;"
+            "jr t0;");
+    }
+
+
     // set Baud rate to 115200
     UART_DIVISOR = REFCLK / 115200;   // compile - time
 
@@ -79,7 +93,7 @@ void main(void)
     } while (gotc != STX);
 
     // store the subsequent bytes into memory one at a time, incrementing each time
-    // Keep doing this until we are reset (with SW15=0 to skip the bootloader)
+    // Keep doing this until we are reset (with SW0=1 to skip the bootloader)
     gotc = uart_get_char(); // get the first byte
     while (1) {
         *mem = gotc;    // store it to memory

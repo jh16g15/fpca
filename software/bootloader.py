@@ -56,7 +56,7 @@ print(f"Opening Serial Port {COM_ID}")
 # defaults: 9600 baud, 8,N,1
 with serial.Serial(COM_ID, baudrate = 115200, timeout = 5) as uart:
 # with serial.Serial(COM_ID) as uart:
-    print(f"{COM_ID} Open!, waiting to enter Bootloader (Reset with SW0=1)")
+    print(f"{COM_ID} Open!, waiting to enter Bootloader (Reset with SW0=0)")
 
     # don't wait for response when testing with logic analyser
     if (COM_ID != TEST_COM):
@@ -90,7 +90,7 @@ with serial.Serial(COM_ID, baudrate = 115200, timeout = 5) as uart:
     send_bin_file(main_bin, uart)
 
     print("Bootloader Ended, program Uploaded!")
-    print("set SW0 to 0 and reset to start updated program")
+    print("set SW0 to 1 and reset to start updated program")
 
 
 
