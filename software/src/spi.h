@@ -14,7 +14,10 @@
 
 void spi_start(void);
 void spi_stop(void);
+
+// TEST BYTE WRITE
 void spi_write_byte(char);
 char spi_read_byte(void);
+void spi_set_throttle(char throttle);
 
 #endif // _SPI_H_

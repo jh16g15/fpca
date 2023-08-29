@@ -171,11 +171,11 @@ begin
         -- SPI (PMOD-SD Card)
         SD_CLK <= i_spi_sck;
         SD_D3 <= i_spi_csn;
-        SD_CMD <= i_spi_mosi; --(pullup=true)
+        SD_CMD <= i_spi_mosi;
         i_spi_miso <= SD_D0;
         -- unused for SD card in SPI mode
-        SD_D1 <= '0';
-        SD_D2 <= '0';
+        SD_D1 <= '1';
+        SD_D2 <= '1';
     end generate;
 
     

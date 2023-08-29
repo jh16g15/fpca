@@ -6,6 +6,10 @@
 # $?	Names of all prerequisites newer than the target
 # $^	Names of all prerequisites
 
+
+#############################################################
+# Variables
+#############################################################
 COM_PORT = COM4
 
 # we should really pass the std lib (libgcc.a) to the linker as a libray
@@ -21,10 +25,28 @@ build/text_display.o \
 build/spi.o \
 build/console.o
 
-lib_objects = \
-build/lib/printf.o
+lib_printf_includes = -Isrc/lib/printf/src -Isrc/lib/printf/src/printf
+lib_printf_objects = build/lib/printf.o
 
-LIB_INCLUDES = -Isrc/lib/printf/src
+lib_sdcard_includes = -Isrc/lib/sdcard
+lib_sdcard_objects = build/lib/mmc.o
+
+lib_fatfs_includes = -Isrc/lib/fatfs
+lib_fatfs_objects = \
+build/lib/ff.o \
+build/lib/ffsystem.o \
+build/lib/ffunicode.o
+
+lib_objects = \
+$(lib_printf_objects) \
+$(lib_sdcard_objects)
+# $(lib_fatfs_objects)
+
+LIB_INCLUDES = \
+$(lib_printf_includes) \
+$(lib_fatfs_includes) \
+$(lib_sdcard_includes)
+
 # for configuring libraries
 LIB_DEFINES = -DPRINTF_INCLUDE_CONFIG_H=1
 
@@ -42,7 +64,7 @@ ASCII_HEX_TO_BIN=xxd -r -p
 COPT = -O0
 
 # compile only
-CFLAGS= -g -c $(COPT) $(LIB_INCLUDES) $(LIB_DEFINES)
+CFLAGS= -g -c $(COPT) -Isrc $(LIB_INCLUDES) $(LIB_DEFINES)
 
 # Change the RV extensions here:
 CFLAGS_RV = $(CFLAGS) -march=rv32i -mabi=ilp32 -ffreestanding -mstrict-align
@@ -59,44 +81,21 @@ LDFLAGS = -Map=build/output.map
 # As we are running without an OS, for syscalls we use libnosys.a (_sbrk etc)
 LDFLAGS_RV = $(LDFLAGS) -lgcc -lg_nano -lnosys --gc-sections  -T riscv32-fpca.ld
 
+#############################################################
+# Main Outputs
+#############################################################
 # as this is the first "recipe", executing "make" on its own will run this
-all: clean_libs main boot asm # hosted
+all: main boot # hosted
 	@echo Made everything!
 
 # For checking against ILAs etc
 main : hex/main.hex
 
+upload : hex/main.hex
+	./upload.sh $(COM_PORT)
+
 # alternative target to get the disassembly as well
 asm : build/main.asm  main build/minimal_boot.asm
-
-
-# always treat this file as "out-of-date", so we always display the asm to the terminal
-# .PHONY : build/main.asm
-
-boot : hex/boot.hex
-
-hex/boot.hex : build/minimal_boot.o
-	@echo "Building boot.hex"
-	$(ELF2HEX) --bit-width 32 --input $< --output $@
-	$(ASCII_HEX_SWAP_ENDIAN) hex/boot.hex build/boot.hexr
-	$(ASCII_HEX_TO_BIN) build/boot.hexr hex/boot.bin
-
-build/minimal_boot.asm : build/minimal_boot.o
-
-	riscv32-unknown-elf-objdump -d -S $< > $@
-	@#@echo ""
-	@#@echo "******************** START $@ *********************"
-	@#@echo ""
-	@#riscv32-unknown-elf-objdump -d -S $<
-	@#@echo ""
-	@#@echo "********************* END $@ **********************"
-	@#@echo ""
-
-build/minimal_boot.o : src/boot/minimal_boot.c src/boot/crt0-boot.s
-	$(CC) -g -O0 -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections \
-	-nostartfiles -nostdlib -nodefaultlibs -Wl,-T,riscv32-fpca-boot.ld $^ -o $@
-
-
 
 # This regenerates the hex/main.hex file, building the other files as necessary
 hex/main.hex : build/main.elf asm
@@ -104,7 +103,6 @@ hex/main.hex : build/main.elf asm
 	$(ELF2HEX) --bit-width 32 --input $< --output $@
 	$(ASCII_HEX_SWAP_ENDIAN) hex/main.hex build/main.hexr
 	$(ASCII_HEX_TO_BIN) build/main.hexr hex/main.bin
-
 
 build/main.asm : build/main.elf
 	@# output to file and to terminal
@@ -115,6 +113,7 @@ build/main.asm : build/main.elf
 	@# @echo ""
 	@# @echo "********************* END $@ **********************"
 	@# @echo ""
+	@echo "dumping ASM to $@"
 	riscv32-unknown-elf-objdump -d -S $< > $@
 
 # This step links all the object files together
@@ -122,16 +121,55 @@ build/main.elf : $(objects) $(lib_objects)
 	@echo Linking...
 	$(LD) -o $@ $^ $(LDFLAGS_RV)
 
-
+#############################################################
+# Hosted build (for small tests)
+#############################################################
 hosted :
 	$(CC_PC) -g src/hosted-test.c -o build/hosted-test
 	./build/hosted-test
 
-# Make specific libraries as required
+#############################################################
+# Bootloader
+#############################################################
+boot : hex/boot.hex
+
+hex/boot.hex : build/minimal_boot.o
+	@echo "Building boot.hex"
+	$(ELF2HEX) --bit-width 32 --input $< --output $@
+	$(ASCII_HEX_SWAP_ENDIAN) hex/boot.hex build/boot.hexr
+	$(ASCII_HEX_TO_BIN) build/boot.hexr hex/boot.bin
+
+build/minimal_boot.o : src/boot/minimal_boot.c src/boot/crt0-boot.s
+	$(CC) -g -O0 -march=rv32i -mabi=ilp32 -ffreestanding -Wl,--gc-sections \
+	-nostartfiles -nostdlib -nodefaultlibs -Wl,-T,riscv32-fpca-boot.ld $^ -o $@
+
+build/minimal_boot.asm : build/minimal_boot.o
+	riscv32-unknown-elf-objdump -d -S $< > $@
+	@#@echo ""
+	@#@echo "******************** START $@ *********************"
+	@#@echo ""
+	@#riscv32-unknown-elf-objdump -d -S $<
+	@#@echo ""
+	@#@echo "********************* END $@ **********************"
+	@#@echo ""
+
+#############################################################
+# PrintF Library
+#############################################################
 build/lib/printf.o : src/lib/printf/src/printf/printf.c
 	@echo building $@ from $<
 	$(CC) $(CFLAGS_RV) -Isrc/lib/ $< -o $@
 
+#############################################################
+# SD Card Library
+#############################################################
+build/lib/mmc.o : src/lib/sdcard/mmc.c
+	@echo building $@ from $<
+	$(CC) $(CFLAGS_RV) $< -o $@
+
+#############################################################
+# Generic Build Rules
+#############################################################
 build/%.o : src/%.c
 	@echo building $@ from $<
 	$(CC) $(CFLAGS_RV)  $< -o $@
@@ -140,9 +178,9 @@ build/%.o : src/%.s
 	@echo building $@ from $<
 	$(CC) $(CFLAGS_RV)  $< -o $@
 
-upload : hex/main.hex
-	./upload.sh $(COM_PORT)
-
+#############################################################
+# Clean
+#############################################################
 clean_all: clean clean_libs clean_boot
 
 clean:
@@ -154,3 +192,4 @@ clean_libs:
 
 clean_boot:
 	rm -rf build/boot/*
+#############################################################

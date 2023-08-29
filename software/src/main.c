@@ -13,7 +13,10 @@
 // #include "ssd1306_i2c.h"
 #include "spi.h"
 #include "console.h"
-#include "lib/printf/src/printf/printf.h"
+
+#include "printf.h"
+// #include "ff.h"
+#include "diskio.h"
 
 void wait_for_btn_press(int btn){
     while(get_bit(GPIO_BTN, btn) != 0){} // wait for 0
@@ -86,10 +89,14 @@ void main(void)
     cls();
 
     printf_("Hello World\n");
+
+    disk_initialize(0);
+
     printf_("Console is working!\n");
     printf_("CPU Arch      : %s\n", "RISC-V RV32I");
     printf_("CPU Frequency : %i MHz\n", GPIO_SOC_FREQ/1000000);
     printf_("CPU Memory    : %i KB\n", GPIO_SOC_MEM/1024);
+
 
     int tmp = 21;
     int test_var = 0;
