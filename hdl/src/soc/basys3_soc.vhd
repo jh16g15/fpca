@@ -11,7 +11,7 @@ use work.joe_common_pkg.all;
 entity basys3_soc is
     generic (
         G_PROJECT_ROOT       : string  := "";
-        G_MEM_KBYTES         : integer := 32;
+        G_MEM_KBYTES         : integer := 64;
         G_MEM_INIT_FILE      : string  := "software/hex/main.hex";
         G_BOOT_INIT_FILE     : string  := "software/hex/boot.hex";
         G_SOC_FREQ           : integer := 50_000_000;
@@ -85,15 +85,20 @@ architecture rtl of basys3_soc is
     -- Wishbone to framebuffer
     signal text_display_wb_mosi_out : t_wb_mosi;
     signal text_display_wb_miso_in  : t_wb_miso;
-
+    
     signal rw_regs_out : t_slv32_arr(G_NUM_RW_REGS - 1 downto 0);
     signal ro_regs_in  : t_slv32_arr(G_NUM_RO_REGS - 1 downto 0);
 
+    signal monitor_write_cmd_stb  : std_logic;
+    signal monitor_read_cmd_stb  : std_logic;
+
     attribute mark_debug                    : boolean;
-    attribute mark_debug of rw_regs_out     : signal is true;
-    attribute mark_debug of ro_regs_in      : signal is true;
+--    attribute mark_debug of rw_regs_out     : signal is true;
+--    attribute mark_debug of ro_regs_in      : signal is true;
     attribute mark_debug of wb_cpu_sel_mosi : signal is true;
     attribute mark_debug of wb_cpu_sel_miso : signal is true;
+    attribute mark_debug of monitor_write_cmd_stb : signal is true;
+    attribute mark_debug of monitor_read_cmd_stb : signal is true;
 
     -- Seven Segment Display controller
     signal sseg_display_data : std_logic_vector(15 downto 0);
@@ -172,6 +177,18 @@ begin
         --            );
 
     end generate;
+    
+    wb_address_monitor_inst : entity work.wb_address_monitor
+      generic map (
+        G_ADDR => x"0000_0000"
+      )
+      port map (
+        wb_clk => clk,
+        wb_mosi => wb_master_sel_mosi,
+        wb_miso => wb_master_sel_miso,
+        write_cmd_stb => monitor_write_cmd_stb,
+        read_cmd_stb => monitor_read_cmd_stb
+      );
 
     -- 1:N interconnect
     wb_interconnect_inst : entity work.wb_interconnect

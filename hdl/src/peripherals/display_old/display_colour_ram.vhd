@@ -51,7 +51,7 @@ begin
     fg_colour_code_int <= to_integer(fg_colour_code);
     bg_colour_code_int <= to_integer(bg_colour_code);
     
-    colour_decode_proc : process(clk) is
+    colour_decode_proc : process(all) is
     begin
         if(rising_edge(clk)) then
             case fg_colour_code_int is -- max 2^6=64 colour
