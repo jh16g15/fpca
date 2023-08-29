@@ -57,7 +57,7 @@ architecture rtl of basys3_soc is
     constant MEM_INIT_FILE  : string := G_PROJECT_ROOT & G_MEM_INIT_FILE;
     constant BOOT_INIT_FILE : string := G_PROJECT_ROOT & G_BOOT_INIT_FILE;
 
-    constant G_PC_RESET_ADDR : unsigned(31 downto 0) := x"0000_0000";
+    constant G_PC_RESET_ADDR : unsigned(31 downto 0) := x"F000_0000"; -- always reset into bootloader
 
     constant G_NUM_SLAVES : integer := 16; -- max 16
 
@@ -188,7 +188,7 @@ begin
     --! x0000_0000 to x0FFF_FFFF
     wb_sp_bram_inst : entity work.wb_sp_bram
         generic map(
-            G_MEM_DEPTH_WORDS => 4096,
+            G_MEM_DEPTH_WORDS => 8192,
             G_INIT_FILE       => MEM_INIT_FILE
         )
         port map(
