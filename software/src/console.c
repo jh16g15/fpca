@@ -6,7 +6,7 @@
 
 // Terminal object used for the console
 t_terminal *t;
-char t_buf[TEXT_W * TEXT_H];
+char t_buf[TEXT_W * (TEXT_H+1)];
 
 // set up the primary console
 void console_init(){
@@ -26,8 +26,9 @@ void print(char *s){
 
 // write a char to the output console (used by printf_() function)
 void putchar_(char c){
-    terminal_write_char(t, c, 1);  // autoadvance = True
-    text_refresh_from_terminal(t); // flush to screen RAM after every character (a bit ew really, but oh well)
+    terminal_write_char(t, c);
+    // terminal_write_string(t, &c);
+    text_refresh_from_terminal(t); // flush to screen after every character (a bit ew really, but oh well)
 }
 
 void cls(){

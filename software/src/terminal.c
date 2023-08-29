@@ -98,7 +98,7 @@ void terminal_set_cursor(t_terminal *t, unsigned int x, unsigned int y){
 }
 
 // write a byte at the current cursor position (optional call to terminal_advance_cursor)
-void terminal_write_char(t_terminal *t, char c, char auto_adv)
+void terminal_write_raw_char(t_terminal *t, char c, char auto_adv)
 {
     int index = (t->y * t->w) + t->x;
     t->buf[index] = c;
@@ -108,26 +108,10 @@ void terminal_write_char(t_terminal *t, char c, char auto_adv)
     }
 }
 
-// write a string to the terminal
-void terminal_write_raw_string(t_terminal *t, char *s)
+// write a byte at the current cursor position (interpret \r and \n as control chars)
+void terminal_write_char(t_terminal *t, char c)
 {
-    char c;
-    do
-    {
-        c = *s; // character of string (contents of s mem)
-        terminal_write_char(t, c, 1);  // print this char
-        s++;                           // increment pointer to move through array
-    } while (c != '\0');
-}
-
-// write a string to the terminal (interpret \r and \n as control chars)
-void terminal_write_string(t_terminal *t, char *s)
-{
-    char c;
-    do
-    {
-        c = *s; // character of string (contents of s mem)
-        switch (c)
+    switch (c)
         {
         case '\n':
             unsigned int y = (t->y + 1) % t->h; // x=0, increment y
@@ -141,10 +125,32 @@ void terminal_write_string(t_terminal *t, char *s)
             // TODO: implement tab stops
             // for now, fall through to `default`
         default:
-            terminal_write_char(t, c, 1);  // print this char
+            terminal_write_raw_char(t, c, 1);  // print this char
             break;
         }
+}
+
+// write a string to the terminal
+void terminal_write_raw_string(t_terminal *t, char *s)
+{
+    char c;
+    do
+    {
+        c = *s; // character of string (contents of s mem)
+        terminal_write_raw_char(t, c, 1);  // print this char
         s++;                           // increment pointer to move through array
+    } while (c != '\0');
+}
+
+// write a string to the terminal (interpret \r and \n as control chars)
+void terminal_write_string(t_terminal *t, char *s)
+{
+    char c;
+    do
+    {
+        c = *s; // character of string (contents of s mem)
+        terminal_write_char(t, c);
+        s++; // increment pointer to move through array
     } while (c != '\0');
 }
 

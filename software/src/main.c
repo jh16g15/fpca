@@ -89,12 +89,12 @@ void main(void)
 
     console_init();
     cls();
-    print("Hello World\n");
+    // print("Hello World\n");
 
     int test_var = 0;
+    print("console is working!\n");
     while(1){
-        print("console is working!\n");
-        printf_("test_var=%i\n", test_var);
+        printf_("test_var=%i\r", test_var);
         test_var++;
 
         // cls();

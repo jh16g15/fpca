@@ -44,7 +44,9 @@ void terminal_set_cursor(t_terminal *t, unsigned int x, unsigned int y);
 void terminal_scroll_one_line(t_terminal *t);
 
 // write a byte at the current cursor position (optional call to terminal_advance_cursor)
-void terminal_write_char(t_terminal *t, char c, char auto_adv);
+void terminal_write_raw_char(t_terminal *t, char c, char auto_adv);
+// write a byte at the current cursor position (interpret \r and \n as control chars)
+void terminal_write_char(t_terminal *t, char c);
 
 // write a string to the terminal
 void terminal_write_raw_string(t_terminal *t, char *s);
