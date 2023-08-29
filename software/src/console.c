@@ -5,23 +5,20 @@
 // global variables to statically allocate
 
 // Terminal object used for the console
-t_terminal *t;
-char t_buf[TEXT_W * (TEXT_H)];
+// make static to limit to just in this file
+static t_terminal terminal; // allocate space for a terminal object
+static t_terminal *t = &terminal; // get the pointer to this to use below
+static char t_buf[TEXT_W * (TEXT_H)]; // also allocate space for the terminal buffer
 
-// set up the primary console
-void console_init(){
+// set up the primary console (using return value is optional)
+t_terminal* console_init(){
     t->w = TEXT_W;
     t->h = TEXT_H;
     t->x = 0;
     t->y = 0;
     t->buf = t_buf;
     t->line_at_top = 1;
-}
-
-// print a basic string to the console and refresh the screen
-void print(char *s){
-    terminal_write_string(t, s);
-    text_refresh_from_terminal(t);
+    return t;
 }
 
 // write a char to the output console (used by printf_() function)

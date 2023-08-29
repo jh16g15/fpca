@@ -81,17 +81,29 @@ void main(void)
     // spi_test();
 
     Q_SSEG = 0x0;
-    console_init();
+    // pointer to initial terminal created on the stack, containing the static address of the terminal
+    t_terminal *term = console_init();
     cls();
 
-    print("Hello World\n");
+    printf_("Hello World\n");
+    printf_("Initial Terminal Address : %p\n", term);
     printf_("CPU Frequency = %i MHz\n", GPIO_SOC_FREQ/1000000);
     printf_("CPU Memory    = %i KB\n", GPIO_SOC_MEM/1024);
 
+    printf_("Terminal Address       : %p\n", &term);
+    printf_("Terminal Width Addr    : %p\n", &term->w);
+    printf_("Terminal Height Addr   : %p\n", &term->h);
+    printf_("Terminal Buf Addr      : %p\n", &term->buf);
+    printf_("Terminal X   Addr      : %p\n", &term->x);
+    printf_("Terminal Y Addr        : %p\n", &term->y);
+    printf_("Terminal top line Adr  : %p\n", &term->line_at_top);
+    printf_("Terminal Buf contents start : %p\n", term->buf);
 
+
+    int tmp = 21;
     int test_var = 0;
     printf_("console is working!\n");
-    printf_("Happy days! %p\n", &Q_SSEG);
+    printf_("Happy days! Test Var location (on stack): %p\n", &test_var);
     putchar_(1);
     putchar_(' ');
     putchar_(' ');
