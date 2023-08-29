@@ -18,10 +18,16 @@ void console_init(){
     t->line_at_top = 1;
 }
 
-// print a string to the console and refresh the screen
+// print a basic string to the console and refresh the screen
 void print(char *s){
     terminal_write_string(t, s);
     text_refresh_from_terminal(t);
+}
+
+// write a char to the output console (used by printf_() function)
+void putchar_(char c){
+    terminal_write_char(t, c, 1);  // autoadvance = True
+    text_refresh_from_terminal(t); // flush to screen RAM after every character (a bit ew really, but oh well)
 }
 
 void cls(){

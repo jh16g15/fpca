@@ -20,6 +20,12 @@ build/text_display.o \
 build/spi.o \
 build/console.o
 
+lib_objects = \
+build/lib/printf.o
+
+LIB_INCLUDES = -Isrc/lib/printf/src
+# for configuring libraries
+LIB_DEFINES = -DPRINTF_INCLUDE_CONFIG_H=1
 
 boot_objects = \
 build/minimal_boot.o
@@ -35,7 +41,7 @@ ASCII_HEX_TO_BIN=xxd -r -p
 COPT = -O0
 
 # compile only
-CFLAGS= -g -c $(COPT)
+CFLAGS= -g -c $(COPT) $(LIB_INCLUDES) $(LIB_DEFINES)
 
 # Change the RV extensions here:
 CFLAGS_RV = $(CFLAGS) -march=rv32i -mabi=ilp32 -ffreestanding -mstrict-align
@@ -53,9 +59,10 @@ LDFLAGS = -Map=build/output.map
 LDFLAGS_RV = $(LDFLAGS) -lgcc -lg_nano -lnosys --gc-sections  -T riscv32-fpca.ld
 
 # as this is the first "recipe", executing "make" on its own will run this
-all: clean main boot asm # hosted
+all: clean_libs main boot asm # hosted
 	@echo Made everything!
 
+# For checking against ILAs etc
 main : hex/main.hex
 
 # alternative target to get the disassembly as well
@@ -110,7 +117,7 @@ build/main.asm : build/main.elf
 	riscv32-unknown-elf-objdump -d -S $< > $@
 
 # This step links all the object files together
-build/main.elf : $(objects)
+build/main.elf : $(objects) $(lib_objects)
 	@echo Linking...
 	$(LD) -o $@ $^ $(LDFLAGS_RV)
 
@@ -119,9 +126,13 @@ hosted :
 	$(CC_PC) -g src/hosted-test.c -o build/hosted-test
 	./build/hosted-test
 
-build/lib/*/%.o : src/lib/*/%.c
+# Make specific libraries as required
+build/lib/printf.o : src/lib/printf/src/printf/printf.c
 	@echo building $@ from $<
-	$(CC) $(CFLAGS_RV)  $< -o $@
+	$(CC) $(CFLAGS_RV) -Isrc/lib/ $< -o $@
+	# @echo ===== PRINTF NM =====
+	# riscv32-unknown-elf-nm --print-size -t d build/lib/printf.o
+
 
 build/%.o : src/%.c
 	@echo building $@ from $<
@@ -134,6 +145,11 @@ build/%.o : src/%.s
 upload : hex/main.hex
 	./upload.sh COM8
 
+clean_all: clean clean_libs
+
 clean:
 	rm -rf build/*.*
 	rm -rf hex/*.*
+
+clean_libs:
+	rm -rf build/lib/*

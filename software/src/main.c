@@ -13,6 +13,7 @@
 // #include "ssd1306_i2c.h"
 #include "spi.h"
 #include "console.h"
+#include "lib/printf/src/printf/printf.h"
 
 void wait_for_btn_press(int btn){
     while(get_bit(GPIO_BTN, btn) != 0){} // wait for 0
@@ -90,12 +91,12 @@ void main(void)
     cls();
     print("Hello World\n");
 
-
+    int test_var = 0;
     while(1){
-        print("console is working!");
-        print("console is working!");
-        print("console is working!");
-        print("console is working!");
+        print("console is working!\n");
+        printf_("test_var=%i\n", test_var);
+        test_var++;
+
         // cls();
     }
 
