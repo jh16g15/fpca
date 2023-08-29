@@ -145,7 +145,7 @@ build/%.o : src/%.s
 upload : hex/main.hex
 	./upload.sh COM8
 
-clean_all: clean clean_libs
+clean_all: clean clean_libs clean_boot
 
 clean:
 	rm -rf build/*.*
@@ -153,3 +153,6 @@ clean:
 
 clean_libs:
 	rm -rf build/lib/*
+
+clean_boot:
+	rm -rf build/boot/*
