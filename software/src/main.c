@@ -90,7 +90,7 @@ void main(void)
     printf_("CPU Frequency = %i MHz\n", GPIO_SOC_FREQ/1000000);
     printf_("CPU Memory    = %i KB\n", GPIO_SOC_MEM/1024);
 
-    printf_("Terminal Address       : %p\n", &term);
+    printf_("Terminal Address       : %p\n", term);
     printf_("Terminal Width Addr    : %p\n", &term->w);
     printf_("Terminal Height Addr   : %p\n", &term->h);
     printf_("Terminal Buf Addr      : %p\n", &term->buf);
@@ -103,6 +103,7 @@ void main(void)
     int tmp = 21;
     int test_var = 0;
     printf_("console is working!\n");
+    cls();
     printf_("Happy days! Test Var location (on stack): %p\n", &test_var);
     putchar_(1);
     putchar_(' ');
