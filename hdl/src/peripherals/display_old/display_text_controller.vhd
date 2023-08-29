@@ -86,50 +86,52 @@ architecture rtl of display_text_controller is
     -- text RAM parameters
     constant TEXT_ADDR_W : integer := 16; -- todo: parametersise this
     constant TEXT_DATA_W : integer := 18; -- 8 bit charcode, 10 bit colours (6b foreground, 4b background)
-    constant TEXT_DEPTH  : integer := CHARS_X * CHARS_Y;
+    -- constant TEXT_DEPTH  : integer := CHARS_X * CHARS_Y;
+    constant TEXT_DEPTH  : integer := (END_BPORCH_X/CHAR_W) * (END_BPORCH_Y/CHAR_H); -- make this big enough to cover the porches too
+
     -- RAM control signals
     signal font_ena   : std_logic;
     signal font_enb   : std_logic;
     signal font_wea   : std_logic;
-    signal font_addra : std_logic_vector(FONT_ADDR_W - 1 downto 0);
-    signal font_addrb : std_logic_vector(FONT_ADDR_W - 1 downto 0);
+    signal font_addra : std_logic_vector(FONT_ADDR_W - 1 downto 0) := (others => '0');
+    signal font_addrb : std_logic_vector(FONT_ADDR_W - 1 downto 0) := (others => '0');
     signal font_dia   : std_logic_vector(FONT_DATA_W - 1 downto 0);
     signal font_dob   : std_logic_vector(FONT_DATA_W - 1 downto 0);
     signal text_ena   : std_logic;
     signal text_enb   : std_logic;
     signal text_wea   : std_logic;
-    signal text_addra : std_logic_vector(TEXT_ADDR_W - 1 downto 0);
-    signal text_addrb : std_logic_vector(TEXT_ADDR_W - 1 downto 0);
+    signal text_addra : std_logic_vector(TEXT_ADDR_W - 1 downto 0) := (others => '0');
+    signal text_addrb : std_logic_vector(TEXT_ADDR_W - 1 downto 0) := (others => '0');
     signal text_dia   : std_logic_vector(TEXT_DATA_W - 1 downto 0);
     signal text_dob   : std_logic_vector(TEXT_DATA_W - 1 downto 0);
 
-    signal h_count     : integer := 0;
-    signal v_count     : integer := 0;
-    signal h_count_d1  : integer;
-    signal v_count_d1  : integer;
-    signal h_count_d2  : integer;
-    signal v_count_d2  : integer;
-    signal h_count_d3  : integer;
-    signal v_count_d3  : integer;
+    signal h_count     : natural := 0;
+    signal v_count     : natural := 0;
+    signal h_count_d1  : natural := 0;
+    signal v_count_d1  : natural := 0;
+    signal h_count_d2  : natural := 0;
+    signal v_count_d2  : natural := 0;
+    signal h_count_d3  : natural := 0;
+    signal v_count_d3  : natural := 0;
     signal active_area : std_logic;
 
-    signal char_x       : integer;
-    signal char_y       : integer;
-    signal char_address : integer;
+    signal char_x       : integer := 0;
+    signal char_y       : integer := 0;
+    signal char_address : integer := 0;
 
     -- display signals
-    signal font_line             : std_logic_vector(CHAR_W - 1 downto 0);
-    signal font_row              : unsigned(FONT_ADDR_W - 1 downto 0); -- needs to be same size to add to charcode_base_address
-    signal charcode_to_display   : unsigned(8 - 1 downto 0);           -- up to 255, but need to scale up width to avoid overflow
-    signal charcode_base_address : unsigned(FONT_ADDR_W - 1 downto 0);
-    signal colour_code           : std_logic_vector(9 downto 0);
-    signal fg_colour             : std_logic_vector(11 downto 0);
-    signal bg_colour             : std_logic_vector(11 downto 0);
-    signal fg_colour_d1          : std_logic_vector(11 downto 0);
-    signal bg_colour_d1          : std_logic_vector(11 downto 0);
+    signal font_line             : std_logic_vector(CHAR_W - 1 downto 0) := (others => '0');
+    signal font_row              : unsigned(FONT_ADDR_W - 1 downto 0) := (others => '0'); -- needs to be same size to add to charcode_base_address
+    signal charcode_to_display   : unsigned(8 - 1 downto 0) := (others => '0');           -- up to 255, but need to scale up width to avoid overflow
+    signal charcode_base_address : unsigned(FONT_ADDR_W - 1 downto 0) := (others => '0');
+    signal colour_code           : std_logic_vector(9 downto 0) := (others => '0');
+    signal fg_colour             : std_logic_vector(11 downto 0) := (others => '0');
+    signal bg_colour             : std_logic_vector(11 downto 0) := (others => '0');
+    signal fg_colour_d1          : std_logic_vector(11 downto 0) := (others => '0');
+    signal bg_colour_d1          : std_logic_vector(11 downto 0) := (others => '0');
     signal font_bit              : std_logic;
-    signal colour_selected       : std_logic_vector(11 downto 0);
-    signal font_bit_select       : unsigned(2 downto 0);
+    signal colour_selected       : std_logic_vector(11 downto 0) := (others => '0');
+    signal font_bit_select       : unsigned(2 downto 0) := (others => '0');
 
 begin
 
