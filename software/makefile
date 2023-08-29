@@ -6,6 +6,7 @@
 # $?	Names of all prerequisites newer than the target
 # $^	Names of all prerequisites
 
+COM_PORT = COM4
 
 # we should really pass the std lib (libgcc.a) to the linker as a libray
 # we need
@@ -70,7 +71,7 @@ asm : build/main.asm  main build/minimal_boot.asm
 
 
 # always treat this file as "out-of-date", so we always display the asm to the terminal
-.PHONY : build/main.asm
+# .PHONY : build/main.asm
 
 boot : hex/boot.hex
 
@@ -98,7 +99,7 @@ build/minimal_boot.o : src/boot/minimal_boot.c src/boot/crt0-boot.s
 
 
 # This regenerates the hex/main.hex file, building the other files as necessary
-hex/main.hex : build/main.elf
+hex/main.hex : build/main.elf asm
 	@echo "Building main.hex"
 	$(ELF2HEX) --bit-width 32 --input $< --output $@
 	$(ASCII_HEX_SWAP_ENDIAN) hex/main.hex build/main.hexr
@@ -140,7 +141,7 @@ build/%.o : src/%.s
 	$(CC) $(CFLAGS_RV)  $< -o $@
 
 upload : hex/main.hex
-	./upload.sh COM8
+	./upload.sh $(COM_PORT)
 
 clean_all: clean clean_libs clean_boot
 
