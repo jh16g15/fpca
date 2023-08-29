@@ -44,10 +44,6 @@ architecture rtl of wb_sp_bram is
     signal mem32 : t_slv32_arr(0 to G_MEM_DEPTH_WORDS - 1) := init_mem32(G_INIT_FILE, G_MEM_DEPTH_WORDS);
 
     signal dbg_word_addr : std_logic_vector(C_WORD_ADR_W-1 downto 0);
-
-    --GOWIN
-    attribute syn_ramstyle : string;
-    attribute syn_ramstyle of mem32 : signal is "block_ram";
     
 begin
     -- this slave can always respond to requests, so no stalling is required
@@ -85,11 +81,10 @@ begin
                             if wb_mosi_in.we = '1' then
                                 -- synchronous write logic
                                 mem32(slv2uint(wb_mosi_in.adr(C_WORD_ADR_H downto C_WORD_ADR_L)))(8 * (i + 1) - 1 downto 8 * i) <= wb_mosi_in.wdat(8 * (i + 1) - 1 downto 8 * i); -- write byte
-                            else
-                                -- synchronous read logic
-                                wb_miso_out.rdat(8 * (i + 1) - 1 downto 8 * i) <= mem32(slv2uint(wb_mosi_in.adr(C_WORD_ADR_H downto C_WORD_ADR_L)))(8 * (i + 1) - 1 downto 8 * i); -- read byte
                             end if;
                         end if;
+                        -- synchronous read logic
+                        wb_miso_out.rdat(8 * (i + 1) - 1 downto 8 * i) <= mem32(slv2uint(wb_mosi_in.adr(C_WORD_ADR_H downto C_WORD_ADR_L)))(8 * (i + 1) - 1 downto 8 * i); -- read byte
                     end loop;
                 end if;
 
