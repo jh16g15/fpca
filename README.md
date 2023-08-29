@@ -11,7 +11,7 @@ The FPCA (Friendly Programmable Computing Asset) is a RISC-V SoC design with acc
 - Wishbone B4 Instruction Fetch and Data Access
 
 # Current Peripherals
-- 32K combined program ROM/RAM
+- 64K combined program ROM/RAM
 - UART Peripheral (up to 921600 baud, no FIFOs)
 - GPIO
     - Switches / Buttons

@@ -30,7 +30,7 @@ ETX = b'\x03'
 EOT = b'\x04'
 ###########################
 
-PROG_MEM_MAX = 8192 * 4 # 32KB
+PROG_MEM_MAX = 64 * 1024 # 64KB
 CONSOLE_RESERVED_SPACE = 80 * 30 * 1 + 512 # width, height, bytes per char, extra room
 RESERVED_STACK_HEAP_SPACE = 1024 + CONSOLE_RESERVED_SPACE # warn if less than 1KB stack/heap space
 
