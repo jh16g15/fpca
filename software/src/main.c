@@ -73,28 +73,33 @@ void spi_test(){
 
 void main(void)
 {
-    Q_SSEG = 0xc0de;
+    Q_SSEG = 0xc1de;
     uart_set_baud(9600);
     GPIO_LED = 0xF;
 
     // test SPI ram on PMOD B (working!!!)
     // spi_test();
 
-    // test text scrolling/terminal functionality
-
-
-
-    // initial setup of text framebuffer
-    // text_fill(0, 0, TEXT_MAX_X, TEXT_MAX_Y, GREY);
-
+    Q_SSEG = 0x0;
     console_init();
     cls();
-    // print("Hello World\n");
+
+    print("Hello World\n");
+    printf_("CPU Frequency = %i MHz\n", GPIO_SOC_FREQ/1000000);
+    printf_("CPU Memory    = %i KB\n", GPIO_SOC_MEM/1024);
+
 
     int test_var = 0;
-    print("console is working!\n");
+    printf_("console is working!\n");
+    printf_("Happy days! %p\n", &Q_SSEG);
+    putchar_(1);
+    putchar_(' ');
+    putchar_(' ');
+    putchar_(1);
+    putchar_(' ');
     while(1){
-        printf_("test_var=%i\r", test_var);
+        putchar_(test_var);
+        printf_("test_var=%i\n", test_var);
         test_var++;
 
         // cls();

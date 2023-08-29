@@ -6,7 +6,7 @@
 
 // Terminal object used for the console
 t_terminal *t;
-char t_buf[TEXT_W * (TEXT_H+1)];
+char t_buf[TEXT_W * (TEXT_H)];
 
 // set up the primary console
 void console_init(){

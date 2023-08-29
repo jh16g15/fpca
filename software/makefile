@@ -130,9 +130,6 @@ hosted :
 build/lib/printf.o : src/lib/printf/src/printf/printf.c
 	@echo building $@ from $<
 	$(CC) $(CFLAGS_RV) -Isrc/lib/ $< -o $@
-	# @echo ===== PRINTF NM =====
-	# riscv32-unknown-elf-nm --print-size -t d build/lib/printf.o
-
 
 build/%.o : src/%.c
 	@echo building $@ from $<

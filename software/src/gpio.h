@@ -10,6 +10,8 @@
 #define Q_SSEG_UPPER (*((volatile unsigned char *)0x10000005))
 #define GPIO_BTN (*((volatile unsigned long *)0x10000100))
 #define GPIO_SW (*((volatile unsigned long *)0x10000104))
+#define GPIO_SOC_FREQ (*((volatile unsigned long *)0x10000108))
+#define GPIO_SOC_MEM (*((volatile unsigned long *)0x1000010C))
 
 
 #endif // _GPIO_H_

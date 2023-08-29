@@ -11,6 +11,7 @@ use work.joe_common_pkg.all;
 entity basys3_soc is
     generic (
         G_PROJECT_ROOT       : string  := "";
+        G_MEM_KBYTES         : integer := 32;
         G_MEM_INIT_FILE      : string  := "software/hex/main.hex";
         G_BOOT_INIT_FILE     : string  := "software/hex/boot.hex";
         G_SOC_FREQ           : integer := 50_000_000;
@@ -54,6 +55,8 @@ end entity basys3_soc;
 
 architecture rtl of basys3_soc is
 
+    constant MEM_BYTES : integer := G_MEM_KBYTES * 1024;
+    constant MEM_WORDS : integer := MEM_BYTES / 4;
     constant MEM_INIT_FILE  : string := G_PROJECT_ROOT & G_MEM_INIT_FILE;
     constant BOOT_INIT_FILE : string := G_PROJECT_ROOT & G_BOOT_INIT_FILE;
 
@@ -63,7 +66,7 @@ architecture rtl of basys3_soc is
 
     -- for GPIO register bank
     constant G_NUM_RW_REGS : integer := 4;
-    constant G_NUM_RO_REGS : integer := 2;
+    constant G_NUM_RO_REGS : integer := 4;
 
     signal if_wb_mosi         : t_wb_mosi;
     signal if_wb_miso         : t_wb_miso;
@@ -188,7 +191,7 @@ begin
     --! x0000_0000 to x0FFF_FFFF
     wb_sp_bram_inst : entity work.wb_sp_bram
         generic map(
-            G_MEM_DEPTH_WORDS => 8192,
+            G_MEM_DEPTH_WORDS => MEM_WORDS,
             G_INIT_FILE       => MEM_INIT_FILE
         )
         port map(
@@ -219,6 +222,8 @@ begin
     gpio_led_out      <= rw_regs_out(0);
     ro_regs_in(0)     <= gpio_btn_in;
     ro_regs_in(1)     <= gpio_sw_in;
+    ro_regs_in(2)     <= int2slv(G_SOC_FREQ);
+    ro_regs_in(3)     <= int2slv(MEM_BYTES);
     sseg_display_data <= rw_regs_out(1)(15 downto 0);
 
     i2c_scl_out <= rw_regs_out(2)(0);

@@ -33,7 +33,7 @@ void text_refresh_from_terminal(t_terminal *t){
 
         // write each character to the display
         for (int col = 0; col < TEXT_W; col++){
-            text_set(col, row, t->buf[(mem_row * TEXT_W) + col], WHITE, BLACK);
+            text_set(col, row, t->buf[(mem_row * TEXT_W) + col], WHITE, RED);
         }
         mem_row++;
         if (mem_row >= t->h){
