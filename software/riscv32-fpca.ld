@@ -8,12 +8,12 @@ OUTPUT_FORMAT("elf32-littleriscv", "elf32-littleriscv",
 OUTPUT_ARCH(riscv)
 MEMORY
 {
-  /* Joe: FPCA memory layout, 8K using 4 GOWUIN BRAMs (could go up to 16K if needed)
+  /* Joe: FPCA memory layout, 32K
           Read/Write/eXecute
 
           We may need a section that is Allocatable if we want to use the heap.
    */
-  RAM (rwx) : ORIGIN = 0x0, LENGTH = 16K
+  RAM (rwx) : ORIGIN = 0x0, LENGTH = 32K
 }
 ENTRY(_start)
 /* locations of std libraries*/

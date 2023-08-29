@@ -24,7 +24,7 @@
 #define SSEG (*((volatile unsigned long *)0x10000004))
 #define GPIO_SW (*((volatile unsigned long *)0x10000104))
 
-#define MAIN_RAM_LEN 16384   // bytes
+#define MAIN_RAM_LEN 8192 * 4   // bytes
 
 int get_bit(int reg, int bitnum)
 {
