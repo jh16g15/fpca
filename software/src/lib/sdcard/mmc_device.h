@@ -22,14 +22,20 @@
 #define R1_ERASE_RESET_ERR 0x02
 #define R1_IDLE 0x01
 
+#define R1_VALUE_READY 0x00
+
 // Voltage Accepted
 #define VOLTAGE_ACC_2V7_3V6 0x01
 #define VOLTAGE_ACC_LOW 0x02
 #define VOLTAGE_ACC_RES1 0x04
 #define VOLTAGE_ACC_RES2 0x08
 
+#define OCR_VOLTAGE_WINDOW_2V8_3V6 0xff
 #define OCR_POWER_UP_STATUS 0x80
 #define OCR_CARD_CAPACITY_STATUS 0x40
+
+void sd_spi_start();
+void sd_spi_stop();
 
 void sd_command(u8 cmd, u32 arg, u8 crc);
 u8 sd_response_r1();
@@ -39,6 +45,7 @@ void sd_power_up_init();
 u8 sd_go_idle_state();
 void sd_send_interface_condition(u8 *res);
 void sd_read_operating_conditions_register(u8 *res);
+u8 sd_send_operating_condition();
 
 void sd_print_r1(u8 res);
 void sd_print_r3(u8 *res);

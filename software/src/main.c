@@ -107,6 +107,7 @@ void main(void)
     putchar_(' ');
     putchar_(1);
     putchar_(' ');
+    while(1){}
     while(1){
         putchar_(test_var);
         printf_("test_var=%i\n", test_var);

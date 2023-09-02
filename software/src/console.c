@@ -32,6 +32,7 @@ void putchar_(char c){
     }
 }
 
+// clear terminal buffer and console
 void cls(){
     for (int i = 0; i < (TEXT_W * TEXT_H);i++){
         t.buf[i] = 0;
