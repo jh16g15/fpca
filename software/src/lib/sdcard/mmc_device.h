@@ -6,12 +6,14 @@
 #include "cpu.h"
 #include "utils.h"
 
-#define SPI_MAX_SPEED (REFCLK/2)
+#define SPI_MAX_SPEED (REFCLK/2) // max spi_clk our core can generate
 
-#define SPI_INIT_SPEED 200000 // 200KHz (100KHz - 400KHz)
+#define SD_SPI_INIT_SPEED 200000 // 200KHz (100KHz - 400KHz)
 
-#define SPI_THROTTLE_INIT ((SPI_MAX_SPEED/SPI_INIT_SPEED) - 1)
-#define SPI_THROTTLE_RUN 0
+#define SD_SPI_THROTTLE_INIT ((SPI_MAX_SPEED/SD_SPI_INIT_SPEED) - 1)
+#define SD_SPI_THROTTLE_RUN 0  // this may need to increase if the SoC clock increases beyond 50MHz
+
+#define SD_SPI_RUN_SPEED (REFCLK/(2*(SD_SPI_THROTTLE_RUN+1)))  // Max 25MHz
 
 #define R1_MSB 0x80
 #define R1_PARAM_ERR 0x40

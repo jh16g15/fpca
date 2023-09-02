@@ -35,9 +35,12 @@
 #define ACMD41_ARG 0x40000000   // support High Capacity SD cards
 #define ACMD41_CRC 0x00   // not required
 
-
+// Intitialise disk "pdrv" (only disk 0 is supported for now)
+// Returns 0 if successful, 0x1 if disk could not be initialised
 DSTATUS disk_initialize (BYTE pdrv){
-    printf_("Starting Disk Initialisation...\n");
+    printf_("\nStarting Disk Initialisation...\n");
+    printf_("Setting SD SPI Speed to ~200KHz\n");
+    spi_set_throttle(SD_SPI_THROTTLE_INIT); // set speed to 200KHz for SD card initialisation
     sd_power_up_init();
     u8 status = sd_go_idle_state();
     if (status != 0){
@@ -61,6 +64,8 @@ DSTATUS disk_initialize (BYTE pdrv){
     }
     sd_read_operating_conditions_register(res);
     sd_print_r3(res);
+    printf_("Setting SD SPI Speed to %iHz\n", SD_SPI_RUN_SPEED);
+    spi_set_throttle(SD_SPI_THROTTLE_RUN); // set speed to max 25MHz for SD card operation
     printf_("Disk Initialisation Complete!\n\n");
     return 0;
 }
@@ -78,13 +83,7 @@ void sd_spi_stop(){
     spi_write_byte(0xff);
 }
 
-
-
 void sd_power_up_init(){
-    printf_("Setting SPI Speed to ~200KHz\n");
-    // set speed to 200KHz for SD card initialisation
-    spi_set_throttle(SPI_THROTTLE_INIT);
-
     // TODO wait for 1ms after power on
     // not important right now as we take way more than 1ms to program the FPGA
 
