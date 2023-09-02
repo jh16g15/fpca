@@ -27,6 +27,9 @@ void putchar_(char c){
     if (c=='\n'){
         text_refresh_from_terminal(&t); // flush to screen only after every newline to improve performance
     }
+    if (c=='\r'){
+        text_refresh_from_terminal(&t); // flush to screen also when returning cursor to start of line
+    }
 }
 
 void cls(){
