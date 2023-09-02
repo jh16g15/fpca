@@ -24,7 +24,9 @@ t_terminal* console_init(){
 void putchar_(char c){
     terminal_write_char(&t, c);
     // terminal_write_string(t, &c);
-    text_refresh_from_terminal(&t); // flush to screen after every character (a bit ew really, but oh well)
+    if (c=='\n'){
+        text_refresh_from_terminal(&t); // flush to screen only after every newline to improve performance
+    }
 }
 
 void cls(){
