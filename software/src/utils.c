@@ -42,6 +42,21 @@ void delay_ms(int dly_ms)
 }
 #endif
 
+// alignment safe way of reading u32 from a byte array
+u32 u32_from_u8s(u8 *buf){
+    u32 dat = buf[0];
+    dat = dat | (buf[1] << 8);
+    dat = dat | (buf[2] << 16);
+    dat = dat | (buf[3] << 24);
+    return dat;
+}
+// alignment safe way of reading u16 from a byte array
+u16 u16_from_u8s(u8 *buf){
+    u16 dat = buf[0];
+    dat = dat | (buf[1] << 8);
+    return dat;
+}
+
 /// @brief  Converts a u32 to a fixed length hex string
 /// @param data u32 to convert
 /// @param buf pointer to character buffer

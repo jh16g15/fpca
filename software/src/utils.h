@@ -52,6 +52,12 @@ static inline u8 read_u8(u32 addr){
     return *(volatile u8*)addr;
 }
 
+// alignment safe way of reading u32 from a byte array
+u32 u32_from_u8s(u8 *buf);
+
+// alignment safe way of reading u16 from a byte array
+u16 u16_from_u8s(u8 *buf);
+
 void u32_to_hstring(u32 data, u8 *buf, u8 buf_len);
 char nibble_to_hex_char(u8 nibble);
 
