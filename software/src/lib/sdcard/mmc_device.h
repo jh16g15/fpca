@@ -15,6 +15,8 @@
 
 #define SD_SPI_RUN_SPEED (REFCLK/(2*(SD_SPI_THROTTLE_RUN+1)))  // Max 25MHz
 
+#define SD_BYTES_PER_BLOCK 512
+
 #define R1_MSB 0x80
 #define R1_PARAM_ERR 0x40
 #define R1_ADDR_ERR 0x20
@@ -36,6 +38,11 @@
 #define OCR_POWER_UP_STATUS 0x80
 #define OCR_CARD_CAPACITY_STATUS 0x40
 
+// Control Tokens
+#define START_BLOCK 0xfe    // start of read data/single write data block
+#define MULTIWRITE_START_BLOCK 0xfc
+#define STOP_TRAN_TOKEN 0xfd    // for stopping multi-write
+
 void sd_spi_start();
 void sd_spi_stop();
 
@@ -48,6 +55,8 @@ u8 sd_go_idle_state();
 void sd_send_interface_condition(u8 *res);
 void sd_read_operating_conditions_register(u8 *res);
 u8 sd_send_operating_condition();
+
+u8 sd_read_single_block(u8 *buf, u32 sector);
 
 void sd_print_r1(u8 res);
 void sd_print_r3(u8 *res);

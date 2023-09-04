@@ -92,11 +92,53 @@ void main(void)
 
     disk_initialize(0);
 
-    printf_("Console is working!\n");
+    u8 disk_buffer[512];
+    printf_("Read Sector 0:\n");
+    disk_read(0, disk_buffer, 0, 1);
+
+    printf_("Partition 0 Details:\n");
+    u16 offset = 0x1be; // skip 446 bytes of boot code (we don't use that)
+    printf_("State: 0x%x, ", disk_buffer[offset]);
+    printf_("Partition Type: 0x%x", disk_buffer[offset + 4]);
+    if (disk_buffer[offset + 4] == 0x0b)
+        printf_(" (FAT32)");
+
+    // pointer arithmetic to read out u32s from byte buffer
+    // THIS CAUSES MISALIGNED MEMORY ACCESSES = SYSTEM CRASH!
+    // u32 mbr_gap = *(u32 *)(disk_buffer + offset + 0x8);
+    u32 mbr_gap = u32_from_u8s(disk_buffer + (offset + 0x8));
+    printf_("\nSectors between MBR and First Sector: 0x%x (%i)\n", mbr_gap, mbr_gap);
+
+    // THIS CAUSES MISALIGNED MEMORY ACCESSES = SYSTEM CRASH!
+    // u32 num_sectors = *(u32 *)(disk_buffer + offset + 0xC);
+    u32 num_sectors = u32_from_u8s(disk_buffer + (offset + 0xC));
+    printf_("Number of Sectors in partition : 0x%x (%i)\n", num_sectors, num_sectors);
+    printf_("Volume Size: %iMB\n", num_sectors / 1024 * 512 / 1024);    // careful order of operations to avoid u32 overflow!
+
+
     printf_("CPU Arch      : %s\n", "RISC-V RV32I");
     printf_("CPU Frequency : %i MHz\n", GPIO_SOC_FREQ/1000000);
     printf_("CPU Memory    : %i KB\n", GPIO_SOC_MEM/1024);
 
+    // SECTOR 0 ANALYSIS
+    // 440 bytes of 0x0 (22 lines of 20 bytes)
+    // 0xbe 0xdb 0x94 0x12 0x00 0x00 (6 bytes with last bootcode)
+
+    // Partition 0
+    // 00 82 03 00 0B FE FF C5 00 20 00 00 46 AC EC 00
+
+    // Little Endian!
+
+    // 00   Inactive
+    // 82   Beginning of partition (Head)
+    // 0030 Beginning of partition (Cylinder/Sector)
+    // 0B   Type of Partition   - 32bit FAT!
+    // FE   End of Partition (Head)
+    // C5FF End of Partition (Cylinder/Sector)
+    // 00002000   Sectors between MBR and First Sector in partition
+    // 00ECAC46   Number of Sectors in Partition (=15510598, which x512b = 8GB!!)
+
+    printf_("Read Sector 0 Done\n");
 
     int tmp = 21;
     int test_var = 0;

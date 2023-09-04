@@ -35,9 +35,17 @@
 #define ACMD41_ARG 0x40000000   // support High Capacity SD cards
 #define ACMD41_CRC 0x00   // not required
 
+#define CMD17 17
+#define CMD17_CRC 0x00  // not required
+
+static DSTATUS SD_DISK_STATUS = STA_NOINIT;
+
 // Intitialise disk "pdrv" (only disk 0 is supported for now)
 // Returns 0 if successful, 0x1 if disk could not be initialised
 DSTATUS disk_initialize (BYTE pdrv){
+    if (pdrv > 0){
+        return STA_NODISK;
+    }
     printf_("\nStarting Disk Initialisation...\n");
     printf_("Setting SD SPI Speed to ~200KHz\n");
     spi_set_throttle(SD_SPI_THROTTLE_INIT); // set speed to 200KHz for SD card initialisation
@@ -66,8 +74,63 @@ DSTATUS disk_initialize (BYTE pdrv){
     sd_print_r3(res);
     printf_("Setting SD SPI Speed to %iHz\n", SD_SPI_RUN_SPEED);
     spi_set_throttle(SD_SPI_THROTTLE_RUN); // set speed to max 25MHz for SD card operation
+    SD_DISK_STATUS = 0; // clear STA_NOINIT flag to mark disk initialisation
     printf_("Disk Initialisation Complete!\n\n");
     return 0;
+}
+
+DSTATUS disk_status(BYTE pdrv){
+    if (pdrv > 0){
+        return STA_NOINIT;
+    }
+    return SD_DISK_STATUS;
+}
+
+DRESULT disk_read (BYTE pdrv, BYTE* buff, LBA_t sector, UINT count){
+    if (count > 1){
+        return RES_PARERR;
+    }
+    if (pdrv > 0){
+        return RES_PARERR;
+    }
+    if (SD_DISK_STATUS & STA_NOINIT){
+        return RES_NOTRDY;
+    }
+    sd_read_single_block(buff, sector);
+    printf_("Done Reading block %i\n", sector);
+    return RES_OK;
+}
+
+u8 sd_read_single_block(u8 *buf, u32 sector){
+    // TODO accept token as pointer arg so we can check it
+    printf_("Reading block %i...\n", sector);
+    sd_spi_start();
+    sd_command(CMD17, sector, CMD17_CRC);   // single block read
+    u8 res = sd_response_r1();
+    sd_print_r1(res);
+
+    u8 token;
+    // poll until data start token received, TODO add ~100ms timeout
+    while((token = spi_read_byte()) == 0xff){
+        // printf_("spi read byte: 0x%x\n", token);
+        // if(i > 8) break; // timeout and return 0xFF
+    }
+    printf_("token: 0x%x\n", token);
+    // printf_("data:\n", token);
+    if (token == START_BLOCK){
+        //read 512B data block
+        for (u16 i = 0; i < SD_BYTES_PER_BLOCK;i++){
+            buf[i] = spi_read_byte();
+            // printf_("0x%x ", buf[i]);
+        }
+        // printf_("Data Done\n");
+        //read and bin 2-byte CRC
+        spi_read_byte();
+        spi_read_byte();
+    }
+
+    sd_spi_stop();
+    return res;
 }
 
 // set CSn low to start a transaction
