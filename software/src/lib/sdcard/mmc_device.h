@@ -27,6 +27,7 @@
 #define R1_IDLE 0x01
 
 #define R1_VALUE_READY 0x00
+#define R1B_BUSY 0x00
 
 // Voltage Accepted
 #define VOLTAGE_ACC_2V7_3V6 0x01
@@ -48,6 +49,7 @@ void sd_spi_stop();
 
 void sd_command(u8 cmd, u32 arg, u8 crc);
 u8 sd_response_r1();
+u8 sd_response_r1b();
 u8 sd_response_r3r7(u8 *res);
 
 void sd_power_up_init();
@@ -57,6 +59,7 @@ void sd_read_operating_conditions_register(u8 *res);
 u8 sd_send_operating_condition();
 
 u8 sd_read_single_block(u8 *buf, u32 sector);
+u8 sd_read_multi_block(u8 *buf, u32 sector, u32 count);
 
 void sd_print_r1(u8 res);
 void sd_print_r3(u8 *res);

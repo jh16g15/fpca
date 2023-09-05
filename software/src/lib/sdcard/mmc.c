@@ -35,8 +35,17 @@
 #define ACMD41_ARG 0x40000000   // support High Capacity SD cards
 #define ACMD41_CRC 0x00   // not required
 
-#define CMD17 17
+#define CMD17 17    // Single Block Read
 #define CMD17_CRC 0x00  // not required
+
+#define CMD18 18    // Multi Block Read
+#define CMD18_CRC 0x00  // not required
+
+#define CMD12 12    // Stop Transmission (of Read Data)
+#define CMD12_ARG 0x00000000
+#define CMD12_CRC 0x00  // not required
+
+
 
 static DSTATUS SD_DISK_STATUS = STA_NOINIT;
 
@@ -87,17 +96,17 @@ DSTATUS disk_status(BYTE pdrv){
 }
 
 DRESULT disk_read (BYTE pdrv, BYTE* buff, LBA_t sector, UINT count){
-    if (count > 1){
-        return RES_PARERR;
-    }
     if (pdrv > 0){
         return RES_PARERR;
     }
     if (SD_DISK_STATUS & STA_NOINIT){
         return RES_NOTRDY;
     }
-    sd_read_single_block(buff, sector);
-    printf_("Done Reading block %i\n", sector);
+    if (count == 1){
+        sd_read_single_block(buff, sector);
+    } else {
+        sd_read_multi_block(buff, sector, count);
+    }
     return RES_OK;
 }
 
@@ -130,6 +139,49 @@ u8 sd_read_single_block(u8 *buf, u32 sector){
     }
 
     sd_spi_stop();
+    return res;
+}
+
+u8 sd_read_multi_block(u8 *buf, u32 sector, u32 count){
+    printf_("Reading %i blocks starting from %i...\n", count, sector);
+    sd_spi_start();
+    sd_command(CMD18, sector, CMD18_CRC);   // multi block read
+    u8 res = sd_response_r1();
+    sd_print_r1(res);
+
+    u8 token;
+
+    // read each block in turn
+    for (u32 j = 0; j < count; j++){
+        // poll until data start token received, TODO add ~100ms timeout
+        while((token = spi_read_byte()) == 0xff){
+            // printf_("spi read byte: 0x%x\n", token);
+            // if(i > 8) break; // timeout and return 0xFF
+        }
+        printf_("token: 0x%x\n", token);
+        // printf_("data:\n", token);
+        if (token == START_BLOCK){
+            //read 512B data block
+            for (u16 i = 0; i < SD_BYTES_PER_BLOCK;i++){
+                buf[SD_BYTES_PER_BLOCK*j + i] = spi_read_byte();
+                // printf_("0x%x ", buf[i]);
+            }
+            // printf_("Data Done\n");
+            //read and bin 2-byte CRC
+            spi_read_byte();
+            spi_read_byte();
+        }
+
+    }
+
+    // send STOP_TRANSMISSION
+    sd_command(CMD12, CMD12_ARG, CMD12_CRC);
+    spi_read_byte(); // Discard Stuff Byte before reading CMD12 response - see http://elm-chan.org/docs/mmc/mmc_e.html
+    res = sd_response_r1b();
+    sd_print_r1(res);
+
+    sd_spi_stop();
+    printf_("Done Reading %i blocks starting from %i\n", count, sector);
     return res;
 }
 
@@ -238,6 +290,27 @@ u8 sd_response_r1(){
     return res1;
 }
 
+// Get an R1 1-byte response from the SD card, wait for BUSY to be deasserted
+u8 sd_response_r1b(){
+    u8 i = 0, res1, busy;
+    // printf_("Getting R1b response\n", res1);
+    // poll until response data received
+    while((res1 = spi_read_byte()) == 0xff){
+        // printf_("spi read byte: 0x%x\n", res1);
+        i++;
+        if(i > 8) break; // timeout and return 0xFF
+    }
+
+    // wait for BUSY to clear (any number of 0x00 bytes)
+    printf_("Wait for BUSY to clear\n");
+    while ((busy = spi_read_byte()) == R1B_BUSY) {
+        // printf_("spi read byte: 0x%x\n", busy);
+    };
+
+    printf_("BUSY cleared!\n");
+    return res1;
+}
+
 // Get an R7 5-byte response from the SD card (first byte is R1 response)
 u8 sd_response_r3r7(u8 *res){
     res[0] = sd_response_r1();
@@ -256,7 +329,7 @@ void sd_print_r1(u8 res){
     if(res & R1_MSB){
         printf_("Error: MSB=1\n"); return;
     }
-    if(res == 0){
+    if(res == R1_VALUE_READY){
         printf_("Card Ready\n"); return;
     }
     if(res & R1_PARAM_ERR){
