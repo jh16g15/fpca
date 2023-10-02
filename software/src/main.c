@@ -15,7 +15,7 @@
 #include "console.h"
 
 #include "printf.h"
-// #include "ff.h"
+#include "ff.h"
 #include "diskio.h"
 
 void wait_for_btn_press(int btn){
@@ -73,6 +73,66 @@ void spi_test(){
     spi_check(0x5);
 }
 
+// #define MAIN_USE_FATFS
+
+FRESULT list_dir (const char *path)
+{
+    FRESULT res;
+    DIR dir;
+    FILINFO fno;
+    int nfile, ndir;
+
+
+    res = f_opendir(&dir, path);                       /* Open the directory */
+    if (res == FR_OK) {
+        nfile = ndir = 0;
+        for (;;) {
+            res = f_readdir(&dir, &fno);                   /* Read a directory item */
+            if (res != FR_OK || fno.fname[0] == 0) break;  /* Error or end of dir */
+            if (fno.fattrib & AM_DIR) {            /* Directory */
+                printf_("   <DIR>   %s\n", fno.fname);
+                ndir++;
+            } else {                               /* File */
+                printf_("%10u %s\n", fno.fsize, fno.fname);
+                nfile++;
+            }
+        }
+        f_closedir(&dir);
+        printf_("%d dirs, %d files.\n", ndir, nfile);
+    } else {
+        printf_("Failed to open \"%s\". (%u)\n", path, res);
+    }
+    return res;
+}
+
+// reads PSRAM ID register and confirms density
+void psram_read_id(void)
+{
+    printf_("Reading PSRAM ID\n");
+    spi_stop();
+    spi_start();
+    spi_write_byte(0x9F);   // PSRAM READ ID
+
+    spi_write_byte(0xFF);   // PSRAM Address (unused for this cmd)
+    spi_write_byte(0xFF);   // PSRAM Address (unused for this cmd)
+    spi_write_byte(0xFF);   // PSRAM Address (unused for this cmd)
+
+    u8 manu_id = spi_read_byte();
+    u8 kgd = spi_read_byte();
+    u8 eid[6];
+    eid[5] = spi_read_byte();
+    eid[4] = spi_read_byte();
+    eid[3] = spi_read_byte();
+    eid[2] = spi_read_byte();
+    eid[1] = spi_read_byte();
+    eid[0] = spi_read_byte();
+
+    spi_stop();
+    u8 density = eid[5] >> 5;  // top 3 bits represent density
+    u8 density_MB = 2 << (density + 3);
+    eid[5] = eid[5] & 0x1F;
+    printf_("MANU: 0x%x, KGD: 0x%x, Capacity: %dMB, EID: 0x%x%x%x%x%x%x\n", manu_id, kgd, density_MB, eid[5], eid[4], eid[3], eid[2], eid[1], eid[0]);
+}
 
 void main(void)
 {
@@ -90,36 +150,20 @@ void main(void)
 
     printf_("Hello World\n");
 
-    disk_initialize(0);
+    // Test APS6404 PSRAM pmod for correct operation
+    psram_read_id();
 
-    u8 disk_buffer[512*2];
-    printf_("Read Sector 0:\n");
-    disk_read(0, disk_buffer, 0, 1);
+#ifdef MAIN_USE_FATFS
+    FATFS fs;
+    f_mount(&fs, "", 1);
+    list_dir("0:");
 
-    printf_("Partition 0 Details:\n");
-    u16 offset = 0x1be; // skip 446 bytes of boot code (we don't use that)
-    printf_("State: 0x%x, ", disk_buffer[offset]);
-    printf_("Partition Type: 0x%x", disk_buffer[offset + 4]);
-    if (disk_buffer[offset + 4] == 0x0b)
-        printf_(" (FAT32)");
 
-    // pointer arithmetic to read out u32s from byte buffer
-    // THIS CAUSES MISALIGNED MEMORY ACCESSES = SYSTEM CRASH!
-    // u32 mbr_gap = *(u32 *)(disk_buffer + offset + 0x8);
-    u32 mbr_gap = u32_from_u8s(disk_buffer + (offset + 0x8));
-    printf_("\nSectors between MBR and First Sector: 0x%x (%i)\n", mbr_gap, mbr_gap);
-
-    // THIS CAUSES MISALIGNED MEMORY ACCESSES = SYSTEM CRASH!
-    // u32 num_sectors = *(u32 *)(disk_buffer + offset + 0xC);
-    u32 num_sectors = u32_from_u8s(disk_buffer + (offset + 0xC));
-    printf_("Number of Sectors in partition : 0x%x (%i)\n", num_sectors, num_sectors);
-    printf_("Volume Size: %iMB\n", num_sectors / 1024 / 1024 * 512);    // careful order of operations to avoid u32 overflow!
-
+    #endif
 
     printf_("CPU Arch      : %s\n", "RISC-V RV32I");
     printf_("CPU Frequency : %i MHz\n", GPIO_SOC_FREQ/1000000);
     printf_("CPU Memory    : %i KB\n", GPIO_SOC_MEM/1024);
-    disk_read(0, disk_buffer, 0x8000, 2);
 
     // SECTOR 0 ANALYSIS
     // 440 bytes of 0x0 (22 lines of 20 bytes)
