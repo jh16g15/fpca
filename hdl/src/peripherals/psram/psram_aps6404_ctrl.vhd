@@ -63,6 +63,9 @@ architecture rtl of psram_aps6404_ctrl is
     constant CMD_QUAD_WRITE     : std_logic_vector(7 downto 0) := x"38";
     constant CMD_FAST_QUAD_READ : std_logic_vector(7 downto 0) := x"EB";
 
+    constant FAST_QUAD_READ_WAIT_CYCLES : integer := 6;
+    constant FAST_QUAD_READ_WAIT_BYTES : integer := FAST_QUAD_READ_WAIT_CYCLES/2;
+
     -- 19.5MHz MEM_CTRL_CLK_FREQ_HZ is the minimum for 32 byte burst
 
     --   BYTES  | Efficiency    | Min MEM_CTRL Freq | Approx BW at 84MHz SPI CLK
@@ -203,7 +206,7 @@ begin
                         -- Receive QPI Read Data
                         --------------------------------------------------------------------------------
                     when QPI_READ_DATA =>
-                        xchg_num_bytes         <= BURST_LENGTH_BYTES;
+                        xchg_num_bytes         <= FAST_QUAD_READ_WAIT_BYTES + BURST_LENGTH_BYTES; -- the top FAST_QUAD_READ_WAIT_BYTES bytes will shift out the top and be discarded
                         xchg_bytes_counter     <= 0;
                         xchg_return_state      <= CMD_DONE;
                         psram_qpi_io_dir_input <= '1'; -- set to INPUT
@@ -220,7 +223,7 @@ begin
                         psram_clk <= '1'; -- now generate posedge
                         state     <= XCHG_BYTES_POSEDGE;
                         --------------------------------------------------------------------------------
-                    when XCHG_BYTES_POSEDGE =>
+                        when XCHG_BYTES_POSEDGE =>
                         if mode_qpi = '1' then
                             xchg_buffer <= xchg_buffer(xchg_buffer'left - 4 downto 0) & psram_qpi_si; -- and shift in
                             bits_transferred := bits_transferred + 4;
@@ -229,6 +232,8 @@ begin
                             bits_transferred := bits_transferred + 4;
                         end if;
                         psram_clk <= '0'; --now generate negedge
+                        state     <= XCHG_BYTES_NEGEDGE;
+                        -- unless we have finished our transfer
                         if bits_transferred = 8 then
                             xchg_bytes_counter <= xchg_bytes_counter + 1;
                             if xchg_bytes_counter + 1 = xchg_num_bytes then
