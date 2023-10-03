@@ -2,6 +2,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+--! Simple burst-driven controller for APS6404 PSRAM
+--! Bursts are read from and written to this controller all in one cycle, making it only suitable for short bursts
+--!
 entity psram_aps6404_ctrl is
     generic
     (
@@ -64,7 +67,7 @@ architecture rtl of psram_aps6404_ctrl is
     constant CMD_FAST_QUAD_READ : std_logic_vector(7 downto 0) := x"EB";
 
     constant FAST_QUAD_READ_WAIT_CYCLES : integer := 6;
-    constant FAST_QUAD_READ_WAIT_BYTES : integer := FAST_QUAD_READ_WAIT_CYCLES/2;
+    constant FAST_QUAD_READ_WAIT_BYTES  : integer := FAST_QUAD_READ_WAIT_CYCLES/2;
 
     -- 19.5MHz MEM_CTRL_CLK_FREQ_HZ is the minimum for 32 byte burst
 
@@ -81,16 +84,14 @@ architecture rtl of psram_aps6404_ctrl is
 
     signal psram_qpi_so           : std_logic_vector(3 downto 0);
     signal psram_qpi_si           : std_logic_vector(3 downto 0);
-    signal psram_qpi_io_dir_input : std_logic; -- '1' for input, '0' for output
+    signal psram_qpi_io_dir_input : std_logic := '1'; -- '1' for input, '0' for output
 
     signal psram_spi_so : std_logic;
     signal psram_spi_si : std_logic;
 
     signal mode_qpi : std_logic := '0';
 
-    signal cycle_counter : integer;
-
-    type t_state is (PWR_ON, ENTER_QUAD, IDLE, QPI_READ_CMD, QPI_READ_DATA, QPI_WRITE_CMD, QPI_WRITE_DATA, XCHG_BYTES_NEGEDGE, XCHG_BYTES_POSEDGE, CMD_DONE);
+    type t_state is (PWR_ON, ENTER_QUAD, IDLE, QPI_READ_CMD, QPI_READ_WAIT, QPI_READ_DATA, QPI_WRITE_CMD, QPI_WRITE_DATA, XCHG_BYTES_START, XCHG_BYTES_NEGEDGE, XCHG_BYTES_POSEDGE, CMD_DONE);
     signal state              : t_state := PWR_ON;
     signal xchg_buffer        : std_logic_vector(XCHG_BUFFER_SIZE_BYTES * 8 - 1 downto 0);
     signal xchg_num_bytes     : integer;
@@ -118,7 +119,7 @@ begin
                         psram_cs_n             <= '1';
                         psram_clk              <= '0';
                         mode_qpi               <= '0';
-                        psram_qpi_io_dir_input <= '1';
+                        psram_qpi_io_dir_input <= '1'; -- default to Hi-Z
                         psram_busy             <= '1';
                         bits_transferred := 0;
                         -- wait for 150us (not implemented) then move to next state
@@ -128,7 +129,6 @@ begin
                         -- Send Enter Quad Mode command over SPI
                         --------------------------------------------------------------------------------
                     when ENTER_QUAD =>
-                        state                  <= XCHG_BYTES_NEGEDGE;
                         psram_qpi_io_dir_input <= '0'; -- set to OUTPUT (although this is SPI mode anyway)
 
                         psram_cs_n                                                    <= '0'; -- start PSRAM transaction
@@ -136,12 +136,14 @@ begin
                         xchg_num_bytes                                                <= 1;
                         xchg_bytes_counter                                            <= 0;
                         xchg_return_state                                             <= CMD_DONE;
+                        state                                                         <= XCHG_BYTES_START;
 
                         --------------------------------------------------------------------------------
                         -- Deassert Chip Select and psram_busy, move to IDLE
                         --------------------------------------------------------------------------------
                     when CMD_DONE =>
                         psram_cs_n <= '1';
+                        psram_clk <= '0';
                         mode_qpi   <= '1'; -- after ENTER QUAD command done, we are in QPI mode
                         psram_busy <= '0';
                         rdata_out  <= xchg_buffer(BURST_LENGTH_BYTES * 8 - 1 downto 0); -- if not a read, this will be junk
@@ -175,6 +177,7 @@ begin
                         xchg_num_bytes         <= 4;
                         xchg_bytes_counter     <= 0;
                         xchg_return_state      <= QPI_WRITE_DATA;
+                        state                  <= XCHG_BYTES_START;
                         --------------------------------------------------------------------------------
                         -- Send QPI Write Data
                         --------------------------------------------------------------------------------
@@ -183,6 +186,7 @@ begin
                         xchg_num_bytes                                   <= BURST_LENGTH_BYTES;
                         xchg_bytes_counter                               <= 0;
                         xchg_return_state                                <= CMD_DONE;
+                        state                                            <= XCHG_BYTES_START;
                         psram_qpi_io_dir_input                           <= '0'; -- set to OUTPUT
 
                         --------------------------------------------------------------------------------
@@ -200,19 +204,39 @@ begin
                         psram_qpi_io_dir_input <= '0'; -- set to OUTPUT
                         xchg_num_bytes         <= 4;
                         xchg_bytes_counter     <= 0;
+                        xchg_return_state      <= QPI_READ_WAIT;
+                        state                  <= XCHG_BYTES_START;
+
+                        --------------------------------------------------------------------------------
+                        -- QPI Read Wait States
+                        --------------------------------------------------------------------------------
+                    when QPI_READ_WAIT =>
+                        xchg_num_bytes         <= FAST_QUAD_READ_WAIT_BYTES;
+                        xchg_bytes_counter     <= 0;
                         xchg_return_state      <= QPI_READ_DATA;
+                        state                  <= XCHG_BYTES_START;
+                        psram_qpi_io_dir_input <= '1'; -- set to INPUT for Hi-Z
 
                         --------------------------------------------------------------------------------
                         -- Receive QPI Read Data
                         --------------------------------------------------------------------------------
                     when QPI_READ_DATA =>
-                        xchg_num_bytes         <= FAST_QUAD_READ_WAIT_BYTES + BURST_LENGTH_BYTES; -- the top FAST_QUAD_READ_WAIT_BYTES bytes will shift out the top and be discarded
+                        xchg_num_bytes         <= BURST_LENGTH_BYTES;
                         xchg_bytes_counter     <= 0;
                         xchg_return_state      <= CMD_DONE;
+                        state                  <= XCHG_BYTES_START;
                         psram_qpi_io_dir_input <= '1'; -- set to INPUT
 
                         --------------------------------------------------------------------------------
                         -- subroutine to send bytes from a buffer
+                        --------------------------------------------------------------------------------
+                    when XCHG_BYTES_START =>    -- set up initial bit(s) on the bus
+                        if mode_qpi = '1' then
+                            psram_qpi_so <= xchg_buffer(xchg_buffer'left downto xchg_buffer'left - 4 + 1); -- set from top 4 bits
+                        else
+                            psram_spi_so <= xchg_buffer(xchg_buffer'left); -- set from top bit
+                        end if;
+                        state <= XCHG_BYTES_POSEDGE;
                         --------------------------------------------------------------------------------
                     when XCHG_BYTES_NEGEDGE =>
                         if mode_qpi = '1' then
@@ -220,18 +244,18 @@ begin
                         else
                             psram_spi_so <= xchg_buffer(xchg_buffer'left); -- set from top bit
                         end if;
-                        psram_clk <= '1'; -- now generate posedge
+                        psram_clk <= '0'; -- now generate negedge
                         state     <= XCHG_BYTES_POSEDGE;
                         --------------------------------------------------------------------------------
-                        when XCHG_BYTES_POSEDGE =>
+                    when XCHG_BYTES_POSEDGE =>
                         if mode_qpi = '1' then
                             xchg_buffer <= xchg_buffer(xchg_buffer'left - 4 downto 0) & psram_qpi_si; -- and shift in
                             bits_transferred := bits_transferred + 4;
                         else
                             xchg_buffer <= xchg_buffer(xchg_buffer'left - 1 downto 0) & psram_spi_si; -- and shift in
-                            bits_transferred := bits_transferred + 4;
+                            bits_transferred := bits_transferred + 1;
                         end if;
-                        psram_clk <= '0'; --now generate negedge
+                        psram_clk <= '1'; --now generate posedge
                         state     <= XCHG_BYTES_NEGEDGE;
                         -- unless we have finished our transfer
                         if bits_transferred = 8 then
@@ -247,6 +271,7 @@ begin
             end if;
         end if;
     end process;
+
     -- infer IOBUFs (TODO check for correct inference!)
     process (all)
     begin

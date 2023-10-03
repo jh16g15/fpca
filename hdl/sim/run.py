@@ -128,7 +128,7 @@ def main():
 
     # Increase the maximum size  of a single object to get rid of this error
     # /usr/local/bin/ghdl:error: declaration of a too large object (144 > --max-stack-alloc=128 KB)
-    VU.set_sim_option("ghdl.sim_flags", ["--max-stack-alloc=256"]) # value is in KB
+    VU.set_sim_option("ghdl.sim_flags", ["--max-stack-alloc=256", "--ieee-asserts=disable"]) # value is in KB
 
     VU.main()
 
