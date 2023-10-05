@@ -111,6 +111,7 @@ begin
             if reset = '1' then
                 state <= PWR_ON;
             else
+                burst_done <= '0'; -- default
                 case state is
                         --------------------------------------------------------------------------------
                         -- Start init process
@@ -143,10 +144,11 @@ begin
                         --------------------------------------------------------------------------------
                     when CMD_DONE =>
                         psram_cs_n <= '1';
-                        psram_clk <= '0';
+                        psram_clk  <= '0';
                         mode_qpi   <= '1'; -- after ENTER QUAD command done, we are in QPI mode
                         psram_busy <= '0';
                         rdata_out  <= xchg_buffer(BURST_LENGTH_BYTES * 8 - 1 downto 0); -- if not a read, this will be junk
+                        burst_done <= '1'; -- high for 1 cycle
                         state      <= IDLE;
 
                         --------------------------------------------------------------------------------
@@ -154,6 +156,7 @@ begin
                         --------------------------------------------------------------------------------
                     when IDLE =>
                         if burst_start = '1' then
+                            psram_busy <= '1';
                             if burst_write = '1' then
                                 state <= QPI_WRITE_CMD;
                             else
@@ -230,7 +233,8 @@ begin
                         --------------------------------------------------------------------------------
                         -- subroutine to send bytes from a buffer
                         --------------------------------------------------------------------------------
-                    when XCHG_BYTES_START =>    -- set up initial bit(s) on the bus
+                    when XCHG_BYTES_START => -- set up initial bit(s) on the bus
+                        psram_clk  <= '0';
                         if mode_qpi = '1' then
                             psram_qpi_so <= xchg_buffer(xchg_buffer'left downto xchg_buffer'left - 4 + 1); -- set from top 4 bits
                         else
@@ -250,6 +254,7 @@ begin
                     when XCHG_BYTES_POSEDGE =>
                         if mode_qpi = '1' then
                             xchg_buffer <= xchg_buffer(xchg_buffer'left - 4 downto 0) & psram_qpi_si; -- and shift in
+                            -- report "shifted in " & to_hstring(psram_qpi_si);
                             bits_transferred := bits_transferred + 4;
                         else
                             xchg_buffer <= xchg_buffer(xchg_buffer'left - 1 downto 0) & psram_spi_si; -- and shift in
@@ -259,6 +264,7 @@ begin
                         state     <= XCHG_BYTES_NEGEDGE;
                         -- unless we have finished our transfer
                         if bits_transferred = 8 then
+                            bits_transferred := 0;
                             xchg_bytes_counter <= xchg_bytes_counter + 1;
                             if xchg_bytes_counter + 1 = xchg_num_bytes then
                                 state <= xchg_return_state;
