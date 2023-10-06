@@ -40,6 +40,9 @@ end entity psram_aps6404_ctrl;
 
 architecture rtl of psram_aps6404_ctrl is
     constant PSRAM_CLK_FREQ_KHZ : integer := MEM_CTRL_CLK_FREQ_KHZ / 2; -- spi clk
+
+
+
     constant MAX_BURST_CYCLES   : integer := 8 * PSRAM_CLK_FREQ_KHZ / 1000; -- 8us per burst
     constant MAX_BURST_BYTES    : integer := (MAX_BURST_CYCLES - 14) / 2;
 
@@ -91,7 +94,7 @@ architecture rtl of psram_aps6404_ctrl is
 
     signal mode_qpi : std_logic := '0';
 
-    type t_state is (PWR_ON, ENTER_QUAD, IDLE, QPI_READ_CMD, QPI_READ_WAIT, QPI_READ_DATA, QPI_WRITE_CMD, QPI_WRITE_DATA, XCHG_BYTES_START, XCHG_BYTES_NEGEDGE, XCHG_BYTES_POSEDGE, CMD_DONE);
+    type t_state is (PWR_ON, ENTER_QUAD, IDLE, QPI_READ_CMD, QPI_READ_WAIT, QPI_READ_DATA, QPI_READ_DONE_HOLD_CSN, QPI_WRITE_CMD, QPI_WRITE_DATA, XCHG_BYTES_START, XCHG_BYTES_NEGEDGE, XCHG_BYTES_POSEDGE, CMD_DONE);
     signal state              : t_state := PWR_ON;
     signal xchg_buffer        : std_logic_vector(XCHG_BUFFER_SIZE_BYTES * 8 - 1 downto 0);
     signal xchg_num_bytes     : integer;
@@ -223,18 +226,25 @@ begin
                         --------------------------------------------------------------------------------
                         -- Receive QPI Read Data
                         --------------------------------------------------------------------------------
-                    when QPI_READ_DATA =>
+                        when QPI_READ_DATA =>
                         xchg_num_bytes         <= BURST_LENGTH_BYTES;
                         xchg_bytes_counter     <= 0;
-                        xchg_return_state      <= CMD_DONE;
+                        xchg_return_state      <= QPI_READ_DONE_HOLD_CSN;
                         state                  <= XCHG_BYTES_START;
                         psram_qpi_io_dir_input <= '1'; -- set to INPUT
+
+                        --------------------------------------------------------------------------------
+                        -- Wait 1 cycle before deasserting Chip Select to ensure we latch correctly
+                        --------------------------------------------------------------------------------
+                    when QPI_READ_DONE_HOLD_CSN =>
+                        psram_clk <= '0';
+                        state     <= CMD_DONE;
 
                         --------------------------------------------------------------------------------
                         -- subroutine to send bytes from a buffer
                         --------------------------------------------------------------------------------
                     when XCHG_BYTES_START => -- set up initial bit(s) on the bus
-                        psram_clk  <= '0';
+                        psram_clk <= '0';
                         if mode_qpi = '1' then
                             psram_qpi_so <= xchg_buffer(xchg_buffer'left downto xchg_buffer'left - 4 + 1); -- set from top 4 bits
                         else
