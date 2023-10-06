@@ -41,16 +41,20 @@ end entity psram_aps6404_ctrl;
 architecture rtl of psram_aps6404_ctrl is
     constant PSRAM_CLK_FREQ_KHZ : integer := MEM_CTRL_CLK_FREQ_KHZ / 2; -- spi clk
 
+    constant PSRAM_REFRESH_TARGET : time := 18 ns;
 
-
-    constant MAX_BURST_CYCLES   : integer := 8 * PSRAM_CLK_FREQ_KHZ / 1000; -- 8us per burst
-    constant MAX_BURST_BYTES    : integer := (MAX_BURST_CYCLES - 14) / 2;
+    constant MAX_BURST_CYCLES : integer := 8 * PSRAM_CLK_FREQ_KHZ / 1000; -- 8us per burst
+    constant MAX_BURST_BYTES  : integer := (MAX_BURST_CYCLES - 14) / 2;
 
     constant PWR_ON_DELAY_CYCLES : integer := 150 * MEM_CTRL_CLK_FREQ_KHZ / 1000; -- 150us
 
+    -- We need 18ns of CS_N deasserted between each burst for DRAM auto-refresh
+    -- 18ns = 55.5 MHz
+    constant REFRESH_CYCLES : integer := (PSRAM_CLK_FREQ_KHZ / 55500) + 1;
+    signal refresh_counter  : integer := 0;
+
     -- set XCHG buffer as large of CMD+ADDR (4 bytes) or burst buffer
     function f_get_buf_size(burst_len : integer) return integer is
-        variable buf_size                 : integer;
     begin
         if (4 > burst_len) then
             return 4;
@@ -127,7 +131,8 @@ begin
                         psram_busy             <= '1';
                         bits_transferred := 0;
                         -- wait for 150us (not implemented) then move to next state
-                        state <= ENTER_QUAD;
+                        state           <= ENTER_QUAD;
+                        refresh_counter <= 0;
 
                         --------------------------------------------------------------------------------
                         -- Send Enter Quad Mode command over SPI
@@ -146,18 +151,22 @@ begin
                         -- Deassert Chip Select and psram_busy, move to IDLE
                         --------------------------------------------------------------------------------
                     when CMD_DONE =>
-                        psram_cs_n <= '1';
-                        psram_clk  <= '0';
-                        mode_qpi   <= '1'; -- after ENTER QUAD command done, we are in QPI mode
-                        psram_busy <= '0';
-                        rdata_out  <= xchg_buffer(BURST_LENGTH_BYTES * 8 - 1 downto 0); -- if not a read, this will be junk
-                        burst_done <= '1'; -- high for 1 cycle
-                        state      <= IDLE;
+                        psram_cs_n      <= '1';
+                        psram_clk       <= '0';
+                        mode_qpi        <= '1'; -- after ENTER QUAD command done, we are in QPI mode
+                        rdata_out       <= xchg_buffer(BURST_LENGTH_BYTES * 8 - 1 downto 0); -- if not a read, this will be junk
+                        burst_done      <= '1'; -- high for 1 cycle
+                        refresh_counter <= refresh_counter + 1;
+                        if refresh_counter + 1 = REFRESH_CYCLES then
+                            psram_busy <= '0';
+                            state      <= IDLE;
+                        end if;
 
                         --------------------------------------------------------------------------------
                         -- Wait for next burst
                         --------------------------------------------------------------------------------
                     when IDLE =>
+                        refresh_counter <= 0;
                         if burst_start = '1' then
                             psram_busy <= '1';
                             if burst_write = '1' then
@@ -226,7 +235,7 @@ begin
                         --------------------------------------------------------------------------------
                         -- Receive QPI Read Data
                         --------------------------------------------------------------------------------
-                        when QPI_READ_DATA =>
+                    when QPI_READ_DATA =>
                         xchg_num_bytes         <= BURST_LENGTH_BYTES;
                         xchg_bytes_counter     <= 0;
                         xchg_return_state      <= QPI_READ_DONE_HOLD_CSN;
