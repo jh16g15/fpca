@@ -67,8 +67,11 @@ begin
 
                 sim_wb_write(wb_clk, wb_mosi, wb_miso, x"0000_0000", x"1111_2222");
                 sim_wb_read(wb_clk, wb_mosi, wb_miso, x"0000_0000", rdata);
+                sim_wb_write(wb_clk, wb_mosi, wb_miso, x"0000_0010", x"3333_4444");
+                sim_wb_read(wb_clk, wb_mosi, wb_miso, x"0000_0000", rdata);
 
                 wait for 10 * wb_clk_period;
+                info("Test Complete!");
                 test_runner_cleanup(runner);
             end if;
         end loop;

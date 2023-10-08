@@ -25,7 +25,7 @@ entity psram_aps6404_ctrl is
         wdata_in : in std_logic_vector(BURST_LENGTH_BYTES * 8 - 1 downto 0);
 
         -- data out (valid with burst_done)
-        burst_done : out std_logic;
+        burst_done : out std_logic := '0';
         rdata_out  : out std_logic_vector(BURST_LENGTH_BYTES * 8 - 1 downto 0);
 
         psram_busy : out std_logic; -- ready for next burst

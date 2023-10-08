@@ -94,7 +94,7 @@ architecture rtl of wb_psram_aps6404 is
     signal reg_cache_miss_count   : std_logic_vector(31 downto 0) := x"0000_0000";
     signal reg_stall_cycles_count : std_logic_vector(31 downto 0) := x"0000_0000";
     -- on wishbone clk
-    type t_wb_state is (IDLE, CACHE_HIT, CACHE_MISS_WAIT_FOR_PSRAM_READY, CACHE_MISS_WRITEBACK, CACHE_MISS_RELOAD, CACHE_MISS_FINAL);
+    type t_wb_state is (IDLE, CACHE_MISS_WAIT_FOR_PSRAM_READY, CACHE_MISS_WRITEBACK, CACHE_MISS_RELOAD, CACHE_MISS_FINAL);
     signal wb_state : t_wb_state := IDLE;
 
     type t_mem_state is (BUSY, IDLE, FETCH, WRITEBACK);
@@ -168,7 +168,6 @@ begin
                             else -- Cache/PSRAM access
                                 if (addr_tag = cache_tag) and cache_line_empty_wb_clk = '0' then
                                     cache_hit_count <= cache_hit_count + to_unsigned(1, 32);
-                                    -- wb_state        <= CACHE_HIT;    -- no need to change state on Cache Hit
                                     wb_miso_out.ack <= '1'; -- ACK Cache Hit
 
                                     -- on a cache hit, perform the read/write. If a write, trigger a writeback
