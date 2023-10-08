@@ -77,6 +77,7 @@ architecture rtl of psram_aps6404_ctrl is
     constant FAST_QUAD_READ_WAIT_BYTES  : integer := FAST_QUAD_READ_WAIT_CYCLES/2;
 
     -- 19.5MHz MEM_CTRL_CLK_FREQ_HZ is the minimum for 32 byte burst
+    -- as CSn can't be asserted for more than 8us
 
     --   BYTES  | Efficiency    | Min MEM_CTRL Freq | Approx BW at 84MHz SPI CLK
     -- ---------|---------------|-------------------|---------------------------
