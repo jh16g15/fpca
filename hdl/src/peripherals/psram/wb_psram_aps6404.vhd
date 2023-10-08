@@ -9,7 +9,6 @@ use work.wb_pkg.all;
 entity wb_psram_aps6404 is
     generic
     (
-        MEM_CLK_IS_WB_CLK     : boolean := true; -- TODO allow these clocks to be decoupled for higher performance
         MEM_CTRL_CLK_FREQ_KHZ : integer;
         BURST_LENGTH_BYTES    : integer := 4
     );
@@ -48,36 +47,37 @@ architecture rtl of wb_psram_aps6404 is
     constant REG_CACHE_MISS_COUNT_ADDR     : std_logic_vector(WB_ADDR_BITS - 1 downto 0) := x"80_0008";
     constant REG_STALL_CYCLES_COUNTER_ADDR : std_logic_vector(WB_ADDR_BITS - 1 downto 0) := x"80_000C";
 
-    --! Function to get the bit offset of the access into a cache line
-    function get_cache_line_offset(addr_byte : std_logic_vector(CACHE_BYTE_ADDR_BITS - 1 downto 0)) return integer is
-    begin
-        -- Examples:
-        -- If byte address is 0x0, cache line size = 8 bytes then offset = 0
-        -- If byte address is 0x4, cache line size = 8 bytes then byte offset = 4, bit offset = 32
-    end function;
-
-    signal reset_mem_clk : std_logic_vector := '1';
+    signal reset_mem_clk : std_logic := '1';
 
     -- very minimal 1-line cache of X bytes to improve efficiency by using longer burst length
     -- also lets us do sub-word writes
-    signal cache_line_buf          : std_logic_vector(BURST_LENGTH_BYTES * 8 - 1 downto 0);
-    signal cache_tag               : std_logic_vector(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
-    signal cache_line_addr         : std_logic_vector(PSRAM_ADDR_BITS - 1 downto 0); -- Start Byte Address of the line currently in the cache (debug)
+    signal cache_line_buf : std_logic_vector(BURST_LENGTH_BYTES * 8 - 1 downto 0);
+    signal cache_tag      : std_logic_vector(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
+    -- signal cache_line_addr         : std_logic_vector(PSRAM_ADDR_BITS - 1 downto 0); -- Start Byte Address of the line currently in the cache (debug)
     signal cache_line_empty_wb_clk : std_logic := '1'; -- clear after first load
 
     -- decompose the WB address into its parts/
     signal addr_tag  : std_logic_vector(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
-    signal addr_byte : std_logic_vector(CACHE_BYTE_ADDR_BITS - 1 downto 0);
+    signal addr_byte : natural;
+
+    -- save the WB transaction in case of a cache miss
+    signal saved_wb_mosi   : t_wb_mosi;
+    signal saved_addr_tag  : std_logic_vector(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
+    signal saved_addr_byte : natural;
+
     -- signal when cache line modified
-    signal cache_line_dirty : std_logic;
-
-
+    signal cache_line_dirty        : std_logic;
     signal psram_read_req_wb_clk   : std_logic;
     signal psram_write_req_wb_clk  : std_logic;
     signal psram_read_req_mem_clk  : std_logic;
     signal psram_write_req_mem_clk : std_logic;
-    signal burst_wdata             : std_logic_vector(BURST_LENGTH_BYTES * 8 - 1 downto 0); -- memclk
-    signal burst_rdata             : std_logic_vector(BURST_LENGTH_BYTES * 8 - 1 downto 0); -- memclk
+
+    -- PSRAM controller signals (memclk)
+    signal burst_start : std_logic;
+    signal burst_start_byte_address : std_logic_vector(22 downto 0);
+    signal burst_write : std_logic;
+    signal burst_wdata : std_logic_vector(BURST_LENGTH_BYTES * 8 - 1 downto 0); -- memclk
+    signal burst_rdata : std_logic_vector(BURST_LENGTH_BYTES * 8 - 1 downto 0); -- memclk
 
     -- signal when PSRAM read has completed
     signal psram_done_mem_clk : std_logic;
@@ -93,22 +93,24 @@ architecture rtl of wb_psram_aps6404 is
     signal reg_cache_hit_count    : std_logic_vector(31 downto 0) := x"0000_0000";
     signal reg_cache_miss_count   : std_logic_vector(31 downto 0) := x"0000_0000";
     signal reg_stall_cycles_count : std_logic_vector(31 downto 0) := x"0000_0000";
-
     -- on wishbone clk
-    type t_wb_state is (IDLE, CACHE_HIT, CACHE_MISS_WAIT_FOR_PSRAM_DONE);
+    type t_wb_state is (IDLE, CACHE_HIT, CACHE_MISS_WAIT_FOR_PSRAM_READY, CACHE_MISS_WRITEBACK, CACHE_MISS_RELOAD, CACHE_MISS_FINAL);
     signal wb_state : t_wb_state := IDLE;
 
     type t_mem_state is (BUSY, IDLE, FETCH, WRITEBACK);
     signal mem_state : t_mem_state := BUSY;
 begin
 
-    addr_tag  <= wb_mosi_in.adr(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
-    addr_byte <= wb_mosi_in.adr(CACHE_BYTE_ADDR_BITS - 1 downto 0); -- note that bits 1:0 should always be 0 for WB - check SEL lines
+    addr_tag        <= wb_mosi_in.adr(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
+    addr_byte       <= slv2uint(wb_mosi_in.adr(CACHE_BYTE_ADDR_BITS - 1 downto 0)); -- note that bits 1:0 should always be 0 for WB - check SEL lines
+    saved_addr_tag  <= saved_wb_mosi.adr(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
+    saved_addr_byte <= slv2uint(saved_wb_mosi.adr(CACHE_BYTE_ADDR_BITS - 1 downto 0)); -- note that bits 1:0 should always be 0 for WB - check SEL lines
 
     process (wb_clk)
         -- used for addressing calcs
         variable hi : integer;
         variable lo : integer;
+
     begin
         if rising_edge(wb_clk) then
             if wb_reset = '1' then
@@ -127,8 +129,8 @@ begin
                 wb_miso_out.rty  <= '0';
                 wb_miso_out.rdat <= x"DEADC0DE";
 
-                wb_miso_out.stall <= '1'; -- stall by default
-                psram_read_req_wb_clk <= '0';
+                wb_miso_out.stall      <= '1'; -- stall by default
+                psram_read_req_wb_clk  <= '0';
                 psram_write_req_wb_clk <= '0';
 
                 case wb_state is
@@ -136,29 +138,30 @@ begin
                     when IDLE =>
                         wb_miso_out.stall <= '0'; -- ready for WB transaction
                         if wb_mosi_in.stb = '1' and wb_miso_out.stall = '0' then
+                            saved_wb_mosi <= wb_mosi_in;
                             if wb_mosi_in.adr(WB_ADDR_BITS - 1) = '1' then -- register access
                                 wb_miso_out.ack <= '1'; -- ACK register access
                                 if wb_mosi_in.we then
                                     -- Register Write
                                     case(wb_mosi_in.adr(WB_REG_ADDR_BITS - 1 downto 0)) is
-                                        when REG_CONTROL_ADDR(WB_REG_ADDR_BITS - 1 downto 0) => -- Latch all counters
+                                    when REG_CONTROL_ADDR(WB_REG_ADDR_BITS - 1 downto 0) => -- Latch all counters
                                         reg_cache_hit_count    <= std_logic_vector(cache_hit_count);
                                         reg_cache_miss_count   <= std_logic_vector(cache_miss_count);
                                         reg_stall_cycles_count <= std_logic_vector(stall_cycles_count);
-                                        when others => null;
+                                    when others => null;
                                     end case;
                                 else
                                     -- Register Read
                                     case(wb_mosi_in.adr(WB_REG_ADDR_BITS - 1 downto 0)) is
-                                        when REG_CONTROL_ADDR(WB_REG_ADDR_BITS - 1 downto 0)         =>
+                                    when REG_CONTROL_ADDR(WB_REG_ADDR_BITS - 1 downto 0)         =>
                                         wb_miso_out.rdat <= (others                                  => '0'); -- autoformat breaks here
-                                        when REG_CACHE_HIT_COUNT_ADDR(WB_REG_ADDR_BITS - 1 downto 0) =>
+                                    when REG_CACHE_HIT_COUNT_ADDR(WB_REG_ADDR_BITS - 1 downto 0) =>
                                         wb_miso_out.rdat <= reg_cache_hit_count;
-                                        when REG_CACHE_MISS_COUNT_ADDR(WB_REG_ADDR_BITS - 1 downto 0) =>
+                                    when REG_CACHE_MISS_COUNT_ADDR(WB_REG_ADDR_BITS - 1 downto 0) =>
                                         wb_miso_out.rdat <= reg_cache_miss_count;
-                                        when REG_STALL_CYCLES_COUNTER_ADDR(WB_REG_ADDR_BITS - 1 downto 0) =>
+                                    when REG_STALL_CYCLES_COUNTER_ADDR(WB_REG_ADDR_BITS - 1 downto 0) =>
                                         wb_miso_out.rdat <= reg_stall_cycles_count;
-                                        when others =>
+                                    when others =>
                                         null;
                                     end case;
                                 end if;
@@ -176,7 +179,7 @@ begin
                                         lo := 8 * (i + addr_byte);
                                         if wb_mosi_in.sel(i) = '1' then -- if this byte is selected
                                             -- synchronous write logic
-                                            cache_line_dirty <= '1';    -- mark cache line as dirty
+                                            cache_line_dirty <= '1'; -- mark cache line as dirty
                                             if wb_mosi_in.we = '1' then
                                                 cache_line_buf(hi downto lo) <= wb_mosi_in.wdat(8 * (i + 1) - 1 downto 8 * i); -- write byte
                                             end if;
@@ -186,15 +189,55 @@ begin
                                     end loop;
 
                                 else
-                                    cache_miss_count <= cache_miss_count + to_unsigned(1, 32);
-                                    wb_state         <= CACHE_MISS_WAIT_FOR_PSRAM_READY;
-
+                                    cache_miss_count  <= cache_miss_count + to_unsigned(1, 32);
+                                    wb_state          <= CACHE_MISS_WAIT_FOR_PSRAM_READY;
+                                    wb_miso_out.stall <= '1'; -- halt future WB transactions
                                 end if;
 
                             end if;
                         end if;
-                    when CACHE_MISS_WAIT_FOR_PSRAM_DONE =>
 
+                    when CACHE_MISS_WAIT_FOR_PSRAM_READY => -- wait for PSRAM to be ready (TODO skippable if already ready)
+                        if psram_busy_wb_clk = '0' then
+                            if cache_line_dirty = '1' then
+                                wb_state               <= CACHE_MISS_WRITEBACK; -- writeback before we reload cache line
+                                psram_write_req_wb_clk <= '1'; -- 1-cycle pulse to CDC
+                            else
+                                wb_state              <= CACHE_MISS_RELOAD;
+                                psram_read_req_wb_clk <= '1'; -- 1-cycle pulse to CDC
+                            end if;
+                        end if;
+
+                    when CACHE_MISS_WRITEBACK =>
+                        if psram_done_wb_clk = '1' then
+                            cache_line_dirty      <= '0'; -- now cache line is clean as writeback complete
+                            wb_state              <= CACHE_MISS_RELOAD;
+                            psram_read_req_wb_clk <= '1'; -- 1-cycle pulse to CDC
+                        end if;
+                    when CACHE_MISS_RELOAD => -- wait for cache line to be reloaded
+                        if psram_done_wb_clk = '1' then
+                            wb_state                <= CACHE_MISS_FINAL;
+                            cache_line_empty_wb_clk <= '0';
+                            cache_line_buf          <= burst_rdata;-- NOTE burst_rdata is in the mem_clk domain, but will be stable while the PSRAM DONE pulse is CDC'd
+                            cache_tag               <= saved_addr_tag;
+                        end if;
+                    when CACHE_MISS_FINAL => -- apply original WB transaction to new cache line
+                        wb_state        <= IDLE;
+                        wb_miso_out.ack <= '1';
+                        for i in 0 to 3 loop
+                            -- add on addr_byte  offset within cache line
+                            hi := 8 * (i + saved_addr_byte + 1) - 1;
+                            lo := 8 * (i + saved_addr_byte);
+                            if saved_wb_mosi.sel(i) = '1' then -- if this byte is selected
+                                -- synchronous write logic
+                                cache_line_dirty <= '1'; -- mark cache line as dirty
+                                if saved_wb_mosi.we = '1' then
+                                    cache_line_buf(hi downto lo) <= saved_wb_mosi.wdat(8 * (i + 1) - 1 downto 8 * i); -- write byte
+                                end if;
+                            end if;
+                            -- synchronous read logic
+                            wb_miso_out.rdat(8 * (i + 1) - 1 downto 8 * i) <= cache_line_buf(hi downto lo); -- read byte
+                        end loop;
                     when others =>
                         null;
                 end case;
@@ -213,7 +256,7 @@ begin
                 case(mem_state) is
                     when BUSY =>
                     if psram_busy_mem_clk = '0' then
-                        state <= IDLE;
+                        mem_state <= IDLE;
                     end if;
                     when IDLE =>
                     if psram_read_req_mem_clk then
@@ -266,8 +309,8 @@ begin
     cdc_sync_rst_inst : entity work.cdc_sync_rst
         port
         map (
-        dest_clk => mem_ctrl_clk,
         src_rst  => wb_reset,
+        dest_clk => mem_ctrl_clk,
         dest_rst => reset_mem_clk
         );
 
@@ -276,7 +319,7 @@ begin
         map (
         src_clk    => wb_clk,
         src_pulse  => psram_read_req_wb_clk,
-        dest_clk   => wb_clk,
+        dest_clk   => mem_ctrl_clk,
         dest_pulse => psram_read_req_mem_clk
         );
 
@@ -285,7 +328,7 @@ begin
         map (
         src_clk    => wb_clk,
         src_pulse  => psram_write_req_wb_clk,
-        dest_clk   => wb_clk,
+        dest_clk   => mem_ctrl_clk,
         dest_pulse => psram_write_req_mem_clk
         );
 
@@ -294,10 +337,19 @@ begin
     psram_done_cdc_pulse_inst : entity work.cdc_pulse
         port
         map (
-        src_clk    => wb_clk,
+        src_clk    => mem_ctrl_clk,
         src_pulse  => psram_done_mem_clk,
         dest_clk   => wb_clk,
         dest_pulse => psram_done_wb_clk
+        );
+
+    psram_busy_cdc_single_inst : entity work.cdc_single
+        port
+        map (
+        src_clk  => mem_ctrl_clk,
+        src_in   => psram_busy_mem_clk,
+        dest_clk => wb_clk,
+        dest_out => psram_busy_wb_clk
         );
 
 end architecture;
