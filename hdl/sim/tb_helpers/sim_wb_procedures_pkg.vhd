@@ -49,10 +49,10 @@ package body sim_wb_procedures_pkg is
         wb_mosi_out.wdat(wdata'left downto wdata'right) <= wdata;
         wb_mosi_out.sel <= sel;
         wait until rising_edge(clk) and wb_miso_in.stall = '0';
+        wb_mosi_out <= C_WB_MOSI_INIT;
         if wb_miso_in.ack = '0' then
             wait until rising_edge(clk) and wb_miso_in.ack = '1';
         end if;
-        wb_mosi_out <= C_WB_MOSI_INIT;
         info("WB Write Complete");
     end procedure;
 
@@ -72,6 +72,7 @@ package body sim_wb_procedures_pkg is
         wb_mosi_out.adr(address'left downto address'right) <= address;
         wb_mosi_out.sel <= x"f";
         wait until rising_edge(clk) and wb_miso_in.stall = '0';
+        wb_mosi_out <= C_WB_MOSI_INIT;
         if wb_miso_in.ack = '0' then
             wait until rising_edge(clk) and wb_miso_in.ack = '1';
         end if;
