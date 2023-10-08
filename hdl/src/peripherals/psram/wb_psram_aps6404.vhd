@@ -42,10 +42,10 @@ architecture rtl of wb_psram_aps6404 is
     constant WB_REG_ADDR_BITS     : integer := 4;
     constant CACHE_BYTE_ADDR_BITS : integer := clog2(BURST_LENGTH_BYTES);
 
-    constant REG_CONTROL_ADDR              : std_logic_vector(WB_ADDR_BITS - 1 downto 0) := x"80_0000";
-    constant REG_CACHE_HIT_COUNT_ADDR      : std_logic_vector(WB_ADDR_BITS - 1 downto 0) := x"80_0004";
-    constant REG_CACHE_MISS_COUNT_ADDR     : std_logic_vector(WB_ADDR_BITS - 1 downto 0) := x"80_0008";
-    constant REG_STALL_CYCLES_COUNTER_ADDR : std_logic_vector(WB_ADDR_BITS - 1 downto 0) := x"80_000C";
+    constant REG_CONTROL_ADDR              : std_logic_vector(WB_REG_ADDR_BITS - 1 downto 0) := x"0";
+    constant REG_CACHE_HIT_COUNT_ADDR      : std_logic_vector(WB_REG_ADDR_BITS - 1 downto 0) := x"4";
+    constant REG_CACHE_MISS_COUNT_ADDR     : std_logic_vector(WB_REG_ADDR_BITS - 1 downto 0) := x"8";
+    constant REG_STALL_CYCLES_COUNTER_ADDR : std_logic_vector(WB_REG_ADDR_BITS - 1 downto 0) := x"C";
 
     signal reset_mem_clk : std_logic := '1';
 
@@ -110,7 +110,6 @@ begin
         -- used for addressing calcs
         variable hi : integer;
         variable lo : integer;
-
     begin
         if rising_edge(wb_clk) then
             if wb_reset = '1' then
@@ -144,7 +143,7 @@ begin
                                 if wb_mosi_in.we then
                                     -- Register Write
                                     case(wb_mosi_in.adr(WB_REG_ADDR_BITS - 1 downto 0)) is
-                                    when REG_CONTROL_ADDR(WB_REG_ADDR_BITS - 1 downto 0) => -- Latch all counters
+                                    when REG_CONTROL_ADDR => -- Latch all counters
                                         reg_cache_hit_count    <= std_logic_vector(cache_hit_count);
                                         reg_cache_miss_count   <= std_logic_vector(cache_miss_count);
                                         reg_stall_cycles_count <= std_logic_vector(stall_cycles_count);
@@ -153,13 +152,13 @@ begin
                                 else
                                     -- Register Read
                                     case(wb_mosi_in.adr(WB_REG_ADDR_BITS - 1 downto 0)) is
-                                    when REG_CONTROL_ADDR(WB_REG_ADDR_BITS - 1 downto 0)         =>
+                                    when REG_CONTROL_ADDR =>
                                         wb_miso_out.rdat <= (others                                  => '0'); -- autoformat breaks here
-                                    when REG_CACHE_HIT_COUNT_ADDR(WB_REG_ADDR_BITS - 1 downto 0) =>
+                                    when REG_CACHE_HIT_COUNT_ADDR =>
                                         wb_miso_out.rdat <= reg_cache_hit_count;
-                                    when REG_CACHE_MISS_COUNT_ADDR(WB_REG_ADDR_BITS - 1 downto 0) =>
+                                    when REG_CACHE_MISS_COUNT_ADDR =>
                                         wb_miso_out.rdat <= reg_cache_miss_count;
-                                    when REG_STALL_CYCLES_COUNTER_ADDR(WB_REG_ADDR_BITS - 1 downto 0) =>
+                                    when REG_STALL_CYCLES_COUNTER_ADDR =>
                                         wb_miso_out.rdat <= reg_stall_cycles_count;
                                     when others =>
                                         null;

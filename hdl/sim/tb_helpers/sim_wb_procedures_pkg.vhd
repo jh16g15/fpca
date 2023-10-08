@@ -15,8 +15,8 @@ package sim_wb_procedures_pkg is
         signal clk : in std_logic;
         signal wb_mosi_out : out t_wb_mosi;
         signal wb_miso_in : in t_wb_miso;
-        address : in std_logic_vector;
-        wdata : in std_logic_vector;
+        address : in std_logic_vector(31 downto 0);
+        wdata : in std_logic_vector(31 downto 0);
         sel : in std_logic_vector(3 downto 0) := x"f"
     );
 
@@ -24,9 +24,9 @@ package sim_wb_procedures_pkg is
         signal clk : in std_logic;
         signal wb_mosi_out : out t_wb_mosi;
         signal wb_miso_in : in t_wb_miso;
-        address : in std_logic_vector;
-        rdata : out std_logic_vector
-    )
+        address : in std_logic_vector(31 downto 0);
+        rdata : out std_logic_vector(31 downto 0)
+    );
 end package;
 
 package body sim_wb_procedures_pkg is
@@ -35,8 +35,8 @@ package body sim_wb_procedures_pkg is
         signal clk : in std_logic;
         signal wb_mosi_out : out t_wb_mosi;
         signal wb_miso_in : in t_wb_miso;
-        address : in std_logic_vector;
-        wdata : in std_logic_vector;
+        address : in std_logic_vector(31 downto 0);
+        wdata : in std_logic_vector(31 downto 0);
         sel : in std_logic_vector(3 downto 0) := x"f"
     ) is
     begin
@@ -60,8 +60,8 @@ package body sim_wb_procedures_pkg is
         signal clk : in std_logic;
         signal wb_mosi_out : out t_wb_mosi;
         signal wb_miso_in : in t_wb_miso;
-        address : in std_logic_vector;
-        rdata : out std_logic_vector
+        address : in std_logic_vector(31 downto 0);
+        rdata : out std_logic_vector(31 downto 0)
     ) is
     begin
         info("WB Read from " & to_hstring(address));
@@ -70,7 +70,7 @@ package body sim_wb_procedures_pkg is
         wb_mosi_out.stb <= '1';
         wb_mosi_out.we <= '0';
         wb_mosi_out.adr(address'left downto address'right) <= address;
-        wb_mosi_out.sel <= sel;
+        wb_mosi_out.sel <= x"f";
         wait until rising_edge(clk) and wb_miso_in.stall = '0';
         if wb_miso_in.ack = '0' then
             wait until rising_edge(clk) and wb_miso_in.ack = '1';

@@ -28,7 +28,7 @@ begin
     generic
     map (
     DEST_SYNC_FF   => SYNC_FF, -- DECIMAL; range: 2-10
-    INIT_SYNC_FF   => 0, -- DECIMAL; 0=disable simulation init values, 1=enable simulation init values
+    INIT_SYNC_FF   => 1, -- DECIMAL; 0=disable simulation init values, 1=enable simulation init values
     REG_OUTPUT     => 0, -- DECIMAL; 0=disable registered output, 1=enable registered output
     RST_USED       => 0, -- DECIMAL; 0=no reset, 1=implement reset
     SIM_ASSERT_CHK => 0 -- DECIMAL; 0=disable simulation messages, 1=enable simulation messages

@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.wb_pkg.all;
-use work.sim_wb_procedures.all;
+use work.sim_wb_procedures_pkg.all;
 --
 library vunit_lib;
 context vunit_lib.vunit_context;
@@ -39,7 +39,6 @@ begin
     wb_psram_aps6404_inst : entity work.wb_psram_aps6404
         generic
         map (
-        MEM_CLK_IS_WB_CLK     => MEM_CLK_IS_WB_CLK,
         MEM_CTRL_CLK_FREQ_KHZ => MEM_CTRL_CLK_FREQ_KHZ,
         BURST_LENGTH_BYTES    => BURST_LENGTH_BYTES
         )
@@ -56,16 +55,20 @@ begin
         );
 
     main : process
+        variable rdata : std_logic_vector(31 downto 0);
     begin
         test_runner_setup(runner, runner_cfg);
         while test_suite loop
             if run("test_alive") then
                 info("Hello world test_alive");
+                wait for 10 * wb_clk_period;
+                wb_reset <= '0';
+                wait for 10 * wb_clk_period;
 
-                sim_wb_write(wb_clk, wb_mosi, wb_miso, x"0", x"1111_2222");
-                sim_wb_read(wb_clk, wb_mosi, wb_miso, x"0");
+                sim_wb_write(wb_clk, wb_mosi, wb_miso, x"0000_0000", x"1111_2222");
+                sim_wb_read(wb_clk, wb_mosi, wb_miso, x"0000_0000", rdata);
 
-                wait for 10 * clk_period;
+                wait for 10 * wb_clk_period;
                 test_runner_cleanup(runner);
             end if;
         end loop;
@@ -84,6 +87,6 @@ begin
         );
 
     wb_clk  <= not wb_clk after wb_clk_period/2;
-    mem_clk <= not mem_clk after mem_clk_period/2;
+    mem_ctrl_clk <= not mem_ctrl_clk after mem_clk_period/2;
     test_runner_watchdog(runner, 20 us);
 end;

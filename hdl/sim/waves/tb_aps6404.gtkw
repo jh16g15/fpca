@@ -1,0 +1,90 @@
+[*]
+[*] GTKWave Analyzer v3.3.111 (w)1999-2020 BSI
+[*] Sun Oct  8 23:37:53 2023
+[*]
+[dumpfile] "/mnt/d/Documents/fpga/fpca/hdl/sim/vunit_out/test_output/lib.wb_psram_aps6404_tb.test_alive_dfc11f84de9f8e7a374f9dcf58fb18437fa14d60/ghdl/wave.ghw"
+[dumpfile_mtime] "Sun Oct  8 23:36:00 2023"
+[dumpfile_size] 15954
+[savefile] "/mnt/d/Documents/fpga/fpca/hdl/sim/waves/tb_aps6404.gtkw"
+[timestart] 0
+[size] 2560 1377
+[pos] -61 -61
+*-29.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.wb_psram_aps6404_tb.
+[treeopen] top.wb_psram_aps6404_tb.wb_miso.
+[treeopen] top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.
+[treeopen] top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.
+[treeopen] top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.
+[sst_width] 333
+[signals_width] 536
+[sst_expanded] 1
+[sst_vpaned_height] 896
+@200
+-Wishbone
+@28
+top.wb_psram_aps6404_tb.wb_mosi.cyc
+top.wb_psram_aps6404_tb.wb_mosi.stb
+top.wb_psram_aps6404_tb.wb_mosi.we
+top.wb_psram_aps6404_tb.wb_clk
+@22
+#{top.wb_psram_aps6404_tb.wb_mosi.adr[31:0]} top.wb_psram_aps6404_tb.wb_mosi.adr[31] top.wb_psram_aps6404_tb.wb_mosi.adr[30] top.wb_psram_aps6404_tb.wb_mosi.adr[29] top.wb_psram_aps6404_tb.wb_mosi.adr[28] top.wb_psram_aps6404_tb.wb_mosi.adr[27] top.wb_psram_aps6404_tb.wb_mosi.adr[26] top.wb_psram_aps6404_tb.wb_mosi.adr[25] top.wb_psram_aps6404_tb.wb_mosi.adr[24] top.wb_psram_aps6404_tb.wb_mosi.adr[23] top.wb_psram_aps6404_tb.wb_mosi.adr[22] top.wb_psram_aps6404_tb.wb_mosi.adr[21] top.wb_psram_aps6404_tb.wb_mosi.adr[20] top.wb_psram_aps6404_tb.wb_mosi.adr[19] top.wb_psram_aps6404_tb.wb_mosi.adr[18] top.wb_psram_aps6404_tb.wb_mosi.adr[17] top.wb_psram_aps6404_tb.wb_mosi.adr[16] top.wb_psram_aps6404_tb.wb_mosi.adr[15] top.wb_psram_aps6404_tb.wb_mosi.adr[14] top.wb_psram_aps6404_tb.wb_mosi.adr[13] top.wb_psram_aps6404_tb.wb_mosi.adr[12] top.wb_psram_aps6404_tb.wb_mosi.adr[11] top.wb_psram_aps6404_tb.wb_mosi.adr[10] top.wb_psram_aps6404_tb.wb_mosi.adr[9] top.wb_psram_aps6404_tb.wb_mosi.adr[8] top.wb_psram_aps6404_tb.wb_mosi.adr[7] top.wb_psram_aps6404_tb.wb_mosi.adr[6] top.wb_psram_aps6404_tb.wb_mosi.adr[5] top.wb_psram_aps6404_tb.wb_mosi.adr[4] top.wb_psram_aps6404_tb.wb_mosi.adr[3] top.wb_psram_aps6404_tb.wb_mosi.adr[2] top.wb_psram_aps6404_tb.wb_mosi.adr[1] top.wb_psram_aps6404_tb.wb_mosi.adr[0]
+@28
+top.wb_psram_aps6404_tb.wb_miso.ack
+@22
+#{top.wb_psram_aps6404_tb.wb_miso.rdat[31:0]} top.wb_psram_aps6404_tb.wb_miso.rdat[31] top.wb_psram_aps6404_tb.wb_miso.rdat[30] top.wb_psram_aps6404_tb.wb_miso.rdat[29] top.wb_psram_aps6404_tb.wb_miso.rdat[28] top.wb_psram_aps6404_tb.wb_miso.rdat[27] top.wb_psram_aps6404_tb.wb_miso.rdat[26] top.wb_psram_aps6404_tb.wb_miso.rdat[25] top.wb_psram_aps6404_tb.wb_miso.rdat[24] top.wb_psram_aps6404_tb.wb_miso.rdat[23] top.wb_psram_aps6404_tb.wb_miso.rdat[22] top.wb_psram_aps6404_tb.wb_miso.rdat[21] top.wb_psram_aps6404_tb.wb_miso.rdat[20] top.wb_psram_aps6404_tb.wb_miso.rdat[19] top.wb_psram_aps6404_tb.wb_miso.rdat[18] top.wb_psram_aps6404_tb.wb_miso.rdat[17] top.wb_psram_aps6404_tb.wb_miso.rdat[16] top.wb_psram_aps6404_tb.wb_miso.rdat[15] top.wb_psram_aps6404_tb.wb_miso.rdat[14] top.wb_psram_aps6404_tb.wb_miso.rdat[13] top.wb_psram_aps6404_tb.wb_miso.rdat[12] top.wb_psram_aps6404_tb.wb_miso.rdat[11] top.wb_psram_aps6404_tb.wb_miso.rdat[10] top.wb_psram_aps6404_tb.wb_miso.rdat[9] top.wb_psram_aps6404_tb.wb_miso.rdat[8] top.wb_psram_aps6404_tb.wb_miso.rdat[7] top.wb_psram_aps6404_tb.wb_miso.rdat[6] top.wb_psram_aps6404_tb.wb_miso.rdat[5] top.wb_psram_aps6404_tb.wb_miso.rdat[4] top.wb_psram_aps6404_tb.wb_miso.rdat[3] top.wb_psram_aps6404_tb.wb_miso.rdat[2] top.wb_psram_aps6404_tb.wb_miso.rdat[1] top.wb_psram_aps6404_tb.wb_miso.rdat[0]
+@28
+top.wb_psram_aps6404_tb.wb_miso.stall
+top.wb_psram_aps6404_tb.wb_mosi.lock
+@22
+#{top.wb_psram_aps6404_tb.wb_mosi.sel[3:0]} top.wb_psram_aps6404_tb.wb_mosi.sel[3] top.wb_psram_aps6404_tb.wb_mosi.sel[2] top.wb_psram_aps6404_tb.wb_mosi.sel[1] top.wb_psram_aps6404_tb.wb_mosi.sel[0]
+#{top.wb_psram_aps6404_tb.wb_mosi.wdat[31:0]} top.wb_psram_aps6404_tb.wb_mosi.wdat[31] top.wb_psram_aps6404_tb.wb_mosi.wdat[30] top.wb_psram_aps6404_tb.wb_mosi.wdat[29] top.wb_psram_aps6404_tb.wb_mosi.wdat[28] top.wb_psram_aps6404_tb.wb_mosi.wdat[27] top.wb_psram_aps6404_tb.wb_mosi.wdat[26] top.wb_psram_aps6404_tb.wb_mosi.wdat[25] top.wb_psram_aps6404_tb.wb_mosi.wdat[24] top.wb_psram_aps6404_tb.wb_mosi.wdat[23] top.wb_psram_aps6404_tb.wb_mosi.wdat[22] top.wb_psram_aps6404_tb.wb_mosi.wdat[21] top.wb_psram_aps6404_tb.wb_mosi.wdat[20] top.wb_psram_aps6404_tb.wb_mosi.wdat[19] top.wb_psram_aps6404_tb.wb_mosi.wdat[18] top.wb_psram_aps6404_tb.wb_mosi.wdat[17] top.wb_psram_aps6404_tb.wb_mosi.wdat[16] top.wb_psram_aps6404_tb.wb_mosi.wdat[15] top.wb_psram_aps6404_tb.wb_mosi.wdat[14] top.wb_psram_aps6404_tb.wb_mosi.wdat[13] top.wb_psram_aps6404_tb.wb_mosi.wdat[12] top.wb_psram_aps6404_tb.wb_mosi.wdat[11] top.wb_psram_aps6404_tb.wb_mosi.wdat[10] top.wb_psram_aps6404_tb.wb_mosi.wdat[9] top.wb_psram_aps6404_tb.wb_mosi.wdat[8] top.wb_psram_aps6404_tb.wb_mosi.wdat[7] top.wb_psram_aps6404_tb.wb_mosi.wdat[6] top.wb_psram_aps6404_tb.wb_mosi.wdat[5] top.wb_psram_aps6404_tb.wb_mosi.wdat[4] top.wb_psram_aps6404_tb.wb_mosi.wdat[3] top.wb_psram_aps6404_tb.wb_mosi.wdat[2] top.wb_psram_aps6404_tb.wb_mosi.wdat[1] top.wb_psram_aps6404_tb.wb_mosi.wdat[0]
+@200
+-PSRAM
+@420
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.psram_aps6404_ctrl_inst.state
+@200
+-CDC
+@28
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.src_clk
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.src_pulse
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.dest_clk
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.dest_pulse
+@200
+-Read Req CDC
+@28
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.dest_clk
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.dest_pulse
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.src_clk
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.src_pulse
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_clk
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_event_ff
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_event_nxt
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_pulse
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_pulse_ff
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_pulse_int
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_rst
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_rst_qual
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_sync_out
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.dest_sync_qual
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.src_clk
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.src_edge_det
+@29
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.src_in_ff
+@28
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.src_level_ff
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.src_level_nxt
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.src_pulse
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.src_rst
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.src_rst_qual
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.src_sync_in
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.async_path_bit
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.dest_clk
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.dest_out
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.src_clk
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.src_ff
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.src_in
+top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.src_inqual
+#{top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.syncstages_ff[1:0]} top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.syncstages_ff[1] top.wb_psram_aps6404_tb.wb_psram_aps6404_inst.read_req_cdc_pulse_inst.xpm_cdc_pulse_inst.xpm_cdc_single_inst.syncstages_ff[0]
+[pattern_trace] 1
+[pattern_trace] 0
