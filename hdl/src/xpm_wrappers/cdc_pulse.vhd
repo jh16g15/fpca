@@ -11,7 +11,7 @@ entity cdc_pulse is
     );
     port (
         src_clk   : in std_logic;
-        src_pulse : in std_logic;
+        src_pulse : in std_logic; -- NOTE this must always have an assigned value right from the start (as we aren't using the resets)
         dest_clk   : in std_logic;
         dest_pulse : out std_logic
     );

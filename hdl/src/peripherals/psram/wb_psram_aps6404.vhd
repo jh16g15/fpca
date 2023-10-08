@@ -67,8 +67,8 @@ architecture rtl of wb_psram_aps6404 is
 
     -- signal when cache line modified
     signal cache_line_dirty        : std_logic;
-    signal psram_read_req_wb_clk   : std_logic;
-    signal psram_write_req_wb_clk  : std_logic;
+    signal psram_read_req_wb_clk   : std_logic := '0';
+    signal psram_write_req_wb_clk  : std_logic := '0';
     signal psram_read_req_mem_clk  : std_logic;
     signal psram_write_req_mem_clk : std_logic;
 
@@ -80,10 +80,10 @@ architecture rtl of wb_psram_aps6404 is
     signal burst_rdata : std_logic_vector(BURST_LENGTH_BYTES * 8 - 1 downto 0); -- memclk
 
     -- signal when PSRAM read has completed
-    signal psram_done_mem_clk : std_logic;
+    signal psram_done_mem_clk : std_logic := '0';
     signal psram_done_wb_clk  : std_logic;
 
-    signal psram_busy_mem_clk : std_logic;
+    signal psram_busy_mem_clk : std_logic := '0';
     signal psram_busy_wb_clk  : std_logic;
 
     -- Stats counters
@@ -263,14 +263,14 @@ begin
                         burst_start              <= '1'; -- pulse
                         burst_write              <= '0'; -- READ
                         burst_start_byte_address <= (others => '0'); -- fill with all 0s, overwrite below
-                        burst_start_byte_address <= wb_mosi_in.adr(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
+                        burst_start_byte_address(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS) <= wb_mosi_in.adr(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
                     end if;
                     if psram_write_req_mem_clk then
                         mem_state                <= BUSY;
                         burst_start              <= '1'; -- pulse
                         burst_write              <= '1'; -- WRITE
                         burst_start_byte_address <= (others => '0'); -- fill with all 0s, overwrite below
-                        burst_start_byte_address <= wb_mosi_in.adr(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
+                        burst_start_byte_address(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS) <= wb_mosi_in.adr(PSRAM_ADDR_BITS - 1 downto CACHE_BYTE_ADDR_BITS);
                         burst_wdata              <= cache_line_buf; -- NOTE cache_line_buf is in the wb_clk domain, but will be stable while the WRITE REQ pulse is CDC'd
                     end if;
                     when others => null;
