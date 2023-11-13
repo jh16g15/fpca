@@ -74,6 +74,9 @@ begin
                 wait for 10 * clk_period;
                 psram_32b_write(0, x"12345678");
                 psram_32b_check(0, x"12345678");
+
+                psram_32b_write(1024, x"78653434");
+                psram_32b_check(1024, x"78653434");
                 wait for 10 * clk_period;
 
                 test_runner_cleanup(runner);

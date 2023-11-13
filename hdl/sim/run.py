@@ -75,15 +75,11 @@ def main():
     # print(f"1:{os.listdir(Path(__file__).resolve().parents[1])}")
     # print(f"2:{os.listdir(Path(__file__).resolve().parents[2])}")
 
-    sim_dir = Path(__file__).parent
-    sim_exclude = [
-        "./waves",
-        "./vunit_out/ghdl/libraries",
-        "./vunit_out",
-        "./project_database",
-        "./preprocessed",
-        "./tb_helpers/psram_memory_interface_hs_2ch/temp",
-        "./tb_helpers/psram_memory_interface_hs_2ch/",
+    sim_tb_dir = Path(__file__).parent / "tb"
+    sim_helpers_dir = Path(__file__).parent / "tb_helpers"
+    sim_helpers_exclude = [
+        "psram_memory_interface_hs_2ch/temp",
+        "psram_memory_interface_hs_2ch/",
     ]
     src_dir = Path(__file__).resolve().parents[1] / "src"
     src_exclude = [
@@ -102,7 +98,8 @@ def main():
     ]
 
     VU.add_library("lib")
-    add_some_files_to_vunit(VU, sim_dir, sim_exclude, "lib")
+    VU.add_source_files(sim_tb_dir / "**/*.vhd", "lib")
+    add_some_files_to_vunit(VU, sim_helpers_dir, sim_helpers_exclude, "lib")
     add_some_files_to_vunit(VU, src_dir, src_exclude, "lib")
     # add_some_files_to_vunit(VU, pynq_dir, boards_exclude, "lib")
 
@@ -123,8 +120,10 @@ def main():
         add_some_files_to_vunit(VU, xilinx_unisim_dir, xilinx_exclude, "unisim")
     if USE_XILINX_XPM:
         VU.add_library("xpm")
-        add_some_files_to_vunit(VU, xilinx_xpm_vhdl, xilinx_exclude, "xpm")
-        # VU.add_external_library("xpm", xilinx_xpm_ghdl_precompiled)
+        VU.add_source_files(Path(xilinx_xpm_vhdl) / "xpm_cdc/hdl/*.vhd", "xpm")
+        VU.add_source_files(Path(xilinx_xpm_vhdl) / "xpm_fifo/hdl/*.vhd", "xpm")
+        VU.add_source_files(Path(xilinx_xpm_vhdl) / "xpm_memory/hdl/*.vhd", "xpm")
+        VU.add_source_files(Path(xilinx_xpm_vhdl) / "xpm_VCOMP.vhd", "xpm")
 
     # Increase the maximum size  of a single object to get rid of this error
     # /usr/local/bin/ghdl:error: declaration of a too large object (144 > --max-stack-alloc=128 KB)

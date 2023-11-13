@@ -13,7 +13,8 @@ end tb_basys3_soc;
 
 architecture bench of tb_basys3_soc is
     -- Clock period
-    constant clk_period : time := 5 ns;
+    constant clk_period : time := 40 ns;    -- 25MHz
+    constant mem_ctrl_clk_period : time := 10 ns;    -- 100MHz
     -- Generics
     constant G_PROJECT_ROOT : string := "/mnt/d/Documents/fpga/fpca/";
     -- constant G_MEM_INIT_FILE : string := "data/blinky.hex"; -- simulation
@@ -21,6 +22,7 @@ architecture bench of tb_basys3_soc is
 
     -- Ports
     signal clk          : std_logic;
+    signal mem_ctrl_clk : std_logic;
     signal reset        : std_logic := '0';
     signal gpio_led_out : std_logic_vector(31 downto 0);
     signal gpio_btn_in  : std_logic_vector(31 downto 0);
@@ -29,10 +31,6 @@ architecture bench of tb_basys3_soc is
     signal sseg_an_out  : std_logic_vector(3 downto 0);
     signal uart_tx      : std_logic;
 
-    signal text_display_wb_mosi        : t_wb_mosi;
-    signal text_display_wb_miso        : t_wb_miso;
-    signal zynq_ps_peripherals_wb_mosi : t_wb_mosi;
-    signal zynq_ps_peripherals_wb_miso : t_wb_miso;
 
 begin
     -- DUT
@@ -70,6 +68,7 @@ begin
         )
         port map(
             clk          => clk,
+            mem_ctrl_clk => mem_ctrl_clk,
             reset        => reset,
             gpio_led_out => gpio_led_out,
             gpio_btn_in  => gpio_btn_in,
@@ -125,5 +124,12 @@ begin
         clk <= '0';
         wait for clk_period/2;
     end process clk_process;
+    mem_ctrl_clk_process : process
+    begin
+        mem_ctrl_clk <= '1';
+        wait for mem_ctrl_clk_period/2;
+        mem_ctrl_clk <= '0';
+        wait for mem_ctrl_clk_period/2;
+    end process mem_ctrl_clk_process;
 
 end;
