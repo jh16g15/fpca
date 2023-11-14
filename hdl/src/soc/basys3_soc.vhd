@@ -15,11 +15,13 @@ entity basys3_soc is
         G_MEM_INIT_FILE      : string  := "software/hex/main.hex";
         G_BOOT_INIT_FILE     : string  := "software/hex/boot.hex";
         G_SOC_FREQ           : integer := 50_000_000;
+        G_MEM_CTRL_CLK_FREQ_KHZ : integer := 100_000;
         G_DEFAULT_BAUD       : integer := 9600;
         G_INCLUDE_JTAG_DEBUG : boolean := false
     );
     port (
         clk   : in std_logic;
+        mem_ctrl_clk : in std_logic;
         reset : in std_logic;
 
         -- GPIO
@@ -44,6 +46,11 @@ entity basys3_soc is
         spi_miso_in  : in std_logic;
         spi_mosi_out : out std_logic;
         spi_csn_out   : out std_logic;
+
+        -- QSPI PSRAM
+        psram_clk  : out std_logic;
+        psram_cs_n : out std_logic;
+        psram_sio  : inout std_logic_vector(3 downto 0);
 
         vga_hs_out : out std_logic;
         vga_vs_out : out std_logic;
@@ -85,7 +92,7 @@ architecture rtl of basys3_soc is
     -- Wishbone to framebuffer
     signal text_display_wb_mosi_out : t_wb_mosi;
     signal text_display_wb_miso_in  : t_wb_miso;
-    
+
     signal rw_regs_out : t_slv32_arr(G_NUM_RW_REGS - 1 downto 0);
     signal ro_regs_in  : t_slv32_arr(G_NUM_RO_REGS - 1 downto 0);
 
@@ -177,7 +184,7 @@ begin
         --            );
 
     end generate;
-    
+
     wb_address_monitor_inst : entity work.wb_address_monitor
       generic map (
         G_ADDR => x"0000_0000"
@@ -305,7 +312,7 @@ begin
             sseg_an         => sseg_an_out
         );
 
-    -- 0x5000_0000 SPI controller
+    -- -- 0x5000_0000 SPI controller for SD Card
     wb_spi_inst : entity work.wb_spi
         port map(
             wb_clk      => clk,
@@ -318,7 +325,25 @@ begin
             miso_in     => spi_miso_in
         );
 
-    gen_unmapped : for i in 6 to 14 generate
+    -- 0x6000_0000 SPI 8MB PSRAM controller
+    -- 0x6000_0000 to 0x607f_ffff   Mapped RAM
+    wb_psram_aps6404_inst : entity work.wb_psram_aps6404
+        generic map (
+          MEM_CTRL_CLK_FREQ_KHZ => G_MEM_CTRL_CLK_FREQ_KHZ,
+          BURST_LENGTH_BYTES => 4
+        )
+        port map (
+          wb_clk => clk,
+          mem_ctrl_clk => mem_ctrl_clk, -- max 168MHz
+          wb_reset => reset,
+          wb_mosi_in => wb_slave_mosi_arr(6),
+          wb_miso_out => wb_slave_miso_arr(6),
+          psram_clk => psram_clk,
+          psram_cs_n => psram_cs_n,
+          psram_sio => psram_sio
+        );
+
+    gen_unmapped : for i in 7 to 14 generate
         wb_unmapped_slv_inst : entity work.wb_unmapped_slv
             port map(
                 wb_mosi_in  => wb_slave_mosi_arr(i),
