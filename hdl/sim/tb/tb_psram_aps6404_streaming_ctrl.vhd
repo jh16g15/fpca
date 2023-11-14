@@ -7,13 +7,13 @@ use ieee.numeric_std.all;
 library vunit_lib;
 context vunit_lib.vunit_context;
 
-entity psram_aps6404_streaming_ctrl_tb is
+entity tb_psram_aps6404_streaming_ctrl is
   generic (
     runner_cfg : string
   );
 end;
 
-architecture bench of psram_aps6404_streaming_ctrl_tb is
+architecture bench of tb_psram_aps6404_streaming_ctrl is
   -- Clock period
   constant clk_period : time := 40 ns;
   -- Generics
