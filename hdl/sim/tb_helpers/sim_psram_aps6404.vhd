@@ -30,9 +30,6 @@ architecture rtl of sim_psram_aps6404 is
 
     --command buffer - 1 byte opcode, 3 bytes address
     type t_byte_arr is array (natural range <>) of std_logic_vector(7 downto 0);
-
-    -- simulated PSRAM memory buffer
-    signal MEM_BUFFER                : t_byte_arr(0 to G_MEM_BYTES - 1);
     signal psram_qpi_direction_input : std_logic := '1';
 begin
 
