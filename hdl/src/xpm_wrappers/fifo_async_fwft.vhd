@@ -6,6 +6,7 @@ use ieee.math_real.all;
 library xpm;
 use xpm.vcomponents.all;
 
+-- note that overflow/underflow is non-destructive, as reads/writes are gated inside the XPM
 entity fifo_async_fwft is
     generic
     (
@@ -18,14 +19,14 @@ entity fifo_async_fwft is
     (
         wr_clk   : in std_logic;
         wr_rst : in std_logic;
-        wr_stb   : in std_logic;
+        wr_vld   : in std_logic;
         wr_data  : in std_logic_vector(WR_DATA_WIDTH - 1 downto 0);
-        wr_full  : out std_logic;
+        wr_rdy  : out std_logic;
 
         rd_clk   : in std_logic;
-        rd_stb   : in std_logic;
+        rd_rdy   : in std_logic;
         rd_data  : out std_logic_vector(RD_DATA_WIDTH - 1 downto 0);
-        rd_empty : out std_logic
+        rd_vld   : out std_logic
     );
 end entity fifo_async_fwft;
 
@@ -54,8 +55,8 @@ architecture rtl of fifo_async_fwft is
     -- |   Setting USE_ADV_FEATURES[10] to 1 enables rd_data_count; Default value of this bit is 1                           |
     -- |   Setting USE_ADV_FEATURES[11] to 1 enables almost_empty flag; Default value of this bit is 0                       |
     -- |   Setting USE_ADV_FEATURES[12] to 1 enables data_valid flag; Default value of this bit is 0
-    -- constant ADV_FEATURES : string := "0000";
-    constant ADV_FEATURES : string := "0707";   -- also add data_valid
+    constant ADV_FEATURES : string := "0000";
+    -- constant ADV_FEATURES : string := "0707";
 
     -- gate these with appropriate reset_busy
     signal empty       : std_logic;
@@ -64,10 +65,8 @@ architecture rtl of fifo_async_fwft is
     signal wr_rst_busy : std_logic;
 begin
 
-    rd_empty <= empty or rd_rst_busy; -- force HI while still resetting
-    wr_full  <= full or wr_rst_busy; -- force HI while still resetting
-
-
+    rd_vld <= not(empty or rd_rst_busy); -- force while still resetting
+    wr_rdy <= not(full or wr_rst_busy); -- force while still resetting
 
     xpm_fifo_async_inst : xpm_fifo_async
     generic
@@ -168,7 +167,7 @@ begin
         rd_clk => rd_clk, -- 1-bit input: Read clock: Used for read operation. rd_clk must be a
         -- free running clock.
 
-        rd_en => rd_stb, -- 1-bit input: Read Enable: If the FIFO is not empty, asserting this
+        rd_en => rd_rdy, -- 1-bit input: Read Enable: If the FIFO is not empty, asserting this
         -- signal causes data (on dout) to be read from the FIFO. Must be held
         -- active-low when rd_rst_busy is active high.
 
@@ -182,7 +181,7 @@ begin
         wr_clk => wr_clk, -- 1-bit input: Write clock: Used for write operation. wr_clk must be a
         -- free running clock.
 
-        wr_en => wr_stb -- 1-bit input: Write Enable: If the FIFO is not full, asserting this
+        wr_en => wr_vld -- 1-bit input: Write Enable: If the FIFO is not full, asserting this
         -- signal causes data (on din) to be written to the FIFO. Must be held
         -- active-low when rst or wr_rst_busy is active high.
 
