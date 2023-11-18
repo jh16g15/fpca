@@ -54,7 +54,8 @@ architecture rtl of fifo_async_fwft is
     -- |   Setting USE_ADV_FEATURES[10] to 1 enables rd_data_count; Default value of this bit is 1                           |
     -- |   Setting USE_ADV_FEATURES[11] to 1 enables almost_empty flag; Default value of this bit is 0                       |
     -- |   Setting USE_ADV_FEATURES[12] to 1 enables data_valid flag; Default value of this bit is 0
-    constant ADV_FEATURES : string := "0000";
+    -- constant ADV_FEATURES : string := "0000";
+    constant ADV_FEATURES : string := "0707";   -- also add data_valid
 
     -- gate these with appropriate reset_busy
     signal empty       : std_logic;
@@ -63,8 +64,8 @@ architecture rtl of fifo_async_fwft is
     signal wr_rst_busy : std_logic;
 begin
 
-    rd_empty <= empty and rd_rst_busy; -- force HI while still resetting
-    wr_full  <= full and wr_rst_busy; -- force HI while still resetting
+    rd_empty <= empty or rd_rst_busy; -- force HI while still resetting
+    wr_full  <= full or wr_rst_busy; -- force HI while still resetting
 
 
 
