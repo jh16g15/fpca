@@ -24,10 +24,11 @@ architecture bench of fifo_async_fwft_tb is
     signal SB : ScoreBoardIDType := NewID("FIFO Scoreboard");
 
     -- Clock period
-    constant wr_clk_period : time := 5 ns;
-    constant rd_clk_period : time := 6 ns;
+    constant wr_clk_period : time := 40 ns;
+    constant rd_clk_period : time := 10 ns;
     -- Generics
-    constant RELATED_CLOCKS   : boolean := false;
+    constant DUAL_CLOCK       : boolean := true;
+    constant RELATED_CLOCKS   : boolean := true;
     constant FIFO_WRITE_DEPTH : integer := 16;
     constant WR_DATA_WIDTH    : integer := 8;
     constant RD_DATA_WIDTH    : integer := 8;
@@ -43,9 +44,10 @@ architecture bench of fifo_async_fwft_tb is
     signal rd_vld  : std_logic;
 begin
 
-    fifo_async_fwft_inst : entity work.fifo_async_fwft
+    fifo_fwft_inst : entity work.fifo_fwft
         generic
         map (
+        DUAL_CLOCK       => DUAL_CLOCK,
         RELATED_CLOCKS   => RELATED_CLOCKS,
         FIFO_WRITE_DEPTH => FIFO_WRITE_DEPTH,
         WR_DATA_WIDTH    => WR_DATA_WIDTH,
@@ -94,7 +96,7 @@ begin
                 for i in 0 to 50 loop
                     write_byte(std_logic_vector(to_unsigned(i, 8)));
                 end loop;
-
+                write_byte(x"ff");
                 wait for 100 * wr_clk_period;
                 test_runner_cleanup(runner);
 
@@ -105,12 +107,14 @@ test_runner_watchdog(runner, 10 us);
 
 -- allow the FIFO to hit full before we start reading out
 rd_rdy <= '1' after 2 us;
+-- rd_rdy <= '1';
 
     -- Check using OSVVM Scoreboard
     check_proc : process is
         variable sb_data : std_logic_vector(7 downto 0);
     begin
         wait until rd_vld = '1' and rd_rdy = '1' and rising_edge(rd_clk);
+        info("Read byte 0x" & to_hstring(rd_data));
         Pop(SB, sb_data); -- OSVVM Check fails not picked up by VUnit, so pop expected data off scoreboard
         check_equal(rd_data, sb_data);
     end process;
