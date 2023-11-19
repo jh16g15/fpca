@@ -49,8 +49,11 @@ package body sim_wb_procedures_pkg is
         wdata : in std_logic_vector(31 downto 0);
         sel : in std_logic_vector(3 downto 0) := x"f"
     ) is
+        constant checker : checker_t := new_checker("WB BFM");
     begin
         info("WB Write to " & to_hstring(address) & " wdata= " & to_hstring(wdata) & " sel= " & to_string(sel));
+        check(checker, address(1 downto 0) = b"00", "Check for bottom 2 bits of address being 0", warning);
+        check(checker, sel /= x"0", "Check for sel not 0", error);
         wb_mosi_out <= C_WB_MOSI_INIT;
         wb_mosi_out.cyc <= '1';
         wb_mosi_out.stb <= '1';
@@ -77,8 +80,11 @@ package body sim_wb_procedures_pkg is
         rdata : out std_logic_vector(31 downto 0);
         sel : in std_logic_vector(3 downto 0) := x"f"
     ) is
+        constant checker : checker_t := new_checker("WB BFM");
     begin
         info("WB Read from " & to_hstring(address) & " sel= " & to_string(sel));
+        check(checker, address(1 downto 0) = b"00", "Check for bottom 2 bits of address being 0", warning);
+        check(checker, sel /= x"0", "Check for sel not 0", error);
         wb_mosi_out <= C_WB_MOSI_INIT;
         wb_mosi_out.cyc <= '1';
         wb_mosi_out.stb <= '1';
