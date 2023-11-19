@@ -130,8 +130,8 @@ begin
                 wait until start_of_frame_dma_clk_out = '1';
                 info("started frame 0 output");
                 wait until start_of_frame_dma_clk_out = '1';
-                info("started frame 1 output");
-                wait until start_of_frame_dma_clk_out = '1';
+                -- info("started frame 1 output");
+                -- wait until start_of_frame_dma_clk_out = '1';
                 wait for 100 * dma_clk_period;
                 test_runner_cleanup(runner);
             end if;
