@@ -8,7 +8,6 @@ library vunit_lib;
 context vunit_lib.vunit_context;
 
 library osvvm;
--- context osvvm.osvvm_context;
 use osvvm.ScoreBoardPkg_slv.all;
 
 entity fifo_async_fwft_tb is

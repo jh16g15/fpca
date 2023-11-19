@@ -10,10 +10,6 @@ use vunit_lib.memory_pkg.all;
 --! Very basic simulation model of APS6404 PSRAM
 --! Only supports a handful of commands
 entity sim_psram_aps6404 is
-    generic
-    (
-        G_MEM_BYTES : integer := 1024 -- only simulate small memory range, aliases
-    );
     port
     (
         psram_clk  : in std_logic;

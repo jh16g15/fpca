@@ -25,7 +25,17 @@ package sim_wb_procedures_pkg is
         signal wb_mosi_out : out t_wb_mosi;
         signal wb_miso_in : in t_wb_miso;
         address : in std_logic_vector(31 downto 0);
-        rdata : out std_logic_vector(31 downto 0)
+        rdata : out std_logic_vector(31 downto 0);
+        sel : in std_logic_vector(3 downto 0) := x"f"
+    );
+
+    procedure sim_wb_check (
+        signal clk : in std_logic;
+        signal wb_mosi_out : out t_wb_mosi;
+        signal wb_miso_in : in t_wb_miso;
+        address : in std_logic_vector(31 downto 0);
+        exp_rdata : in std_logic_vector(31 downto 0);
+        sel : in std_logic_vector(3 downto 0) := x"f"
     );
 end package;
 
@@ -40,7 +50,7 @@ package body sim_wb_procedures_pkg is
         sel : in std_logic_vector(3 downto 0) := x"f"
     ) is
     begin
-        info("WB Write to " & to_hstring(address) & " wdata= " & to_hstring(wdata) & " sel= " & to_hstring(sel));
+        info("WB Write to " & to_hstring(address) & " wdata= " & to_hstring(wdata) & " sel= " & to_string(sel));
         wb_mosi_out <= C_WB_MOSI_INIT;
         wb_mosi_out.cyc <= '1';
         wb_mosi_out.stb <= '1';
@@ -50,9 +60,12 @@ package body sim_wb_procedures_pkg is
         wb_mosi_out.sel <= sel;
         wait until rising_edge(clk) and wb_miso_in.stall = '0';
         wb_mosi_out <= C_WB_MOSI_INIT;
+        wb_mosi_out.cyc <= '1'; -- leave CYC high until response
+        info("WB Waiting for ACK");
         if wb_miso_in.ack = '0' then
             wait until rising_edge(clk) and wb_miso_in.ack = '1';
         end if;
+        wb_mosi_out.cyc <= '0';
         info("WB Write Complete");
     end procedure;
 
@@ -61,24 +74,46 @@ package body sim_wb_procedures_pkg is
         signal wb_mosi_out : out t_wb_mosi;
         signal wb_miso_in : in t_wb_miso;
         address : in std_logic_vector(31 downto 0);
-        rdata : out std_logic_vector(31 downto 0)
+        rdata : out std_logic_vector(31 downto 0);
+        sel : in std_logic_vector(3 downto 0) := x"f"
     ) is
     begin
-        info("WB Read from " & to_hstring(address));
+        info("WB Read from " & to_hstring(address) & " sel= " & to_string(sel));
         wb_mosi_out <= C_WB_MOSI_INIT;
         wb_mosi_out.cyc <= '1';
         wb_mosi_out.stb <= '1';
         wb_mosi_out.we <= '0';
         wb_mosi_out.adr(address'left downto address'right) <= address;
-        wb_mosi_out.sel <= x"f";
+        wb_mosi_out.sel <= sel;
         wait until rising_edge(clk) and wb_miso_in.stall = '0';
         wb_mosi_out <= C_WB_MOSI_INIT;
+        wb_mosi_out.cyc <= '1'; -- leave CYC high until response
+        info("WB Waiting for ACK");
         if wb_miso_in.ack = '0' then
             wait until rising_edge(clk) and wb_miso_in.ack = '1';
         end if;
         rdata := wb_miso_in.rdat;
+        wb_mosi_out.cyc <= '0';
         info("WB Read Complete with rdata= " & to_hstring(rdata));
     end procedure;
 
+    procedure sim_wb_check (
+        signal clk : in std_logic;
+        signal wb_mosi_out : out t_wb_mosi;
+        signal wb_miso_in : in t_wb_miso;
+        address : in std_logic_vector(31 downto 0);
+        exp_rdata : in std_logic_vector(31 downto 0);
+        sel : in std_logic_vector(3 downto 0) := x"f"
+    ) is
+        variable rdata : std_logic_vector(31 downto 0);
+    begin
+        sim_wb_read(clk, wb_mosi_out, wb_miso_in, address, rdata, sel);
+        -- only check selected bytes
+        for i in 0 to 3 loop
+            if sel(i) = '1' then
+                check_equal(rdata(8*i+7 downto 8*i), exp_rdata(8*i+7 downto 8*i), "check byte " & to_string(i));
+            end if;
+        end loop;
+    end procedure;
 
 end package body;

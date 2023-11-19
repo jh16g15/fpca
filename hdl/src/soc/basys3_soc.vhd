@@ -327,10 +327,9 @@ begin
 
     -- 0x6000_0000 SPI 8MB PSRAM controller
     -- 0x6000_0000 to 0x607f_ffff   Mapped RAM
-    wb_psram_aps6404_inst : entity work.wb_psram_aps6404
+    wb_psram_aps6404_streaming_inst : entity work.wb_psram_aps6404_streaming
         generic map (
-          MEM_CTRL_CLK_FREQ_KHZ => G_MEM_CTRL_CLK_FREQ_KHZ,
-          BURST_LENGTH_BYTES => 4
+          MEM_CTRL_CLK_FREQ_KHZ => G_MEM_CTRL_CLK_FREQ_KHZ
         )
         port map (
           wb_clk => clk,
