@@ -109,10 +109,6 @@ begin
         );
 
     sim_psram_aps6404_inst : entity work.sim_psram_aps6404
-        generic
-        map (
-        G_MEM_BYTES => 8
-        )
         port
         map (
         psram_clk  => psram_clk,
