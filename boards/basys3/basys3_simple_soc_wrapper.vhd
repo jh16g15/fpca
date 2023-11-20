@@ -40,7 +40,7 @@ entity basys3_simple_soc_wrapper is
         SD_D2  : inout std_logic;
         SD_D3  : inout std_logic; -- CS
 
-        -- PMOD B SPI interface
+        -- PMOD B QSPI interface for APS6404 PSRAM
         PSRAM_QSPI_CSN : out std_logic;
         PSRAM_QSPI_SCK : out std_logic;
         PSRAM_QSPI_SIO : inout std_logic_vector(3 downto 0);
@@ -159,6 +159,13 @@ begin
     JC(0) <= i2c_scl;
     JC(1) <= i2c_sda;
 
+    -- SD Card
+    SD_CLK <= i_spi_sck;
+    SD_CMD <= i_spi_mosi;
+    i_spi_miso <= SD_D0;
+    SD_D3 <= i_spi_csn;
+    
+    
     soc_inst : entity work.basys3_soc
         generic map(
             G_PROJECT_ROOT   => G_PROJECT_ROOT,

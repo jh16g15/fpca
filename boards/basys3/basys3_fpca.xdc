@@ -86,11 +86,11 @@ set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports SD_D1] ; #JA6
 ##Pmod Header JB
 #### PSRAM
 set_property -dict {PACKAGE_PIN A14    IOSTANDARD LVCMOS33 } [get_ports PSRAM_QSPI_CSN] ;#Sch name = JB1
-set_property -dict { PACKAGE_PIN A16   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[0}] ;#Sch name = JB2
-set_property -dict { PACKAGE_PIN B15   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[1}] ;#Sch name = JB3
+set_property -dict { PACKAGE_PIN A16   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[0]}] ;#Sch name = JB2
+set_property -dict { PACKAGE_PIN B15   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[1]}] ;#Sch name = JB3
 set_property -dict { PACKAGE_PIN B16   IOSTANDARD LVCMOS33 } [get_ports PSRAM_QSPI_SCK] ;#Sch name = JB4
-set_property -dict { PACKAGE_PIN A15   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[2}];#Sch name = JB7
-set_property -dict { PACKAGE_PIN A17   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[3}];#Sch name = JB8
+set_property -dict { PACKAGE_PIN A15   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[2]}];#Sch name = JB7
+set_property -dict { PACKAGE_PIN A17   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[3]}];#Sch name = JB8
 set_property -dict { PACKAGE_PIN C15   IOSTANDARD LVCMOS33 } [get_ports NUNCHUCK_I2C_SCL];#Sch name = JB9
 set_property -dict { PACKAGE_PIN C16   IOSTANDARD LVCMOS33 } [get_ports NUNCHUCK_I2C_SDA];#Sch name = JB10
 
