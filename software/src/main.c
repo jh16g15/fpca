@@ -7,7 +7,9 @@
 #define BTN_D 0
 #endif
 
+#include "platform.h"
 #include "uart.h"
+#include "timer.h"
 #include "gpio.h"
 #include "utils.h"
 // #include "ssd1306_i2c.h"
@@ -18,62 +20,22 @@
 #include "ff.h"
 #include "diskio.h"
 
+#include "memtest.h"
+
 void wait_for_btn_press(int btn){
+    printf_(">\n");
     while(get_bit(GPIO_BTN, btn) != 0){} // wait for 0
     while(get_bit(GPIO_BTN, btn) != 1){} // wait for 1
     while(get_bit(GPIO_BTN, btn) != 0){} // wait for 0
 }
 
-u8 spi_ram_read(u32 addr){
-    spi_start();
-    spi_write_byte(0x3); // send Read instruction
-    // send 24-bit address
-    spi_write_byte((0xFF0000 & addr) >> 16);
-    spi_write_byte((0x00FF00 & addr) >> 8);
-    spi_write_byte((0x0000FF & addr));
-    // read byte
-    u8 data = spi_read_byte();
-    spi_stop();
-    return data;
-}
+// Peripherals defined globally
+static struct uart uart0;
+static struct timer timer0;
+static struct spi psram_spi;
 
-void spi_ram_write(u32 addr, u8 data){
-    spi_start();
-    spi_write_byte(0x2); // send Write instruction
-    // send 24-bit address
-    spi_write_byte((0xFF0000 & addr) >> 16);
-    spi_write_byte((0x00FF00 & addr) >> 8);
-    spi_write_byte((0x0000FF & addr));
-    // write byte
-    spi_write_byte(data);
-    spi_stop();
-}
-
-void spi_check(u32 addr){
-    u8 rdata;
-    rdata = spi_ram_read(addr);
-    Q_SSEG = rdata;
-    GPIO_LED = addr;
-    wait_for_btn_press(BTN_L);
-}
-
-void spi_test(){
-    spi_ram_write(0x0, 0x00);
-    spi_ram_write(0x1, 0x11);
-    spi_ram_write(0x2, 0x22);
-    spi_ram_write(0x3, 0x33);
-    spi_ram_write(0x4, 0x44);
-    spi_ram_write(0x5, 0x55);
-
-    spi_check(0x0);
-    spi_check(0x1);
-    spi_check(0x2);
-    spi_check(0x3);
-    spi_check(0x4);
-    spi_check(0x5);
-}
-
-// #define MAIN_USE_FATFS
+#define MAIN_USE_FATFS
+#define MAIN_USE_MEMTEST
 
 FRESULT list_dir (const char *path)
 {
@@ -109,35 +71,42 @@ FRESULT list_dir (const char *path)
 void psram_read_id(void)
 {
     printf_("Reading PSRAM ID\n");
-    spi_stop();
-    spi_start();
-    spi_write_byte(0x9F);   // PSRAM READ ID
+    spi_stop(&psram_spi);
+    spi_start(&psram_spi);
+    spi_write_byte(&psram_spi, 0x9F);   // PSRAM READ ID
 
-    spi_write_byte(0xFF);   // PSRAM Address (unused for this cmd)
-    spi_write_byte(0xFF);   // PSRAM Address (unused for this cmd)
-    spi_write_byte(0xFF);   // PSRAM Address (unused for this cmd)
+    spi_write_byte(&psram_spi, 0xFF);   // PSRAM Address (unused for this cmd)
+    spi_write_byte(&psram_spi, 0xFF);   // PSRAM Address (unused for this cmd)
+    spi_write_byte(&psram_spi, 0xFF);   // PSRAM Address (unused for this cmd)
 
-    u8 manu_id = spi_read_byte();
-    u8 kgd = spi_read_byte();
+    u8 manu_id = spi_read_byte(&psram_spi);
+    u8 kgd = spi_read_byte(&psram_spi);
     u8 eid[6];
-    eid[5] = spi_read_byte();
-    eid[4] = spi_read_byte();
-    eid[3] = spi_read_byte();
-    eid[2] = spi_read_byte();
-    eid[1] = spi_read_byte();
-    eid[0] = spi_read_byte();
+    eid[5] = spi_read_byte(&psram_spi);
+    eid[4] = spi_read_byte(&psram_spi);
+    eid[3] = spi_read_byte(&psram_spi);
+    eid[2] = spi_read_byte(&psram_spi);
+    eid[1] = spi_read_byte(&psram_spi);
+    eid[0] = spi_read_byte(&psram_spi);
 
-    spi_stop();
+    spi_stop(&psram_spi);
     u8 density = eid[5] >> 5;  // top 3 bits represent density
     u8 density_MB = 2 << (density + 3);
     eid[5] = eid[5] & 0x1F;
     printf_("MANU: 0x%x, KGD: 0x%x, Capacity: %dMB, EID: 0x%x%x%x%x%x%x\n", manu_id, kgd, density_MB, eid[5], eid[4], eid[3], eid[2], eid[1], eid[0]);
 }
 
+
 void main(void)
 {
+
     Q_SSEG = 0xc1de;
-    uart_set_baud(9600);
+    // PLATFORM INIT CODE
+    uart_init(&uart0, (volatile void *)PLATFORM_UART0_BASE);
+    timer_init(&timer0, (volatile void *)PLATFORM_TIMER0_BASE);
+    spi_init(&psram_spi, (volatile void *)PLATFORM_PSRAM_BASE); // not done yet
+
+    uart_set_baud(&uart0, 9600);
     GPIO_LED = 0xF;
 
     // test SPI ram on PMOD B (working!!!)
@@ -151,15 +120,60 @@ void main(void)
     printf_("Hello World\n");
 
     // Test APS6404 PSRAM pmod for correct operation
-    psram_read_id();
+    // psram_read_id();
 
 #ifdef MAIN_USE_FATFS
     FATFS fs;
     f_mount(&fs, "", 1);
     list_dir("0:");
+#endif
 
+#ifdef MAIN_USE_MEMTEST
+    printf_("Test PSRAM with memtest (takes a while!)\n");
+    int ret = memTest();
+    printf_("memTest returned %i\n", ret);
+#endif
+    wait_for_btn_press(BTN_D);
 
-    #endif
+    write_u32(PLATFORM_PSRAM_BASE, 0x00beef00);
+    u32 rdat32 = read_u32(PLATFORM_PSRAM_BASE);
+    printf_("0x%x\n", rdat32);
+
+    printf_("Start Single Address Memtest\n");
+    volatile u32 *psram = (u32*)PLATFORM_PSRAM_BASE;
+    // test writing a bunch of values to the same address
+    for (u32 i = 0; i < 256; i++){
+    // try reverse (slightly different behaviour)
+    // for (u32 i = 255; i >= 0; i--){
+        psram[0] = i;
+        printf_("%i \n", i); // delay
+        rdat32 = psram[0];
+        if (rdat32 != i){
+            printf_("ERR Address %p, Exp 0x%x Act 0x%x\n", &psram[0], i, rdat32);
+            wait_for_btn_press(BTN_D);
+        }
+    }
+    printf_("Single Address Memtest done\n");
+
+    // while(1){}
+    u8 i = 10;
+    printf_("Test PSRAM (press down)\n");
+    wait_for_btn_press(BTN_D);
+    while(1){
+        // write_u32(PSRAM_BASE, 0x12345678);
+
+        write_u32(PLATFORM_PSRAM_BASE+4, 0x7a6b5c4d);
+
+        u8 rdat0 = read_u8(PLATFORM_PSRAM_BASE+4);
+        u8 rdat1 = read_u8(PLATFORM_PSRAM_BASE+4+1);
+        u8 rdat2 = read_u8(PLATFORM_PSRAM_BASE+4+2);
+        u8 rdat3 = read_u8(PLATFORM_PSRAM_BASE+4+3);
+        rdat32 = read_u32(PLATFORM_PSRAM_BASE+4);
+        printf_("0x%x, 0x%x, 0x%x, 0x%x: 0x%x\n", rdat3, rdat2, rdat1, rdat0, rdat32);
+        i++;
+        while(1){}
+    }
+
 
     printf_("CPU Arch      : %s\n", "RISC-V RV32I");
     printf_("CPU Frequency : %i MHz\n", GPIO_SOC_FREQ/1000000);
@@ -200,6 +214,4 @@ void main(void)
 
         // cls();
     }
-
-
 }

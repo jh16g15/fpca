@@ -1,5 +1,6 @@
 
 #include "mmc_device.h"
+#include "platform.h"
 #include "spi.h"
 #include "utils.h"
 
@@ -46,8 +47,11 @@
 #define CMD12_CRC 0x00  // not required
 
 
+static struct spi sd_spi;
 
 static DSTATUS SD_DISK_STATUS = STA_NOINIT;
+
+
 
 // Intitialise disk "pdrv" (only disk 0 is supported for now)
 // Returns 0 if successful, 0x1 if disk could not be initialised
@@ -56,8 +60,9 @@ DSTATUS disk_initialize (BYTE pdrv){
         return STA_NODISK;
     }
     printf_("\nStarting Disk Initialisation...\n");
+    spi_init(&sd_spi, (volatile void *)PLATFORM_SD_SPI_BASE);
     printf_("Setting SD SPI Speed to ~200KHz\n");
-    spi_set_throttle(SD_SPI_THROTTLE_INIT); // set speed to 200KHz for SD card initialisation
+    spi_set_throttle(&sd_spi, SD_SPI_THROTTLE_INIT); // set speed to 200KHz for SD card initialisation
     sd_power_up_init();
     u8 status = sd_go_idle_state();
     if (status != 0){
@@ -82,7 +87,7 @@ DSTATUS disk_initialize (BYTE pdrv){
     sd_read_operating_conditions_register(res);
     sd_print_r3(res);
     printf_("Setting SD SPI Speed to %iHz\n", SD_SPI_RUN_SPEED);
-    spi_set_throttle(SD_SPI_THROTTLE_RUN); // set speed to max 25MHz for SD card operation
+    spi_set_throttle(&sd_spi, SD_SPI_THROTTLE_RUN); // set speed to max 25MHz for SD card operation
     SD_DISK_STATUS = 0; // clear STA_NOINIT flag to mark disk initialisation
     printf_("Disk Initialisation Complete!\n\n");
     return 0;
@@ -120,7 +125,7 @@ u8 sd_read_single_block(u8 *buf, u32 sector){
 
     u8 token;
     // poll until data start token received, TODO add ~100ms timeout
-    while((token = spi_read_byte()) == 0xff){
+    while((token = spi_read_byte(&sd_spi)) == 0xff){
         // printf_("spi read byte: 0x%x\n", token);
         // if(i > 8) break; // timeout and return 0xFF
     }
@@ -129,13 +134,13 @@ u8 sd_read_single_block(u8 *buf, u32 sector){
     if (token == START_BLOCK){
         //read 512B data block
         for (u16 i = 0; i < SD_BYTES_PER_BLOCK;i++){
-            buf[i] = spi_read_byte();
+            buf[i] = spi_read_byte(&sd_spi);
             // printf_("0x%x ", buf[i]);
         }
         // printf_("Data Done\n");
         //read and bin 2-byte CRC
-        spi_read_byte();
-        spi_read_byte();
+        spi_read_byte(&sd_spi);
+        spi_read_byte(&sd_spi);
     }
 
     sd_spi_stop();
@@ -154,7 +159,7 @@ u8 sd_read_multi_block(u8 *buf, u32 sector, u32 count){
     // read each block in turn
     for (u32 j = 0; j < count; j++){
         // poll until data start token received, TODO add ~100ms timeout
-        while((token = spi_read_byte()) == 0xff){
+        while((token = spi_read_byte(&sd_spi)) == 0xff){
             // printf_("spi read byte: 0x%x\n", token);
             // if(i > 8) break; // timeout and return 0xFF
         }
@@ -163,20 +168,20 @@ u8 sd_read_multi_block(u8 *buf, u32 sector, u32 count){
         if (token == START_BLOCK){
             //read 512B data block
             for (u16 i = 0; i < SD_BYTES_PER_BLOCK;i++){
-                buf[SD_BYTES_PER_BLOCK*j + i] = spi_read_byte();
+                buf[SD_BYTES_PER_BLOCK*j + i] = spi_read_byte(&sd_spi);
                 // printf_("0x%x ", buf[i]);
             }
             // printf_("Data Done\n");
             //read and bin 2-byte CRC
-            spi_read_byte();
-            spi_read_byte();
+            spi_read_byte(&sd_spi);
+            spi_read_byte(&sd_spi);
         }
 
     }
 
     // send STOP_TRANSMISSION
     sd_command(CMD12, CMD12_ARG, CMD12_CRC);
-    spi_read_byte(); // Discard Stuff Byte before reading CMD12 response - see http://elm-chan.org/docs/mmc/mmc_e.html
+    spi_read_byte(&sd_spi); // Discard Stuff Byte before reading CMD12 response - see http://elm-chan.org/docs/mmc/mmc_e.html
     res = sd_response_r1b();
     sd_print_r1(res);
 
@@ -187,15 +192,15 @@ u8 sd_read_multi_block(u8 *buf, u32 sector, u32 count){
 
 // set CSn low to start a transaction
 void sd_spi_start(){
-    spi_write_byte(0xff);
-    spi_start();
-    spi_write_byte(0xff);
+    spi_write_byte(&sd_spi, 0xff);
+    spi_start(&sd_spi);
+    spi_write_byte(&sd_spi, 0xff);
 }
 // set CSn high to end a transaction
 void sd_spi_stop(){
-    spi_write_byte(0xff);
-    spi_stop(); // set CSn high
-    spi_write_byte(0xff);
+    spi_write_byte(&sd_spi, 0xff);
+    spi_stop(&sd_spi); // set CSn high
+    spi_write_byte(&sd_spi, 0xff);
 }
 
 void sd_power_up_init(){
@@ -206,7 +211,7 @@ void sd_power_up_init(){
     sd_spi_stop(); // set CS high
 
     for (int i = 0; i < 10;i++){ // over 74 "dummy clocks" with DI and CS high
-        spi_write_byte(0xff);   // to enter Native operating mode
+        spi_write_byte(&sd_spi, 0xff);   // to enter Native operating mode
     }
 }
 
@@ -265,16 +270,16 @@ u8 sd_send_operating_condition(){
 
 void sd_command(u8 cmd, u32 arg, u8 crc){
     //transmit command
-    spi_write_byte(0x40 | cmd); // set start bit (0) and transmission bit (1)
+    spi_write_byte(&sd_spi, 0x40 | cmd); // set start bit (0) and transmission bit (1)
 
     //transmit argument
-    spi_write_byte((u8)(arg>>24));  // MSB first
-    spi_write_byte((u8)(arg>>16));
-    spi_write_byte((u8)(arg>>8));
-    spi_write_byte((u8)arg);
+    spi_write_byte(&sd_spi, (u8)(arg>>24));  // MSB first
+    spi_write_byte(&sd_spi, (u8)(arg>>16));
+    spi_write_byte(&sd_spi, (u8)(arg>>8));
+    spi_write_byte(&sd_spi, (u8)arg);
 
     //transmit crc and stop bit
-    spi_write_byte(crc | 0x01); // set stop bit (1)
+    spi_write_byte(&sd_spi, crc | 0x01); // set stop bit (1)
 }
 
 // Get an R1 1-byte response from the SD card
@@ -282,7 +287,7 @@ u8 sd_response_r1(){
     u8 i = 0, res1;
 
     // poll until response data received
-    while((res1 = spi_read_byte()) == 0xff){
+    while((res1 = spi_read_byte(&sd_spi)) == 0xff){
         // printf_("spi read byte: 0x%x\n", res1);
         i++;
         if(i > 8) break; // timeout and return 0xFF
@@ -295,7 +300,7 @@ u8 sd_response_r1b(){
     u8 i = 0, res1, busy;
     // printf_("Getting R1b response\n", res1);
     // poll until response data received
-    while((res1 = spi_read_byte()) == 0xff){
+    while((res1 = spi_read_byte(&sd_spi)) == 0xff){
         // printf_("spi read byte: 0x%x\n", res1);
         i++;
         if(i > 8) break; // timeout and return 0xFF
@@ -303,7 +308,7 @@ u8 sd_response_r1b(){
 
     // wait for BUSY to clear (any number of 0x00 bytes)
     printf_("Wait for BUSY to clear\n");
-    while ((busy = spi_read_byte()) == R1B_BUSY) {
+    while ((busy = spi_read_byte(&sd_spi)) == R1B_BUSY) {
         // printf_("spi read byte: 0x%x\n", busy);
     };
 
@@ -318,10 +323,10 @@ u8 sd_response_r3r7(u8 *res){
     {
         return res[0];  // return early
     }
-    res[1] = spi_read_byte();   // 31:24
-    res[2] = spi_read_byte();   // 23:16
-    res[3] = spi_read_byte();   // 15: 8
-    res[4] = spi_read_byte();   //  7: 0
+    res[1] = spi_read_byte(&sd_spi);   // 31:24
+    res[2] = spi_read_byte(&sd_spi);   // 23:16
+    res[3] = spi_read_byte(&sd_spi);   // 15: 8
+    res[4] = spi_read_byte(&sd_spi);   //  7: 0
     return res[0];
 }
 

@@ -1,83 +1,90 @@
 #include "cpu.h"
 #include "uart.h"
 
-#define UART_TX_BYTE (*((volatile unsigned long *)0x20000000))
-#define UART_TX_IDLE (*((volatile unsigned long *)0x20000004))
-#define UART_DIVISOR (*((volatile unsigned long *)0x20000008))
-#define UART_RX_BYTE (*((volatile unsigned long *)0x2000000C))
-#define UART_RX_VALID (*((volatile unsigned long *)0x20000010))
+#include "utils.h"
+
+// #define UART_TX_BYTE (*((volatile unsigned long *)0x20000000))
+// #define UART_TX_IDLE (*((volatile unsigned long *)0x20000004))
+// #define UART_DIVISOR (*((volatile unsigned long *)0x20000008))
+// #define UART_RX_BYTE (*((volatile unsigned long *)0x2000000C))
+// #define UART_RX_VALID (*((volatile unsigned long *)0x20000010))
+
+// 4 byte registers (which when used to index a 32bit pointer through the array syntax gives the correct address)
+#define UART_REG_TX_BYTE 0
+#define UART_REG_TX_IDLE 1
+#define UART_REG_DIVISOR 2
+#define UART_REG_RX_BYTE 3
+#define UART_REG_RX_VALID 4
 
 // define in main.c
 // #ifndef REFCLK
 // #define REFCLK 50000000
 // #endif
 
-int uart_tx_ready(void){
-    return UART_TX_IDLE;
-}
-int uart_rx_valid(void){
-    return UART_RX_VALID;
+// initialise a UART struct with the base address so we can access the registers
+void uart_init(struct uart *module, volatile void* base_address){
+    module->registers = (volatile uint32_t *)base_address;
 }
 
-void uart_set_baud(int rate){
-    UART_DIVISOR = REFCLK / rate;
+void uart_set_baud(struct uart *module, int rate){
+    module->registers[UART_REG_DIVISOR] = REFCLK / rate;
 }
 
 // consider checking for frame errors
-char uart_get_char(void){
-    while(UART_RX_VALID == 0){}
-    return UART_RX_BYTE;
+char uart_get_char(struct uart *module){
+    while(module->registers[UART_REG_RX_VALID] == 0){}
+    return module->registers[UART_REG_RX_BYTE];
 }
 
 // prints a string to the UART, followed by a newline \n
-void uart_puts(char *s)
+void uart_puts(struct uart *module, char *s)
 {
     char c;
     do
     {
         c = *s;  // character of string (contents of s mem)
-        uart_put_char(c); // print this char
+        uart_put_char(module, c); // print this char
         s++;     // increment pointer to move through array
     } while (c != '\0');
-    uart_put_char('\r');    // for PUTTY compat
-    uart_put_char('\n');
+    uart_put_char(module, '\r');    // for PUTTY compat
+    uart_put_char(module, '\n');
 }
 
 // prints a char to the UART
-void uart_put_char(char c)
+void uart_put_char(struct uart *module, char c)
 {
     // wait for UART to go idle
-    while (UART_TX_IDLE == 0)
+    while (module->registers[UART_REG_TX_IDLE] == 0)
     {
     }
-    UART_TX_BYTE = c;
+    module->registers[UART_REG_TX_BYTE] = c;
 }
 
 // sends the lowest byte of an int to the UART
-void uart_put_byte(int b)
+void uart_put_byte(struct uart *module, s32 b)
 {
     // wait for UART to go idle
-    while (UART_TX_IDLE == 0)
+    while (module->registers[UART_REG_TX_IDLE] == 0)
     {
     }
-    UART_TX_BYTE = b;
+    module->registers[UART_REG_TX_BYTE] = b;
 }
 
 // Receive 32bit unsigned, LSByte first
-unsigned int uart_get_32u(void){
-    unsigned int ret;
-    ret = uart_get_char();
-    ret += uart_get_char() << 8;
-    ret += uart_get_char() << 16;
-    ret += uart_get_char() << 24;
+u32 uart_get_32u(struct uart *module){
+    u32 ret;
+    ret = uart_get_char(module);
+    ret += uart_get_char(module) << 8;
+    ret += uart_get_char(module) << 16;
+    ret += uart_get_char(module) << 24;
     return ret;
 }
 // Receive 32bit signed, LSByte first
-int uart_get_32i(void){
-    int ret;
-    ret = uart_get_char();
-    ret += uart_get_char() << 8;
-    ret += uart_get_char() << 16;
-    ret += uart_get_char() << 24;
+s32 uart_get_32i(struct uart *module){
+    s32 ret;
+    ret = uart_get_char(module);
+    ret += uart_get_char(module) << 8;
+    ret += uart_get_char(module) << 16;
+    ret += uart_get_char(module) << 24;
     return ret;
 }

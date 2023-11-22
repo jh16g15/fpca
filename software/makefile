@@ -18,12 +18,15 @@ objects = \
 build/main.o \
 build/crt0.o \
 build/uart.o \
+build/timer.o \
 build/utils.o \
 build/ssd1306_i2c.o \
 build/terminal.o \
 build/text_display.o \
 build/spi.o \
 build/console.o
+
+lib_misc_includes = -Isrc/lib/misc
 
 lib_printf_includes = -Isrc/lib/printf/src -Isrc/lib/printf/src/printf
 lib_printf_objects = build/lib/printf.o
@@ -33,19 +36,20 @@ lib_sdcard_objects = build/lib/mmc.o
 
 lib_fatfs_includes = -Isrc/lib/fatfs
 lib_fatfs_objects = \
-build/lib/ff.o \
-build/lib/ffsystem.o \
-build/lib/ffunicode.o
+build/lib/ff.o
+# build/lib/ffunicode.o			# for Long File Name extension
+# build/lib/ffsystem.o			# OS dependent functions, for thread-safe
 
 lib_objects = \
 $(lib_printf_objects) \
-$(lib_sdcard_objects)
-# $(lib_fatfs_objects)
+$(lib_sdcard_objects) \
+$(lib_fatfs_objects)
 
 LIB_INCLUDES = \
 $(lib_printf_includes) \
 $(lib_fatfs_includes) \
-$(lib_sdcard_includes)
+$(lib_sdcard_includes) \
+$(lib_misc_includes)
 
 # for configuring libraries
 LIB_DEFINES = -DPRINTF_INCLUDE_CONFIG_H=1
@@ -164,6 +168,13 @@ build/lib/printf.o : src/lib/printf/src/printf/printf.c
 # SD Card Library
 #############################################################
 build/lib/mmc.o : src/lib/sdcard/mmc.c
+	@echo building $@ from $<
+	$(CC) $(CFLAGS_RV) $< -o $@
+
+#############################################################
+# FatFs Library
+#############################################################
+build/lib/ff.o : src/lib/fatfs/ff.c
 	@echo building $@ from $<
 	$(CC) $(CFLAGS_RV) $< -o $@
 

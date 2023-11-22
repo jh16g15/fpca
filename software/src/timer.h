@@ -1,42 +1,30 @@
-/*
- *  Hardware Timer functions
-
-    Register Map per timer
-        x0: Current Value of time_reg (32b)
-        R/W
-        x4: Timer Control and Status register
-        [0]      Timer Start/Stop
-        [1]      Enable Overflow Interrupt
-        [2]      Enable PWM mode
-        [8]     Clear timer overflow
-        [16]     Timer Overflow
-        x8: Timer Threshold Register (32b)
-        xC: PWM Threshold Register (32b)
- */
-
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-#define TIMER1_COUNT (*((volatile unsigned long *)0x30000000))
-#define TIMER1_CTRL (*((volatile unsigned long *)0x30000004))
-#define TIMER1_TOP (*((volatile unsigned long *)0x30000008))
-#define TIMER1_PWM (*((volatile unsigned long *)0x3000000C))
+#include "utils.h"
 
-unsigned int timer_get_time(void);
+struct timer
+{
+    volatile u32 *registers;
+};
 
-void timer_start(void);
-void timer_stop(void);
+void timer_init(struct timer *module, volatile void *base_address);
 
-void timer_enable_interrupt(void);
-void timer_disable_interrupt(void);
-void timer_enable_pwm(void);
-void timer_disable_pwm(void);
-void timer_clear_oflow_flag(void);
-int timer_get_oflow_flag(void);
+u32 timer_get_time(struct timer *module);
 
-void timer_set_threshold(unsigned int val);
-unsigned int timer_get_threshold(void);
-void timer_set_pwm_threshold(unsigned int val);
-unsigned int timer_get_pwm_threshold(void);
+void timer_start(struct timer *module);
+void timer_stop(struct timer *module);
 
-#endif _TIMER_H_
+void timer_enable_interrupt(struct timer *module);
+void timer_disable_interrupt(struct timer *module);
+void timer_enable_pwm(struct timer *module);
+void timer_disable_pwm(struct timer *module);
+void timer_clear_oflow_flag(struct timer *module);
+int timer_get_oflow_flag(struct timer *module);
+
+void timer_set_threshold(struct timer *module, u32 val);
+u32 timer_get_threshold(struct timer *module);
+void timer_set_pwm_threshold(struct timer *module, u32 val);
+u32 timer_get_pwm_threshold(struct timer *module);
+
+#endif // _TIMER_H_

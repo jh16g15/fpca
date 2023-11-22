@@ -369,22 +369,22 @@ void ssd1306_write_gram_bytes(char d, char num)
 // pass x and y by reference to modify
 void ssd1306_advance_cursor(char *x_ptr, char *y_ptr)
 {
-    uart_puts("Advancing Cursor");
+    // uart_puts("Advancing Cursor");
     *x_ptr = *x_ptr + 1;
     if (*x_ptr > CURSOR_MAX_X)
     { // handle X wrapping
-        uart_puts("Handling cursor x overflow");
+        // uart_puts("Handling cursor x overflow");
         *x_ptr = 0;
         *y_ptr = *y_ptr + 1;
         if (*y_ptr > CURSOR_MAX_Y)
         { // handle Y wrapping
-            uart_puts("Handling cursor y overflow");
+            // uart_puts("Handling cursor y overflow");
             *y_ptr = 0;
         }
     }
-    uart_puts("Setting new page/col limits");
+    // uart_puts("Setting new page/col limits");
     ssd1306_set_cursor(*x_ptr, *y_ptr);
-    uart_puts("Done");
+    // uart_puts("Done");
 }
 
 void ssd1306_putc(char c, char *x_ptr, char *y_ptr)

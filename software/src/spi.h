@@ -7,17 +7,22 @@
 #ifndef _SPI_H_
 #define _SPI_H_
 
+#include "utils.h"
 
-#define SPI_DATA (*((volatile unsigned long *)0x50000000))
-#define SPI_CSN (*((volatile unsigned long *)0x50000004))
-#define SPI_THROTTLE (*((volatile unsigned long *)0x50000008))
 
-void spi_start(void);
-void spi_stop(void);
+struct spi
+{
+    volatile u32 *registers;
+};
+
+void spi_init(struct spi *module, volatile void *base_address);
+
+void spi_start(struct spi *module);
+void spi_stop(struct spi *module);
 
 // TEST BYTE WRITE
-void spi_write_byte(char);
-char spi_read_byte(void);
-void spi_set_throttle(char throttle);
+void spi_write_byte(struct spi *module, char);
+char spi_read_byte(struct spi *module);
+void spi_set_throttle(struct spi *module, char throttle);
 
 #endif // _SPI_H_
