@@ -24,6 +24,7 @@ build/ssd1306_i2c.o \
 build/terminal.o \
 build/text_display.o \
 build/spi.o \
+build/spi_psram.o \
 build/console.o
 
 lib_misc_includes = -Isrc/lib/misc

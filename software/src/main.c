@@ -15,6 +15,7 @@
 // #include "ssd1306_i2c.h"
 #include "spi.h"
 #include "console.h"
+#include "spi_psram.h"
 
 #include "printf.h"
 #include "ff.h"
@@ -32,10 +33,9 @@ void wait_for_btn_press(int btn){
 // Peripherals defined globally
 static struct uart uart0;
 static struct timer timer0;
-static struct spi psram_spi;
 
-#define MAIN_USE_FATFS
-#define MAIN_USE_MEMTEST
+// #define MAIN_USE_FATFS
+// #define MAIN_USE_MEMTEST
 
 FRESULT list_dir (const char *path)
 {
@@ -67,35 +67,6 @@ FRESULT list_dir (const char *path)
     return res;
 }
 
-// reads PSRAM ID register and confirms density
-void psram_read_id(void)
-{
-    printf_("Reading PSRAM ID\n");
-    spi_stop(&psram_spi);
-    spi_start(&psram_spi);
-    spi_write_byte(&psram_spi, 0x9F);   // PSRAM READ ID
-
-    spi_write_byte(&psram_spi, 0xFF);   // PSRAM Address (unused for this cmd)
-    spi_write_byte(&psram_spi, 0xFF);   // PSRAM Address (unused for this cmd)
-    spi_write_byte(&psram_spi, 0xFF);   // PSRAM Address (unused for this cmd)
-
-    u8 manu_id = spi_read_byte(&psram_spi);
-    u8 kgd = spi_read_byte(&psram_spi);
-    u8 eid[6];
-    eid[5] = spi_read_byte(&psram_spi);
-    eid[4] = spi_read_byte(&psram_spi);
-    eid[3] = spi_read_byte(&psram_spi);
-    eid[2] = spi_read_byte(&psram_spi);
-    eid[1] = spi_read_byte(&psram_spi);
-    eid[0] = spi_read_byte(&psram_spi);
-
-    spi_stop(&psram_spi);
-    u8 density = eid[5] >> 5;  // top 3 bits represent density
-    u8 density_MB = 2 << (density + 3);
-    eid[5] = eid[5] & 0x1F;
-    printf_("MANU: 0x%x, KGD: 0x%x, Capacity: %dMB, EID: 0x%x%x%x%x%x%x\n", manu_id, kgd, density_MB, eid[5], eid[4], eid[3], eid[2], eid[1], eid[0]);
-}
-
 
 void main(void)
 {
@@ -104,7 +75,6 @@ void main(void)
     // PLATFORM INIT CODE
     uart_init(&uart0, (volatile void *)PLATFORM_UART0_BASE);
     timer_init(&timer0, (volatile void *)PLATFORM_TIMER0_BASE);
-    spi_init(&psram_spi, (volatile void *)PLATFORM_PSRAM_BASE); // not done yet
 
     uart_set_baud(&uart0, 9600);
     GPIO_LED = 0xF;
@@ -120,19 +90,47 @@ void main(void)
     printf_("Hello World\n");
 
     // Test APS6404 PSRAM pmod for correct operation
-    // psram_read_id();
+
+    u32 KBYTE = 1024;
+    u32 PSRAM_KBYTES = 4 * 1024;
+
+    psram_init();
+    psram_read_id();
+    printf_("Start PSRAM Test!\n");
+    printf_("Begin PSRAM Test Writes\n");
+
+    for (u16 j = 0; j < PSRAM_KBYTES; j++){
+        for (u16 i = 0; i < KBYTE; i++){
+            psram_write_byte(j*KBYTE+i, (u8)(i+j));
+        }
+        printf_("KB Written: %i / %i\r", j + 1, PSRAM_KBYTES);
+    }
+    printf_("Begin PSRAM Test Read + Verify\n");
+    for (u16 j = 0; j < PSRAM_KBYTES; j++){
+        for (u16 i = 0; i < KBYTE; i++)
+        {
+            u8 data = psram_read_byte(j*KBYTE+i);
+            if (data != (u8)(i+j)){
+                printf_("OOPS @ 0x%x, got 0x%x\n", i, data);
+            }
+        }
+        printf_("KB Read   : %i / %i\r", j + 1, PSRAM_KBYTES);
+    }
+    printf_("PSRAM Test Done!\n");
+    wait_for_btn_press(BTN_D);
 
 #ifdef MAIN_USE_FATFS
     FATFS fs;
     f_mount(&fs, "", 1);
     list_dir("0:");
 #endif
+    psram_read_id();
 
 #ifdef MAIN_USE_MEMTEST
     printf_("Test PSRAM with memtest (takes a while!)\n");
     int ret = memTest();
     printf_("memTest returned %i\n", ret);
-#endif
+
     wait_for_btn_press(BTN_D);
 
     write_u32(PLATFORM_PSRAM_BASE, 0x00beef00);
@@ -173,7 +171,7 @@ void main(void)
         i++;
         while(1){}
     }
-
+#endif
 
     printf_("CPU Arch      : %s\n", "RISC-V RV32I");
     printf_("CPU Frequency : %i MHz\n", GPIO_SOC_FREQ/1000000);

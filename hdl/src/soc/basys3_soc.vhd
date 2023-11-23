@@ -106,6 +106,7 @@ architecture rtl of basys3_soc is
     attribute mark_debug of wb_cpu_sel_miso : signal is true;
     attribute mark_debug of monitor_write_cmd_stb : signal is true;
     attribute mark_debug of monitor_read_cmd_stb : signal is true;
+    attribute mark_debug of psram_cs_n : signal is true;
 
     -- Seven Segment Display controller
     signal sseg_display_data : std_logic_vector(15 downto 0);
@@ -243,13 +244,13 @@ begin
             ro_regs_in  => ro_regs_in
         );
     -- Map GPIO registers to peripherals
-    gpio_led_out      <= rw_regs_out(0);
     ro_regs_in(0)     <= gpio_btn_in;
     ro_regs_in(1)     <= gpio_sw_in;
     ro_regs_in(2)     <= int2slv(G_SOC_FREQ);
     ro_regs_in(3)     <= int2slv(MEM_BYTES);
-    sseg_display_data <= rw_regs_out(1)(15 downto 0);
 
+    gpio_led_out      <= rw_regs_out(0);
+    sseg_display_data <= rw_regs_out(1)(15 downto 0);
     i2c_scl_out <= rw_regs_out(2)(0);
     i2c_sda_out <= rw_regs_out(3)(0);
 
@@ -325,22 +326,45 @@ begin
             miso_in     => spi_miso_in
         );
 
-    -- 0x6000_0000 SPI 8MB PSRAM controller
+    -- 0x6000_0000 QSPI 8MB PSRAM controller
     -- 0x6000_0000 to 0x607f_ffff   Mapped RAM
-    wb_psram_aps6404_streaming_inst : entity work.wb_psram_aps6404_streaming
-        generic map (
-          MEM_CTRL_CLK_FREQ_KHZ => G_MEM_CTRL_CLK_FREQ_KHZ
-        )
-        port map (
-          wb_clk => clk,
-          mem_ctrl_clk => mem_ctrl_clk, -- max 168MHz
-          wb_reset => reset,
-          wb_mosi_in => wb_slave_mosi_arr(6),
-          wb_miso_out => wb_slave_miso_arr(6),
-          psram_clk => psram_clk,
-          psram_cs_n => psram_cs_n,
-          psram_sio => psram_sio
-        );
+--    wb_machdyne_qqspi_inst : entity work.wb_machdyne_qqspi
+--    port map (
+--        wb_clk => clk,
+--        wb_reset => reset,
+--        wb_mosi_in => wb_slave_mosi_arr(6),
+--        wb_miso_out => wb_slave_miso_arr(6),
+--        psram_clk => psram_clk,
+--        psram_cs_n => psram_cs_n,
+--        psram_sio => psram_sio
+--    );
+    --  wb_psram_aps6404_streaming_inst : entity work.wb_psram_aps6404_streaming
+    --      generic map (
+    --        MEM_CTRL_CLK_FREQ_KHZ => G_MEM_CTRL_CLK_FREQ_KHZ
+    --      )
+    --      port map (
+    --        wb_clk => clk,
+    --        mem_ctrl_clk => mem_ctrl_clk, -- max 168MHz
+    --        wb_reset => reset,
+    --        wb_mosi_in => wb_slave_mosi_arr(6),
+    --        wb_miso_out => wb_slave_miso_arr(6),
+    --        psram_clk => psram_clk,
+    --        psram_cs_n => psram_cs_n,
+    --        psram_sio => psram_sio
+    --      );
+
+    -- generic SPI controller for non-memory mapped access (SPI only)
+    wb_spi_psram_inst : entity work.wb_spi
+         port map(
+             wb_clk      => clk,
+             wb_reset    => reset,
+             wb_mosi_in  => wb_slave_mosi_arr(6),
+             wb_miso_out => wb_slave_miso_arr(6),
+             sck_out     => psram_clk,
+             cs_n_out    => psram_cs_n,
+             mosi_out    => psram_sio(0),
+             miso_in     => psram_sio(1)
+         );
 
     gen_unmapped : for i in 7 to 14 generate
         wb_unmapped_slv_inst : entity work.wb_unmapped_slv
