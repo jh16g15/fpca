@@ -19,6 +19,7 @@
 #define ADDR_IN_MASK 0x0000FF00
 #define ADDR_LO_MASK 0x000000FF
 
+#define PSRAM_SPI_DATA (*((volatile unsigned long *)0x60000000))
 
 static struct spi psram_spi;
 
@@ -39,13 +40,12 @@ void psram_write_byte(u32 addr, u8 data)
 
     spi_stop(&psram_spi);
     spi_start(&psram_spi);
-    spi_write_byte(&psram_spi, CMD_WRITE);   // PSRAM Write
+    PSRAM_SPI_DATA = CMD_WRITE;   // PSRAM Write
 
-    spi_write_byte(&psram_spi, addr_hi);   // PSRAM Address 22:16
-    spi_write_byte(&psram_spi, addr_in);   // PSRAM Address 15: 8
-    spi_write_byte(&psram_spi, addr_lo);   // PSRAM Address  7: 0
-
-    spi_write_byte(&psram_spi, data);
+    PSRAM_SPI_DATA = addr_hi;   // PSRAM Address 22:16
+    PSRAM_SPI_DATA = addr_in;   // PSRAM Address 15: 8
+    PSRAM_SPI_DATA = addr_lo;   // PSRAM Address  7: 0
+    PSRAM_SPI_DATA = data;
     spi_stop(&psram_spi);
 
     // printf_("Wrote byte 0x%x to   PSRAM address 0x%x\n", data, addr);
@@ -62,12 +62,12 @@ u8 psram_read_byte(u32 addr)
 
     spi_stop(&psram_spi);
     spi_start(&psram_spi);
-    spi_write_byte(&psram_spi, CMD_READ);  // PSRAM Write (no wait states, max 33MHz)
-    spi_write_byte(&psram_spi, addr_hi);   // PSRAM Address 22:16
-    spi_write_byte(&psram_spi, addr_in);   // PSRAM Address 15: 8
-    spi_write_byte(&psram_spi, addr_lo);   // PSRAM Address  7: 0
+    PSRAM_SPI_DATA = CMD_READ;  // PSRAM Read (no wait states, max 33MHz)
+    PSRAM_SPI_DATA = addr_hi;   // PSRAM Address 22:16
+    PSRAM_SPI_DATA = addr_in;   // PSRAM Address 15: 8
+    PSRAM_SPI_DATA = addr_lo;   // PSRAM Address  7: 0
 
-    u8 data = spi_read_byte(&psram_spi);
+    u8 data = (u8)PSRAM_SPI_DATA;
     spi_stop(&psram_spi);
 
     // printf_("Read  byte 0x%x from PSRAM address 0x%x\n", data, addr);
@@ -98,8 +98,8 @@ void psram_read_id(void)
 
     spi_stop(&psram_spi);
     u8 density = eid[5] >> 5;  // top 3 bits represent density
-    u8 density_MB = 2 << (density + 3);
+    u8 density_Mb = 2 << (density + 3);
     eid[5] = eid[5] & 0x1F;
-    printf_("MANU: 0x%x, KGD: 0x%x, Capacity: %dMB, EID: 0x%x%x%x%x%x%x\n", manu_id, kgd, density_MB, eid[5], eid[4], eid[3], eid[2], eid[1], eid[0]);
+    printf_("MANU: 0x%x, KGD: 0x%x, Capacity: %dMb, EID: 0x%x%x%x%x%x%x\n", manu_id, kgd, density_MB, eid[5], eid[4], eid[3], eid[2], eid[1], eid[0]);
 }
 

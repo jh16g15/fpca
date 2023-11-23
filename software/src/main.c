@@ -92,7 +92,7 @@ void main(void)
     // Test APS6404 PSRAM pmod for correct operation
 
     u32 KBYTE = 1024;
-    u32 PSRAM_KBYTES = 4 * 1024;
+    u32 PSRAM_KBYTES = 8 * 1024;
 
     psram_init();
     psram_read_id();
@@ -101,6 +101,7 @@ void main(void)
 
     for (u16 j = 0; j < PSRAM_KBYTES; j++){
         for (u16 i = 0; i < KBYTE; i++){
+            // printf_("(u8)i+j=%i", (u8)i + j);
             psram_write_byte(j*KBYTE+i, (u8)(i+j));
         }
         printf_("KB Written: %i / %i\r", j + 1, PSRAM_KBYTES);
@@ -111,7 +112,7 @@ void main(void)
         {
             u8 data = psram_read_byte(j*KBYTE+i);
             if (data != (u8)(i+j)){
-                printf_("OOPS @ 0x%x, got 0x%x\n", i, data);
+                printf_("OOPS @ 0x%x, got 0x%x, expected 0x%x\n", i, data, i+j);
             }
         }
         printf_("KB Read   : %i / %i\r", j + 1, PSRAM_KBYTES);
