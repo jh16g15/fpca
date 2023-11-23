@@ -105,7 +105,7 @@ void main(void)
         }
         printf_("KB Written: %i / %i\r", j + 1, PSRAM_KBYTES);
     }
-    printf_("Begin PSRAM Test Read + Verify\n");
+    printf_("\nBegin PSRAM Test Read + Verify\n");
     for (u16 j = 0; j < PSRAM_KBYTES; j++){
         for (u16 i = 0; i < KBYTE; i++)
         {
@@ -116,7 +116,7 @@ void main(void)
         }
         printf_("KB Read   : %i / %i\r", j + 1, PSRAM_KBYTES);
     }
-    printf_("PSRAM Test Done!\n");
+    printf_("\nPSRAM Test Done!\n");
     wait_for_btn_press(BTN_D);
 
 #ifdef MAIN_USE_FATFS
