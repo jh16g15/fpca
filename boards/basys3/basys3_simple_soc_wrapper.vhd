@@ -89,12 +89,13 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal i_spi_mosi : std_logic;
     signal i_spi_csn  : std_logic;
 
-    constant C_MEM_CTRL_CLK_FREQ_KHZ : integer := 100_000;
+--    constant C_MEM_CTRL_CLK_FREQ_KHZ : integer := 65_000;   -- max for SPI_READ command (no wait states)
+    constant C_MEM_CTRL_CLK_FREQ_KHZ : integer := 50_000;
     component clk_wiz_0 is
         port
         (
             clk_out25 : out std_logic;
-            clk_out_mem : out std_logic; -- 100MHz for 50 MHz
+            clk_out_mem : out std_logic; -- PSRAM SCK is half this frequency
             reset     : in std_logic;
             locked    : out std_logic;
             clk_in1   : in std_logic

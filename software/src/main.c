@@ -37,6 +37,9 @@ static struct timer timer0;
 // #define MAIN_USE_FATFS
 // #define MAIN_USE_MEMTEST
 
+
+#define KBYTE 1024
+
 FRESULT list_dir (const char *path)
 {
     FRESULT res;
@@ -67,6 +70,34 @@ FRESULT list_dir (const char *path)
     return res;
 }
 
+int psram_memtest(u32 size){
+    volatile u8 *PSRAM = (volatile u8*)0x60000000;
+    printf_("Start Memtest @%p, size= %i KB!\n", PSRAM, size);
+    printf_("Begin PSRAM Test Writes\n");
+
+    for (u16 j = 0; j < size; j++){
+        for (u16 i = 0; i < KBYTE; i++){
+            // printf_("(u8)i+j=%i", (u8)i + j);
+            // psram_write_byte(j*KBYTE+i, (u8)(i+j));
+            PSRAM[j * KBYTE + i] = (u8)(i + j);
+        }
+        printf_("KB Written: %i/%i\r", j + 1, size);
+    }
+    printf_("\nBegin PSRAM Test Read + Verify\n");
+    for (u16 j = 0; j < size; j++){
+        for (u16 i = 0; i < KBYTE; i++)
+        {
+            // u8 data = psram_read_byte(j*KBYTE+i);
+            u8 data = PSRAM[j * KBYTE + i];
+            if (data != (u8)(i+j)){
+                printf_("OOPS @ 0x%x, got 0x%x, expected 0x%x\n", i, data, i+j);
+            }
+        }
+        printf_("KB Read   : %i/%i\r", j + 1, size);
+    }
+    printf_("\nPSRAM Test Done!\n");
+}
+
 
 void main(void)
 {
@@ -90,34 +121,24 @@ void main(void)
     printf_("Hello World\n");
 
     // Test APS6404 PSRAM pmod for correct operation
-
-    u32 KBYTE = 1024;
     u32 PSRAM_KBYTES = 8 * 1024;
 
-    psram_init();
-    psram_read_id();
+    // psram_init();
+    // psram_read_id();
     printf_("Start PSRAM Test!\n");
-    printf_("Begin PSRAM Test Writes\n");
+    write_u8(PLATFORM_PSRAM_BASE, 0x81);
+    u8 rdat8 = read_u8(PLATFORM_PSRAM_BASE);
+    write_u16(PLATFORM_PSRAM_BASE, 0x5aa5);
+    u16 rdat16 = read_u16(PLATFORM_PSRAM_BASE);
+    write_u32(PLATFORM_PSRAM_BASE, 0x81abed1);
+    u32 rdat32 = read_u32(PLATFORM_PSRAM_BASE);
+    printf_("rdat: 0x%x 0x%x 0x%x\n", rdat8, rdat16, rdat32);
+    wait_for_btn_press(BTN_D);
 
-    for (u16 j = 0; j < PSRAM_KBYTES; j++){
-        for (u16 i = 0; i < KBYTE; i++){
-            // printf_("(u8)i+j=%i", (u8)i + j);
-            psram_write_byte(j*KBYTE+i, (u8)(i+j));
-        }
-        printf_("KB Written: %i / %i\r", j + 1, PSRAM_KBYTES);
-    }
-    printf_("\nBegin PSRAM Test Read + Verify\n");
-    for (u16 j = 0; j < PSRAM_KBYTES; j++){
-        for (u16 i = 0; i < KBYTE; i++)
-        {
-            u8 data = psram_read_byte(j*KBYTE+i);
-            if (data != (u8)(i+j)){
-                printf_("OOPS @ 0x%x, got 0x%x, expected 0x%x\n", i, data, i+j);
-            }
-        }
-        printf_("KB Read   : %i / %i\r", j + 1, PSRAM_KBYTES);
-    }
-    printf_("\nPSRAM Test Done!\n");
+
+    psram_memtest(1); //start with short test that should fail quickly
+    psram_memtest(PSRAM_KBYTES);
+    printf_("\nAll PSRAM Tests Done!\n");
     wait_for_btn_press(BTN_D);
 
 #ifdef MAIN_USE_FATFS
@@ -125,7 +146,7 @@ void main(void)
     f_mount(&fs, "", 1);
     list_dir("0:");
 #endif
-    psram_read_id();
+    // psram_read_id();
 
 #ifdef MAIN_USE_MEMTEST
     printf_("Test PSRAM with memtest (takes a while!)\n");

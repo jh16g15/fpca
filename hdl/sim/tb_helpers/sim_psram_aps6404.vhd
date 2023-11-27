@@ -29,6 +29,8 @@ architecture rtl of sim_psram_aps6404 is
     signal psram_qpi_direction_input : std_logic := '1';
 begin
 
+    bits_per_clk <= 4 when mode_qpi = '1' else 1;
+
     process is
 
         -- Simulated PSRAM memory buffer, using VUnit memory model
@@ -59,7 +61,7 @@ begin
                 end if;
                 bit_counter := bit_counter + bits_per_clk;
             end loop;
-            -- info(logger,  "shift in loop ended CS=" & to_string(psram_cs_n) & " bit counter=" & to_string(bit_counter) & " byte=" & to_hstring(shift_in_buf);
+            -- info(logger,  "shift in loop ended CS=" & to_string(psram_cs_n) & " bit counter=" & to_string(bit_counter) & " byte=" & to_hstring(shift_in_buf));
             -- wait for 0 ns;
             cmd_buffer(byte_counter) := shift_in_buf;
             byte_counter             := byte_counter + 1;
@@ -110,6 +112,30 @@ begin
             info(logger,  "Start Address: " & integer'image(psram_address));
         end procedure;
 
+        procedure psram_write is
+        begin
+            psram_get_address;
+            if psram_cs_n = '1' then
+                info(logger,  "PSRAM Terminated!");
+                return;
+            end if;
+            -- data
+            while psram_cs_n = '0' loop
+                debug(logger,  "START WRITE LOOP");
+                byte_counter := 0; -- reuse
+                psram_shift_byte_in;
+                if psram_cs_n = '1' then
+                    info(logger,  "PSRAM Terminated!");
+                    return;
+                end if;
+                info(logger,  "Writing 0x" & to_hstring(cmd_buffer(0)) & " to " & integer'image(psram_address));
+                -- MEM_BUFFER(psram_address) <= cmd_buffer(0);
+                write_byte(memory, psram_address, to_integer(unsigned(cmd_buffer(0)))); -- use VUnit Memory Model
+                psram_address := psram_address + 1;
+                debug(logger,  "END WRITE LOOP");
+            end loop;
+        end procedure;
+
         procedure psram_quad_write is
         begin
             psram_get_address;
@@ -131,6 +157,57 @@ begin
                 write_byte(memory, psram_address, to_integer(unsigned(cmd_buffer(0)))); -- use VUnit Memory Model
                 psram_address := psram_address + 1;
                 debug(logger,  "END QUAD WRITE LOOP");
+            end loop;
+        end procedure;
+
+        procedure psram_read is
+        begin
+            psram_get_address;
+            if psram_cs_n = '1' then
+                info(logger,  "PSRAM Terminated!");
+                return;
+            end if;
+            -- clock out data (no wait states)
+            while psram_cs_n = '0' loop
+                byte_counter := 0; -- reuse
+                -- shift_out_buf := MEM_BUFFER(psram_address);
+                shift_out_buf := std_logic_vector(to_unsigned(read_byte(memory, psram_address), 8)); -- use VUnit memory model
+                info(logger,  "Fetched 0x" & to_hstring(shift_out_buf) & " from " & integer'image(psram_address));
+                psram_shift_byte_out;
+                if psram_cs_n = '1' then
+                    info(logger,  "PSRAM Terminated!");
+                    return;
+                end if;
+                psram_address := psram_address + 1;
+            end loop;
+        end procedure;
+
+        procedure psram_fast_read is
+        begin
+            psram_get_address;
+            if psram_cs_n = '1' then
+                info(logger,  "PSRAM Terminated!");
+                return;
+            end if;
+            -- wait states
+            -- 8 wait cycles = 1 bytes
+            info(logger,  "Read Wait Cycles Start");
+            psram_shift_byte_out;
+            info(logger,  "Read Wait Cycles Done");
+
+            -- clock out data
+            while psram_cs_n = '0' loop
+                byte_counter := 0; -- reuse
+
+                -- shift_out_buf := MEM_BUFFER(psram_address);
+                shift_out_buf := std_logic_vector(to_unsigned(read_byte(memory, psram_address), 8)); -- use VUnit memory model
+                info(logger,  "Fetched 0x" & to_hstring(shift_out_buf) & " from " & integer'image(psram_address));
+                psram_shift_byte_out;
+                if psram_cs_n = '1' then
+                    info(logger,  "PSRAM Terminated!");
+                    return;
+                end if;
+                psram_address := psram_address + 1;
             end loop;
         end procedure;
 
@@ -172,6 +249,10 @@ begin
 
         -- Get and Parse PSRAM command
         procedure psram_process_cmd is
+            constant CMD_WRITE : std_logic_vector(7 downto 0) := x"02";
+            constant CMD_READ : std_logic_vector(7 downto 0) := x"03";
+            constant CMD_FAST_READ : std_logic_vector(7 downto 0) := x"0B";
+
             constant CMD_FAST_QUAD_READ : std_logic_vector(7 downto 0) := x"EB";
             constant CMD_QUAD_WRITE     : std_logic_vector(7 downto 0) := x"38";
             constant CMD_ENTER_QUAD     : std_logic_vector(7 downto 0) := x"35";
@@ -181,16 +262,20 @@ begin
 
             psram_shift_byte_in;
             case cmd_buffer(0) is
-                when CMD_FAST_QUAD_READ => info(logger,  "CMD_FAST_QUAD READ (0xEB)");
+                when CMD_WRITE => info(logger,  "CMD_WRITE (0x02)");
+                    psram_write;
+                when CMD_READ => info(logger,  "CMD_READ (0x03)");
+                    psram_read;
+                when CMD_FAST_READ => info(logger,  "CMD_FAST_READ (0x0B)");
+                    psram_fast_read;
+                when CMD_FAST_QUAD_READ => info(logger,  "CMD_FAST_QUAD_READ (0xEB)");
                     psram_fast_quad_read;
-                when CMD_QUAD_WRITE => info(logger,  "CMD_QUAD WRITE (0x38)");
+                when CMD_QUAD_WRITE => info(logger,  "CMD_QUAD_WRITE (0x38)");
                     psram_quad_write;
                 when CMD_ENTER_QUAD => info(logger,  "CMD_ENTER_QUAD (0x35)");-- should be SPI only
                     mode_qpi     <= '1';
-                    bits_per_clk <= 4;
                 when CMD_EXIT_QUAD => info(logger,  "CMD_EXIT_QUAD (0xF5)");-- should be QPI only
                     mode_qpi     <= '0';
-                    bits_per_clk <= 1;
                 when others => warning(logger,  "ERROR Unrecognised command 0x" & to_hstring(cmd_buffer(0)));
             end case;
             info(logger,  "PSRAM done, ready for next command");

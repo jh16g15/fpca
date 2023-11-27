@@ -269,7 +269,7 @@ begin
         rd_vld  => rsp_sel_out_vld
         );
 
-    psram_aps6404_streaming_ctrl_inst : entity work.psram_aps6404_streaming_ctrl
+    psram_aps6404_streaming_ctrl_inst : entity work.psram_aps6404_streaming_ctrl_spi
         generic
         map (
         MEM_CTRL_CLK_FREQ_KHZ => MEM_CTRL_CLK_FREQ_KHZ

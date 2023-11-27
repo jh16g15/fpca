@@ -74,25 +74,25 @@ set_property -dict {PACKAGE_PIN U17 IOSTANDARD LVCMOS33} [get_ports btnD]
 ##Pmod Header JA
 
 #### SD CARD (not standard for PMOD)
-set_property -dict {PACKAGE_PIN J1 IOSTANDARD LVCMOS33} [get_ports SD_D2] ; #JA0    unused
-set_property -dict {PACKAGE_PIN L2 IOSTANDARD LVCMOS33} [get_ports SD_CMD]; #JA1    MOSI
-set_property -dict {PACKAGE_PIN J2 IOSTANDARD LVCMOS33} [get_ports SD_D0] ; #JA2    MISO
+set_property -dict {PACKAGE_PIN J1 IOSTANDARD LVCMOS33} [get_ports SD_D2]
+set_property -dict {PACKAGE_PIN L2 IOSTANDARD LVCMOS33} [get_ports SD_CMD]
+set_property -dict {PACKAGE_PIN J2 IOSTANDARD LVCMOS33} [get_ports SD_D0]
 #set_property -dict {PACKAGE_PIN G2 IOSTANDARD LVCMOS33} [get_ports {JA[3]}]; #JA3 Sch name = JA4
-set_property -dict {PACKAGE_PIN H1 IOSTANDARD LVCMOS33} [get_ports SD_D3] ; #JA4    CSn
-set_property -dict {PACKAGE_PIN K2 IOSTANDARD LVCMOS33} [get_ports SD_CLK]; #JA5    SCLK
-set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports SD_D1] ; #JA6    unused
+set_property -dict {PACKAGE_PIN H1 IOSTANDARD LVCMOS33} [get_ports SD_D3]
+set_property -dict {PACKAGE_PIN K2 IOSTANDARD LVCMOS33} [get_ports SD_CLK]
+set_property -dict {PACKAGE_PIN H2 IOSTANDARD LVCMOS33} [get_ports SD_D1]
 #set_property -dict { PACKAGE_PIN G3   IOSTANDARD LVCMOS33 } [get_ports {JA[7]}];# JA7 Sch name = JA10
 
 ##Pmod Header JB
 #### PSRAM
-set_property -dict {PACKAGE_PIN A14    IOSTANDARD LVCMOS33 } [get_ports PSRAM_QSPI_CSN] ;#Sch name = JB1
-set_property -dict { PACKAGE_PIN A16   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[0]}] ;#Sch name = JB2
-set_property -dict { PACKAGE_PIN B15   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[1]}] ;#Sch name = JB3
-set_property -dict { PACKAGE_PIN B16   IOSTANDARD LVCMOS33 } [get_ports PSRAM_QSPI_SCK] ;#Sch name = JB4
-set_property -dict { PACKAGE_PIN A15   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[2]}];#Sch name = JB7
-set_property -dict { PACKAGE_PIN A17   IOSTANDARD LVCMOS33 } [get_ports {PSRAM_QSPI_SIO[3]}];#Sch name = JB8
-set_property -dict { PACKAGE_PIN C15   IOSTANDARD LVCMOS33 } [get_ports NUNCHUCK_I2C_SCL];#Sch name = JB9
-set_property -dict { PACKAGE_PIN C16   IOSTANDARD LVCMOS33 } [get_ports NUNCHUCK_I2C_SDA];#Sch name = JB10
+set_property -dict {PACKAGE_PIN A14 IOSTANDARD LVCMOS33} [get_ports PSRAM_QSPI_CSN]
+set_property -dict {PACKAGE_PIN A16 IOSTANDARD LVCMOS33} [get_ports {PSRAM_QSPI_SIO[0]}]
+set_property -dict {PACKAGE_PIN B15 IOSTANDARD LVCMOS33} [get_ports {PSRAM_QSPI_SIO[1]}]
+set_property -dict {PACKAGE_PIN B16 IOSTANDARD LVCMOS33} [get_ports PSRAM_QSPI_SCK]
+set_property -dict {PACKAGE_PIN A15 IOSTANDARD LVCMOS33} [get_ports {PSRAM_QSPI_SIO[2]}]
+set_property -dict {PACKAGE_PIN A17 IOSTANDARD LVCMOS33} [get_ports {PSRAM_QSPI_SIO[3]}]
+set_property -dict {PACKAGE_PIN C15 IOSTANDARD LVCMOS33} [get_ports NUNCHUCK_I2C_SCL]
+set_property -dict {PACKAGE_PIN C16 IOSTANDARD LVCMOS33} [get_ports NUNCHUCK_I2C_SDA]
 
 ##Pmod Header JC
 set_property -dict {PACKAGE_PIN K17 IOSTANDARD LVCMOS33} [get_ports {JC[0]}]
@@ -155,4 +155,7 @@ set_property -dict {PACKAGE_PIN A18 IOSTANDARD LVCMOS33} [get_ports RsTx]
 ## Configuration options, can be used for all designs
 set_property CONFIG_VOLTAGE 3.3 [current_design]
 set_property CFGBVS VCCO [current_design]
+
+
+
 

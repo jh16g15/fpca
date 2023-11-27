@@ -72,7 +72,14 @@ begin
                 wb_reset <= '0';
                 wait for 10 * wb_clk_period;
 
-                wait until wb_miso.stall = '0';
+
+                for i in 0 to 255 loop
+                    sim_wb_write(wb_clk, wb_mosi, wb_miso, x"0000_0000", std_logic_vector(to_unsigned(i, 32)));
+                    sim_wb_check(wb_clk, wb_mosi, wb_miso, x"0000_0000", std_logic_vector(to_unsigned(i, 32)));
+                end loop;
+
+
+                wait until wb_miso.stall = '0' and rising_edge(wb_clk);
                 -- WRITE32
                 sim_wb_write(wb_clk, wb_mosi, wb_miso, x"0000_0000", x"ef11_2222"); -- initial
                 wait until rising_edge(wb_clk);
@@ -120,5 +127,5 @@ begin
 
     wb_clk  <= not wb_clk after wb_clk_period/2;
     mem_ctrl_clk <= not mem_ctrl_clk after mem_clk_period/2;
-    test_runner_watchdog(runner, 50 us);
+    test_runner_watchdog(runner, 5 ms);
 end;

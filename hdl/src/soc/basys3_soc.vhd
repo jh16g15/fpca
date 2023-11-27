@@ -338,33 +338,33 @@ begin
 --        psram_cs_n => psram_cs_n,
 --        psram_sio => psram_sio
 --    );
-    --  wb_psram_aps6404_streaming_inst : entity work.wb_psram_aps6404_streaming
-    --      generic map (
-    --        MEM_CTRL_CLK_FREQ_KHZ => G_MEM_CTRL_CLK_FREQ_KHZ
-    --      )
-    --      port map (
-    --        wb_clk => clk,
-    --        mem_ctrl_clk => mem_ctrl_clk, -- max 168MHz
-    --        wb_reset => reset,
-    --        wb_mosi_in => wb_slave_mosi_arr(6),
-    --        wb_miso_out => wb_slave_miso_arr(6),
-    --        psram_clk => psram_clk,
-    --        psram_cs_n => psram_cs_n,
-    --        psram_sio => psram_sio
-    --      );
+     wb_psram_aps6404_streaming_inst : entity work.wb_psram_aps6404_streaming
+         generic map (
+           MEM_CTRL_CLK_FREQ_KHZ => G_MEM_CTRL_CLK_FREQ_KHZ
+         )
+         port map (
+           wb_clk => clk,
+           mem_ctrl_clk => mem_ctrl_clk, -- max 168MHz
+           wb_reset => reset,
+           wb_mosi_in => wb_slave_mosi_arr(6),
+           wb_miso_out => wb_slave_miso_arr(6),
+           psram_clk => psram_clk,
+           psram_cs_n => psram_cs_n,
+           psram_sio => psram_sio
+         );
 
     -- generic SPI controller for non-memory mapped access (SPI only)
-    wb_spi_psram_inst : entity work.wb_spi
-         port map(
-             wb_clk      => clk,
-             wb_reset    => reset,
-             wb_mosi_in  => wb_slave_mosi_arr(6),
-             wb_miso_out => wb_slave_miso_arr(6),
-             sck_out     => psram_clk,
-             cs_n_out    => psram_cs_n,
-             mosi_out    => psram_sio(0),
-             miso_in     => psram_sio(1)
-         );
+    -- wb_spi_psram_inst : entity work.wb_spi
+    --      port map(
+    --          wb_clk      => clk,
+    --          wb_reset    => reset,
+    --          wb_mosi_in  => wb_slave_mosi_arr(6),
+    --          wb_miso_out => wb_slave_miso_arr(6),
+    --          sck_out     => psram_clk,
+    --          cs_n_out    => psram_cs_n,
+    --          mosi_out    => psram_sio(0),
+    --          miso_in     => psram_sio(1)
+    --      );
 
     gen_unmapped : for i in 7 to 14 generate
         wb_unmapped_slv_inst : entity work.wb_unmapped_slv
