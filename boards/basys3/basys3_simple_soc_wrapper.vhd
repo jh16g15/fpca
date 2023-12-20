@@ -7,7 +7,7 @@ use ieee.numeric_std.all;
 entity basys3_simple_soc_wrapper is
     generic
     (
-        G_PROJECT_ROOT : string := "D:/Documents/fpga/fpca/"
+        G_PROJECT_ROOT : string := "C:/Users/joehi/Documents/fpga/fpca/"
     );
     port
     (

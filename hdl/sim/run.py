@@ -26,13 +26,14 @@ def add_some_files_to_vunit(vunit_obj, dir, exclude_patterns, library):
     print(f"Scanning {dir}")
     glob_pattern=  str(dir) + "/**/*.vhd"
     print(f"for {glob_pattern}")
+    print(f"Excluding {exclude_patterns}")
     print("===================================================")
     file_list = glob(glob_pattern, recursive=True)
     trimmed_file_list = []
     for file in file_list:
         include = True
         for pattern in exclude_patterns:
-            if pattern in file:
+            if str(pattern) in file:
                 include = False
         if include:
             trimmed_file_list.append(file)
@@ -50,19 +51,22 @@ def main():
     # increase stack size to prevent GHDL crashing
     resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
 
-
-    VU = VUnit.from_argv()
+    VU = VUnit.from_argv(compile_builtins=False)
+    VU.add_vhdl_builtins()
     VU.add_verification_components()
     print(f"Added verification components to library!")
     USE_GOWIN_SIMLIB = False # needed for simple_dual_port RAM block (TODO: replace this!)
     gowin_simlib = "/mnt/c/Gowin/Gowin_V1.9.8.03_Education/IDE/simlib/gw1n/prim_sim.vhd"
 
-    USE_XILINX_UNISIM = False
+    USE_XILINX_UNISIM = True
     USE_XILINX_XPM = True
-    xilinx_unisim_dir = "/mnt/c/Xilinx/Vivado/2021.1/data/vhdl/src/unisims"
-    xilinx_xpm_dir = "/mnt/c/Xilinx/Vivado/2021.1/data/ip/xpm"
-    xilinx_xpm_vhdl = "/mnt/d/Documents/fpga/xpm_vhdl/src/xpm"
-    xilinx_xpm_ghdl_precompiled = "/mnt/c/Xilinx/Vivado/2021.1/data/vhdl/ghdl/xilinx-vivado/xpm/v08/" #xpm-obj08.cf"
+    FPGA_DIR = Path("/mnt/c/Users/joehi/Documents/fpga")
+    VIVADO_VERSION = "2023.2"
+
+    VIVADO_DIR = Path(f"/mnt/c/Xilinx/Vivado/{VIVADO_VERSION}")
+    xilinx_unisim_dir = VIVADO_DIR / "data/vhdl/src/unisims"
+    xilinx_xpm_dir = VIVADO_DIR / "data/ip/xpm"
+    xilinx_xpm_vhdl = FPGA_DIR / "xpm_vhdl/src/xpm"    
     xilinx_exclude = [
         "secureip",
         "retarget",
@@ -83,18 +87,18 @@ def main():
     ]
     src_dir = Path(__file__).resolve().parents[1] / "src"
     src_exclude = [
-        "/mnt/d/Documents/fpga/fpca/hdl/src/wishbone/jtag_wb_master.vhd",
-        "/mnt/d/Documents/fpga/fpca/hdl/src/peripherals/hamsterworks_dvi/",
-        "/mnt/d/Documents/fpga/fpca/hdl/src/peripherals/display_old/display_top.vhd",
+        FPGA_DIR / "fpca/hdl/src/wishbone/jtag_wb_master.vhd",
+        FPGA_DIR / "fpca/hdl/src/peripherals/hamsterworks_dvi/",
+        FPGA_DIR / "fpca/hdl/src/peripherals/display_old/display_top.vhd",
     ]
     boards_dir = Path(__file__).resolve().parents[2] / "boards"
     pynq_dir = Path(__file__).resolve().parents[2] / "boards" / "pynq_z2"
     boards_exclude = [
-        "/mnt/d/Documents/fpga/fpca/boards/pynq_z2/bd/",
-        "/mnt/d/Documents/fpga/fpca/boards/pynq_z2/bd/",
-        "/mnt/d/Documents/fpga/fpca/boards/pynq_z2/fpca/fpca.ip_user_files/",
-        "/mnt/d/Documents/fpga/fpca/boards/pynq_z2/ip",
-        "/mnt/d/Documents/fpga/fpca/boards/tang_nano_9k/gowin_sim/",
+        FPGA_DIR / "fpca/boards/pynq_z2/bd/",
+        FPGA_DIR / "fpca/boards/pynq_z2/bd/",
+        FPGA_DIR / "fpca/boards/pynq_z2/fpca/fpca.ip_user_files/",
+        FPGA_DIR / "fpca/boards/pynq_z2/ip",
+        FPGA_DIR / "fpca/boards/tang_nano_9k/gowin_sim/",
     ]
 
     VU.add_library("lib")
@@ -110,14 +114,15 @@ def main():
         VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "-fsynopsys", "--std=08", "-frelaxed-rules"])
         VU.set_sim_option("ghdl.elab_flags", ["-fsynopsys"])
     else:
-        VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08", "-frelaxed-rules"])
+        VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08", "-frelaxed-rules", "-frelaxed"])
 
     # allow for shared variables without protected types
     VU.set_sim_option("ghdl.elab_flags", ["-frelaxed-rules"])
 
     if USE_XILINX_UNISIM:
         VU.add_library("unisim")
-        add_some_files_to_vunit(VU, xilinx_unisim_dir, xilinx_exclude, "unisim")
+        # add_some_files_to_vunit(VU, xilinx_unisim_dir, xilinx_exclude, "unisim")
+        VU.add_source_files(xilinx_unisim_dir / "unisim_VCOMP.vhd", "unisim")
     if USE_XILINX_XPM:
         VU.add_library("xpm")
         VU.add_source_files(Path(xilinx_xpm_vhdl) / "xpm_cdc/hdl/*.vhd", "xpm")
