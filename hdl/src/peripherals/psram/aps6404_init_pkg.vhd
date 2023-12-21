@@ -9,7 +9,8 @@ package aps6404_init_pkg is
     --  5   CLK
     --  4   SIO Output En
     -- 3:0  SIO
-type t_init_arr is array (0 to 130) of std_logic_vector(1+1+1+4-1 downto 0);
+constant APS6404_INIT_TICKS : integer := 131;
+type t_init_arr is array (0 to APS6404_INIT_TICKS-1) of std_logic_vector(1+1+1+4-1 downto 0);
 constant APS6404_INIT : t_init_arr := (
     b"1010000",
     b"1010000",

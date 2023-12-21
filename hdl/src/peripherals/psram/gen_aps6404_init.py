@@ -103,7 +103,8 @@ if __name__ == "__main__":
     addtick(CLK="0", SIO="0000", last=True)    
     with open(OUTFILE, "w") as file:
         file.writelines(header)
-        file.writelines(f"type t_init_arr is array (0 to {tick_count-1}) of std_logic_vector(1+1+1+4-1 downto 0);\n")
+        file.writelines(f"constant APS6404_INIT_TICKS : integer := {tick_count};\n")
+        file.writelines(f"type t_init_arr is array (0 to APS6404_INIT_TICKS-1) of std_logic_vector(1+1+1+4-1 downto 0);\n")
         file.writelines(f"constant APS6404_INIT : t_init_arr := (\n")
         file.writelines(contents)
 
