@@ -31,28 +31,36 @@ def addtick(CLK="0", SIO="0000", last=False):
     tick_count = tick_count + 1
 
 def deassert_CSn():
+    global CSn
     CSn = "1"
     addtick()
 
 def assert_CSn():
+    global CSn
     CSn = "0"
     addtick()
 
 def set_mode_output():
+    global OutEn
     OutEn = "1"
+    # print("Output")
 
 def set_mode_input():
+    global OutEn
     OutEn = "0"
+    # print("Input")
 
 def xchg_spi_byte(byte):
     for i in reversed(range(8)):  # only SIO0 used (MSbit first)  
         addtick("0", f"000{(byte >> i) & 0x1:01b}")  # ensure data is set for the rising edge
         addtick("1", f"000{(byte >> i) & 0x1:01b}")      
+    # print("Byte")
 
 def xchg_qpi_byte(byte):
     for i in reversed(range(2)):  # SIO3:0 used (MSbits first)  
         addtick("0", f"{(byte >> 4*i) & 0xf:04b}")  # ensure data is set for the rising edge
         addtick("1", f"{(byte >> 4*i) & 0xf:04b}")  
+    # print("Byte")
 
 def single_byte_spi_command(cmd):
     set_mode_output()
@@ -88,6 +96,10 @@ def quad_read(start_addr, num_bytes):
 
     deassert_CSn()
 
+def write_then_read(byte_arr):
+    quad_write(0, byte_arr)
+    quad_read(0, len(byte_arr))
+
 if __name__ == "__main__":
     with open(TEMPLATE, "r") as template_file:
         header = template_file.readlines()   # header stored in template file
@@ -96,16 +108,20 @@ if __name__ == "__main__":
     single_byte_spi_command(CMD_RST_EN)
     single_byte_spi_command(CMD_RST)
     single_byte_spi_command(CMD_ENTER_QUAD)
-    quad_write(0, [0xf0, 0xf0])
-    quad_read(0, 2)
+    write_then_read([0xf0])
+    write_then_read([0x0f])
+    # write_then_read([0x00, 0x01, 0x02, 0x03, 0x04])
+    write_then_read([0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80])
+    write_then_read([0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f])
+    
 
     # add last tick
     addtick(CLK="0", SIO="0000", last=True)    
     with open(OUTFILE, "w") as file:
         file.writelines(header)
-        file.writelines(f"constant APS6404_INIT_TICKS : integer := {tick_count};\n")
-        file.writelines(f"type t_init_arr is array (0 to APS6404_INIT_TICKS-1) of std_logic_vector(1+1+1+4-1 downto 0);\n")
-        file.writelines(f"constant APS6404_INIT : t_init_arr := (\n")
+        file.writelines(f"constant C_APS6404_INIT_TICKS : integer := {tick_count};\n")
+        file.writelines(f"type t_init_arr is array (0 to C_APS6404_INIT_TICKS-1) of std_logic_vector(1+1+1+4-1 downto 0);\n")
+        file.writelines(f"constant C_APS6404_INIT_ARR : t_init_arr := (\n")
         file.writelines(contents)
 
     print(f"Wrote {tick_count} ticks to file {OUTFILE}")
