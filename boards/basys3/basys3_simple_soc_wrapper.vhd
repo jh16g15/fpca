@@ -73,6 +73,7 @@ architecture rtl of basys3_simple_soc_wrapper is
     signal reset     : std_logic;
 
     signal clk25      : std_logic;
+    signal clk200     : std_logic;
     signal mem_ctrl_clk : std_logic;
     signal pll_locked : std_logic;
     signal sseg_ca    : std_logic_vector(7 downto 0);
@@ -95,6 +96,7 @@ architecture rtl of basys3_simple_soc_wrapper is
         port
         (
             clk_out25 : out std_logic;
+            clk_out200 : out std_logic;
             clk_out_mem : out std_logic; -- PSRAM SCK is half this frequency
             reset     : in std_logic;
             locked    : out std_logic;
@@ -104,10 +106,26 @@ architecture rtl of basys3_simple_soc_wrapper is
 
 begin
 
+
+--    qspi_oversample_inst : entity work.qspi_oversample
+--    generic map (
+--        OVERSAMPLE_KHZ => 200_000,
+--        SPI_KHZ => 20_000
+--    )
+--    port map (
+--        oversample_clk => clk200,
+--        oversample_rst => reset,
+--        init_done_out => open,
+--        qspi_clk_out => PSRAM_QSPI_SCK,
+--        qspi_csn => PSRAM_QSPI_CSN,
+--        qspi_sio => PSRAM_QSPI_SIO
+--    );
+
     -- 100MHz to 25MHz free running
     pll_inst : clk_wiz_0
     port map (
         clk_out25 => clk25,
+        clk_out200 => clk200,
         clk_out_mem => mem_ctrl_clk,
         reset     => '0',
         locked    => pll_locked,
@@ -167,38 +185,38 @@ begin
     SD_D3 <= i_spi_csn;
     
     
-    soc_inst : entity work.basys3_soc
-        generic map(
-            G_PROJECT_ROOT   => G_PROJECT_ROOT,
-            G_MEM_INIT_FILE  => G_MEM_INIT_FILE,
-            G_BOOT_INIT_FILE => G_BOOT_INIT_FILE,
-            G_SOC_FREQ       => 25_000_000,
-            G_MEM_CTRL_CLK_FREQ_KHZ => C_MEM_CTRL_CLK_FREQ_KHZ
-        )
-        port map(
-            clk          => clk25,
-            mem_ctrl_clk => mem_ctrl_clk,
-            reset        => reset,
-            gpio_led_out => gpio_led,
-            gpio_btn_in  => gpio_btn,
-            gpio_sw_in   => gpio_sw,
-            sseg_ca_out  => sseg_ca,
-            sseg_an_out  => sseg_an,
-            uart_tx_out  => uart_tx,
-            uart_rx_in   => uart_rx,
-            i2c_scl_out  => i2c_scl,
-            i2c_sda_out  => i2c_sda,
-            spi_sck_out  => i_spi_sck,
-            spi_miso_in  => i_spi_miso,
-            spi_mosi_out => i_spi_mosi,
-            spi_csn_out  => i_spi_csn,
-            psram_clk    => PSRAM_QSPI_SCK,
-            psram_cs_n   => PSRAM_QSPI_CSN,
-            psram_sio    => PSRAM_QSPI_SIO,
-            vga_hs_out   => Hsync,
-            vga_vs_out   => Vsync,
-            vga_r        => vgaRed,
-            vga_g        => vgaGreen,
-            vga_b        => vgaBlue
-        );
+     soc_inst : entity work.basys3_soc
+         generic map(
+             G_PROJECT_ROOT   => G_PROJECT_ROOT,
+             G_MEM_INIT_FILE  => G_MEM_INIT_FILE,
+             G_BOOT_INIT_FILE => G_BOOT_INIT_FILE,
+             G_SOC_FREQ       => 25_000_000,
+             G_MEM_CTRL_CLK_FREQ_KHZ => C_MEM_CTRL_CLK_FREQ_KHZ
+         )
+         port map(
+             clk          => clk25,
+             mem_ctrl_clk => mem_ctrl_clk,
+             reset        => reset,
+             gpio_led_out => gpio_led,
+             gpio_btn_in  => gpio_btn,
+             gpio_sw_in   => gpio_sw,
+             sseg_ca_out  => sseg_ca,
+             sseg_an_out  => sseg_an,
+             uart_tx_out  => uart_tx,
+             uart_rx_in   => uart_rx,
+             i2c_scl_out  => i2c_scl,
+             i2c_sda_out  => i2c_sda,
+             spi_sck_out  => i_spi_sck,
+             spi_miso_in  => i_spi_miso,
+             spi_mosi_out => i_spi_mosi,
+             spi_csn_out  => i_spi_csn,
+             psram_clk    => PSRAM_QSPI_SCK,
+             psram_cs_n   => PSRAM_QSPI_CSN,
+             psram_sio    => PSRAM_QSPI_SIO,
+             vga_hs_out   => Hsync,
+             vga_vs_out   => Vsync,
+             vga_r        => vgaRed,
+             vga_g        => vgaGreen,
+             vga_b        => vgaBlue
+         );
 end architecture;

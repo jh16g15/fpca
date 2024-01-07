@@ -15,7 +15,6 @@
 // #include "ssd1306_i2c.h"
 #include "spi.h"
 #include "console.h"
-#include "spi_psram.h"
 
 #include "printf.h"
 #include "ff.h"
@@ -34,8 +33,8 @@ void wait_for_btn_press(int btn){
 static struct uart uart0;
 static struct timer timer0;
 
-// #define MAIN_USE_FATFS
-// #define MAIN_USE_MEMTEST
+#define MAIN_USE_FATFS
+#define MAIN_USE_MEMTEST
 
 
 #define KBYTE 1024
@@ -123,8 +122,6 @@ void main(void)
     // Test APS6404 PSRAM pmod for correct operation
     u32 PSRAM_KBYTES = 8 * 1024;
 
-    // psram_init();
-    // psram_read_id();
     printf_("Start PSRAM Test!\n");
     write_u8(PLATFORM_PSRAM_BASE, 0x81);
     u8 rdat8 = read_u8(PLATFORM_PSRAM_BASE);
@@ -137,7 +134,7 @@ void main(void)
 
 
     psram_memtest(1); //start with short test that should fail quickly
-    psram_memtest(PSRAM_KBYTES);
+    psram_memtest(PSRAM_KBYTES/2);
     printf_("\nAll PSRAM Tests Done!\n");
     wait_for_btn_press(BTN_D);
 
@@ -146,7 +143,6 @@ void main(void)
     f_mount(&fs, "", 1);
     list_dir("0:");
 #endif
-    // psram_read_id();
 
 #ifdef MAIN_USE_MEMTEST
     printf_("Test PSRAM with memtest (takes a while!)\n");
@@ -156,7 +152,7 @@ void main(void)
     wait_for_btn_press(BTN_D);
 
     write_u32(PLATFORM_PSRAM_BASE, 0x00beef00);
-    u32 rdat32 = read_u32(PLATFORM_PSRAM_BASE);
+    rdat32 = read_u32(PLATFORM_PSRAM_BASE);
     printf_("0x%x\n", rdat32);
 
     printf_("Start Single Address Memtest\n");
