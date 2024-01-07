@@ -59,7 +59,8 @@ boot_objects = \
 build/minimal_boot.o
 
 CC=riscv32-unknown-elf-gcc
-LD=riscv32-unknown-elf-ld
+# linking with gcc instead of ld is recommended
+LD=riscv32-unknown-elf-gcc
 OBJDUMP=riscv32-unknown-elf-objdump
 ELF2HEX=riscv32-unknown-elf-elf2hex
 NM=riscv32-unknown-elf-nm
@@ -77,14 +78,14 @@ CFLAGS_RV = $(CFLAGS) -march=rv32i -mabi=ilp32 -ffreestanding -mstrict-align
 CC_PC=gcc
 CFLAGS_PC= $(CFLAGS)
 
-LDFLAGS = -Map=build/output.map
+LDFLAGS = -Map=build/output.map 
 # LDFLAGS_RV = $(LDFLAGS) --gc-sections -nostartfiles -T riscv32-fpca.ld
 # we don't need -nostartfiles as a standalone linker invocation requires it to be provided explicitly
 # we need libgcc.a (-lgcc) for soft mult/div, as we aren't using RV32IM
 # we also need one of the following: libc.a, libc_nano.a, libg.a, libg_nano.a for malloc etc
 
 # As we are running without an OS, for syscalls we use libnosys.a (_sbrk etc)
-LDFLAGS_RV = $(LDFLAGS) -lgcc -lg_nano -lnosys --gc-sections  -T riscv32-fpca.ld
+LDFLAGS_RV = -nostartfiles -Wl,-Map=build/output.map,--gc-sections,-T,riscv32-fpca.ld,-lgcc,-lg_nano,-lnosys
 
 #############################################################
 # Main Outputs
