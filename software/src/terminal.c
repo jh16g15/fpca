@@ -111,10 +111,11 @@ void terminal_write_raw_char(t_terminal *t, char c, char auto_adv)
 // write a byte at the current cursor position (interpret \r and \n as control chars)
 void terminal_write_char(t_terminal *t, char c)
 {
+    unsigned int y;
     switch (c)
         {
         case '\n':
-            unsigned int y = (t->y + 1) % t->h; // x=0, increment y
+            y = (t->y + 1) % t->h; // x=0, increment y
             terminal_scroll_one_line(t); // as we've increased Y, scroll the screen
             terminal_set_cursor(t, 0, y);
             break;

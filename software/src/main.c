@@ -34,7 +34,7 @@ static struct uart uart0;
 static struct timer timer0;
 
 #define MAIN_USE_FATFS
-#define MAIN_USE_MEMTEST
+// #define MAIN_USE_MEMTEST
 
 
 #define KBYTE 1024
@@ -130,66 +130,42 @@ void main(void)
     write_u32(PLATFORM_PSRAM_BASE, 0x81abed1);
     u32 rdat32 = read_u32(PLATFORM_PSRAM_BASE);
     printf_("rdat: 0x%x 0x%x 0x%x\n", rdat8, rdat16, rdat32);
-    wait_for_btn_press(BTN_D);
+    // wait_for_btn_press(BTN_D);
 
 
     psram_memtest(1); //start with short test that should fail quickly
-    psram_memtest(PSRAM_KBYTES/2);
+    #ifdef MAIN_USE_MEMTEST
+    psram_memtest(PSRAM_KBYTES/8);   // longer test
+    #endif
     printf_("\nAll PSRAM Tests Done!\n");
-    wait_for_btn_press(BTN_D);
+    // wait_for_btn_press(BTN_D);
 
 #ifdef MAIN_USE_FATFS
-    FATFS fs;
+    FATFS fs;   // filesystem object
+    FIL file;   // file object
+
+    char line[100]; // line buffer
+    FRESULT fr; // fatfs result
+
     f_mount(&fs, "", 1);
+    printf_("Filesystem Mounted!\n");
+    printf_("Listing 0:\n");
     list_dir("0:");
+    printf_("Opening 0:wifi.txt...\n");
+    fr = f_open(&file, "0:wifi.txt", FA_READ);
+    if (fr) printf_("failed to open 0:wifi.txt with error code 0x%x\n", fr);
+    printf_("Opened 0:wifi.txt\n");
+    // read and print each line
+    while (f_gets(line, sizeof line, &file)){
+        printf_(line);
+    }
+    printf_("\nEOF reached!\n");
+
+    printf_("Closing 0:wifi.txt\n");
+    f_close(&file);
+
 #endif
 
-#ifdef MAIN_USE_MEMTEST
-    printf_("Test PSRAM with memtest (takes a while!)\n");
-    int ret = memTest();
-    printf_("memTest returned %i\n", ret);
-
-    wait_for_btn_press(BTN_D);
-
-    write_u32(PLATFORM_PSRAM_BASE, 0x00beef00);
-    rdat32 = read_u32(PLATFORM_PSRAM_BASE);
-    printf_("0x%x\n", rdat32);
-
-    printf_("Start Single Address Memtest\n");
-    volatile u32 *psram = (u32*)PLATFORM_PSRAM_BASE;
-    // test writing a bunch of values to the same address
-    for (u32 i = 0; i < 256; i++){
-    // try reverse (slightly different behaviour)
-    // for (u32 i = 255; i >= 0; i--){
-        psram[0] = i;
-        printf_("%i \n", i); // delay
-        rdat32 = psram[0];
-        if (rdat32 != i){
-            printf_("ERR Address %p, Exp 0x%x Act 0x%x\n", &psram[0], i, rdat32);
-            wait_for_btn_press(BTN_D);
-        }
-    }
-    printf_("Single Address Memtest done\n");
-
-    // while(1){}
-    u8 i = 10;
-    printf_("Test PSRAM (press down)\n");
-    wait_for_btn_press(BTN_D);
-    while(1){
-        // write_u32(PSRAM_BASE, 0x12345678);
-
-        write_u32(PLATFORM_PSRAM_BASE+4, 0x7a6b5c4d);
-
-        u8 rdat0 = read_u8(PLATFORM_PSRAM_BASE+4);
-        u8 rdat1 = read_u8(PLATFORM_PSRAM_BASE+4+1);
-        u8 rdat2 = read_u8(PLATFORM_PSRAM_BASE+4+2);
-        u8 rdat3 = read_u8(PLATFORM_PSRAM_BASE+4+3);
-        rdat32 = read_u32(PLATFORM_PSRAM_BASE+4);
-        printf_("0x%x, 0x%x, 0x%x, 0x%x: 0x%x\n", rdat3, rdat2, rdat1, rdat0, rdat32);
-        i++;
-        while(1){}
-    }
-#endif
 
     printf_("CPU Arch      : %s\n", "RISC-V RV32I");
     printf_("CPU Frequency : %i MHz\n", GPIO_SOC_FREQ/1000000);
