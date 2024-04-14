@@ -40,17 +40,16 @@ architecture bench of tb_wb_master_burst is
   signal rsp_valid_out : std_logic;
   signal rsp_err_out   : std_logic;
 
-    signal SB_Req : ScoreBoardIDType;
-  --   signal SB_Req : queue_t;
+  signal SB_Req : ScoreBoardIDType;
 
   constant ascending_sulv  : std_ulogic_vector(22 to 23)   := "UX";
   constant descending_sulv : std_ulogic_vector(9 downto 1) := "000111UUU";
 
   constant joe_tmp : std_logic_vector(64 downto 0) := "1" & x"0123_4567" & x"89ab_cdef";
 
-  --   signal SB_Rsp_Addr : ScoreBoardIDType := NewID("Rsp_Address");
-  --   signal SB_Rsp_Rdata : ScoreBoardIDType := NewID("Rsp_RData");
-  --   signal SB_Rsp_WE : ScoreBoardIDType := NewID("Rsp_WE");
+    signal SB_Rsp_Addr : ScoreBoardIDType;
+    signal SB_Rsp_Rdata : ScoreBoardIDType;
+    signal SB_Rsp_WE : ScoreBoardIDType;
 begin
 
   rsp_proc : process is
@@ -58,23 +57,18 @@ begin
     wait;
   end process;
   req_proc : process
-    -- variable SB_Req, queue : queue_t;
-    variable result        : std_logic_vector(64 downto 0);
+    variable result : std_logic_vector(64 downto 0);
 
     procedure queue_write(addr, wdata : in std_logic_vector(31 downto 0)) is
-    begin
-    --   info("SB_Req bytes=" & to_string(length(SB_Req)));
+    begin      
       info("add write to " & to_hstring(addr) & " " & to_hstring(wdata) & " to queue");
       push(SB_Req, "1" & wdata & addr);
-    --   push_std_ulogic_vector(SB_Req, '1' & wdata & addr);
-    --   info("SB_Req bytes=" & to_string(length(SB_Req)));
       wait for 0 ns;
     end procedure;
     procedure queue_read(addr : in std_logic_vector(31 downto 0)) is
     begin
       info("add read from " & to_hstring(addr) & " to queue");
-      push(SB_Req, "0" & x"0000_0000" & addr);
-    --   push_std_ulogic_vector(SB_Req, '0' & x"0000_0000" & addr);
+      push(SB_Req, "0" & x"0000_0000" & addr);      
       wait for 0 ns;
     end procedure;
 
@@ -85,23 +79,9 @@ begin
       variable we          : std_logic;
       variable tmp         : integer;
     begin
-      -- tmp := osvvm.ScoreBoardPkg_slv.GetItemCount(SB_Req);
-
-    --   if is_empty(SB_Req) then
-    --     if osvvm.ScoreBoardPkg_slv.Empty(SB_Req) then
-    --     warning("SB_Req is empty");
-    --   else
-    --     info("SB_Req not empty, bytes=" & to_string(length(SB_Req)));
-    --   end if;
-
-    --   while not is_empty(SB_Req) loop
-        while not osvvm.ScoreBoardPkg_slv.Empty(SB_Req) loop
+      while not osvvm.ScoreBoardPkg_slv.Empty(SB_Req) loop
         info("peeking");
-        -- checks work even if peeking does not - overloading seems to be broken
         Peek(SB_Req, transaction);
-        -- Check(SB_Req, transaction); 
-
-        -- osvvm.ScoreBoardPkg_slv.Peek(SB_Req, transaction); 
         info("popping from queue");
         pop(SB_Req, transaction);
         -- transaction := pop_std_ulogic_vector(SB_Req);
@@ -126,16 +106,13 @@ begin
       end loop;
     end procedure;
 
-    -- procedure wqueue (<params>) is
-    -- begin
-
-    -- end procedure;
   begin
     test_runner_setup(runner, runner_cfg);
     show(get_logger("check"), display_handler, pass);
-      SB_Req <= osvvm.ScoreBoardPkg_slv.NewID("SB_Req_name");
-    -- SB_Req <= new_queue;
-    -- SB_Req := new_queue;
+    SB_Req <= NewID("SB_Req_name");
+    SB_Rsp_Addr <= NewID("Rsp_Address");
+    SB_Rsp_Rdata <= NewID("Rsp_RData");
+    SB_Rsp_WE <=  := NewID("Rsp_WE");
 
     while test_suite loop
       if run("test_alive") then
