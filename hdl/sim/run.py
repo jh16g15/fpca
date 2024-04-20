@@ -84,6 +84,7 @@ def main():
     sim_helpers_exclude = [
         "psram_memory_interface_hs_2ch/temp",
         "psram_memory_interface_hs_2ch/",
+        "sim_psram_aps6404_no_vunit.vhd",
     ]
     src_dir = Path(__file__).resolve().parents[1] / "src"
     src_exclude = [
@@ -123,6 +124,10 @@ def main():
         VU.add_library("unisim")
         # add_some_files_to_vunit(VU, xilinx_unisim_dir, xilinx_exclude, "unisim")
         VU.add_source_files(xilinx_unisim_dir / "unisim_VCOMP.vhd", "unisim")
+        VU.add_source_files(xilinx_unisim_dir / "unisim_VPKG.vhd", "unisim")
+        VU.add_source_files(xilinx_unisim_dir / "primitive" / "ODDR.vhd", "unisim")
+        VU.add_compile_option("ghdl.a_flags", ["-frelaxed-rules", "-frelaxed"])
+        
     if USE_XILINX_XPM:
         VU.add_library("xpm")
         VU.add_source_files(Path(xilinx_xpm_vhdl) / "xpm_cdc/hdl/*.vhd", "xpm")

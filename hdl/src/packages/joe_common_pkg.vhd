@@ -65,6 +65,8 @@ package joe_common_pkg is
 
     function test_bit(in_vec : std_logic_vector; i : integer) return boolean;
 
+    function byte_swap(in_vec : std_logic_vector; swap : boolean := true) return std_logic_vector;
+
 end package;
 
 package body joe_common_pkg is
@@ -232,4 +234,20 @@ package body joe_common_pkg is
         return (in_vec(i) = '1');   -- True if '1'
     end function;
 
+    function byte_swap(in_vec : std_logic_vector; swap : boolean := true) return std_logic_vector is 
+        constant NUM_BYTES : integer := in_vec'length / 8;
+        variable tmp_vec : std_logic_vector(in_vec'length-1 downto 0);
+        variable tmp_byte : std_logic_vector(7 downto 0);
+    begin
+        report "Byte swap of " & to_string(NUM_BYTES) & " bytes";
+        if swap then            
+            for i in 0 to NUM_BYTES-1 loop
+                tmp_byte := in_vec((NUM_BYTES-1-i)*8+7 downto (NUM_BYTES-1-i)*8);                
+                tmp_vec(i*8+7 downto i*8) := tmp_byte;
+            end loop;
+            return tmp_vec;
+        else
+            return in_vec;
+        end if;
+    end function;
 end package body;

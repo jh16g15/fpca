@@ -68,6 +68,9 @@ package wb_pkg is
 
     --! Align the valid part of the 32 bit input data to the wishbone 32 bit data bus
     function wb_align_store_data(wdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0)) return std_logic_vector;
+
+    function sel2bytes(sel : std_logic_vector(3 downto 0)) return unsigned;
+    function bytes2sel(bytes : natural) return std_logic_vector;
 end package;
 
 package body wb_pkg is
@@ -164,4 +167,38 @@ package body wb_pkg is
             when others  => return wdata;
         end case;
     end function;
+
+    function sel2bytes(sel : std_logic_vector(3 downto 0)) return unsigned is
+        variable bytes : unsigned(3 downto 0);
+    begin
+        case(sel) is
+            when b"0000" => bytes := x"0";
+            when b"0001" => bytes := x"1";
+            when b"0010" => bytes := x"1";
+            when b"0100" => bytes := x"1";
+            when b"1000" => bytes := x"1";
+            when b"0011" => bytes := x"2";
+            when b"0110" => bytes := x"2";
+            when b"1100" => bytes := x"2";
+            when b"0111" => bytes := x"3";
+            when b"1110" => bytes := x"3";
+            when b"1111" => bytes := x"4";
+            when others =>  bytes := x"0";
+        end case;
+        return bytes;
+    end;
+
+    function bytes2sel(bytes : natural) return std_logic_vector is
+        variable sel : std_logic_vector(3 downto 0);
+    begin
+        case(bytes) is
+            when 0 => sel := b"0000";
+            when 1 => sel := b"0001";
+            when 2 => sel := b"0011";
+            when 3 => sel := b"0111";
+            when 4 => sel := b"1111";
+            when others => sel := b"1111";
+        end case;
+        return sel;
+    end;
 end package body;
