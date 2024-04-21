@@ -100,9 +100,14 @@ architecture rtl of psram_aps6404_ctrl_wrap32 is
     signal psram_qpi_sio_in       : std_logic_vector(3 downto 0); -- FROM APS6404
     signal psram_qpi_io_dir_input : std_logic := '1'; -- '1' for input, '0' for output
 
+    signal reg_psram_qpi_sio_in   : std_logic_vector(3 downto 0); -- FROM APS6404, registered
+    -- (place in IOB flop for better timing)
+    attribute IOB : string;
+    attribute IOB of reg_psram_qpi_sio_in : signal is "TRUE";
+    
     signal psram_spi_so : std_logic;
-    signal psram_spi_si : std_logic;
-
+--    signal psram_spi_si : std_logic;  -- not used
+ 
     signal mode_qpi : std_logic := '0';
 
     signal psram_cmd_addr : std_logic_vector(31 downto 0);
@@ -245,20 +250,20 @@ begin
 
                     when QPI_WAIT => 
                         psram_qpi_io_dir_input <= '1';
-                        if cycle_counter = FAST_QUAD_READ_WAIT_CYCLES-1 then
+                        if cycle_counter = FAST_QUAD_READ_WAIT_CYCLES+1-1 then -- wait one extra cycle as we are registering PSRAM_SIO on input
                             cycle_counter <= x"00";
                             state <= QPI_DATA;
                         end if;
 
                     when QPI_DATA => -- Data is transferred MSNibble of LSByte first, so we previously byte-swapped reg_data
                         psram_qpi_sio_out <= reg_data(reg_data'left downto reg_data'left-3);
-                        reg_data(reg_data'left downto 0) <= reg_data(reg_data'left-4 downto 0) & psram_qpi_sio_in;
+                        reg_data(reg_data'left downto 0) <= reg_data(reg_data'left-4 downto 0) & reg_psram_qpi_sio_in;
                         
                         if cycle_counter = G_BURST_LEN*2 then -- all data transferred
                             psram_clk_en <= '0';    -- stop the clock
                             cycle_counter <= x"00";
                             state <= REFRESH;
-                            rdata := reg_data(reg_data'left-4 downto 0) & psram_qpi_sio_in;
+                            rdata := reg_data(reg_data'left-4 downto 0) & reg_psram_qpi_sio_in;
                             rsp_rdata_out <= byte_swap(rdata);
                             rsp_valid <= '1'; -- one cycle pulse
 
@@ -278,19 +283,26 @@ begin
         end if;
     end process;
 
+    -- Register the Input Data (place in IOB reg for better timing)
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            reg_psram_qpi_sio_in <= psram_qpi_sio_in;
+        end if;
+    end process;
+
+
     process (all)
     begin
-        -- default all 0's
-        psram_qpi_sio_in <= "0000";
-        psram_spi_si     <= '0';
+        psram_qpi_sio_in <= psram_sio;
+--        psram_spi_si     <= '0';
         if mode_qpi then
             psram_sio <= psram_qpi_sio_out when psram_qpi_io_dir_input = '0' else
                 "ZZZZ";
-            psram_qpi_sio_in <= psram_sio;
         else
             psram_sio(0)          <= psram_spi_so; -- Serial IN for APS6404, Serial OUT for controller
             psram_sio(3 downto 1) <= "ZZZ";
-            psram_spi_si          <= psram_sio(1); -- Serial OUT for APS6404, Serial IN for controller
+--            psram_spi_si          <= psram_sio(1); -- Serial OUT for APS6404, Serial IN for controller
         end if;
     end process;
 

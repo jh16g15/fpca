@@ -9,6 +9,7 @@ entity wrap32_test_vectors is
         G_BURST_LEN   : integer range 4 to 32 := 4;
         G_FREQ_KHZ    : integer               := 100_000;
         G_SIM         : boolean               := false;
+        G_ILA         : boolean               := false;
         G_TEST_LENGTH : integer               := 100 -- number of bursts to check
     );
     port
@@ -54,6 +55,16 @@ architecture rtl of wrap32_test_vectors is
     signal r_lfsr_next : std_logic;
     signal r_lfsr_data : std_logic_vector(31 downto 0);
 
+    attribute mark_debug : boolean;
+    attribute mark_debug of state : signal is G_ILA;
+    attribute mark_debug of cmd_valid : signal is G_ILA;
+    attribute mark_debug of cmd_ready : signal is G_ILA;
+    attribute mark_debug of cmd_address_in : signal is G_ILA;
+    attribute mark_debug of cmd_we_in : signal is G_ILA;
+    attribute mark_debug of cmd_wdata_in : signal is G_ILA;
+    attribute mark_debug of rsp_valid : signal is G_ILA;
+    attribute mark_debug of rsp_rdata_out : signal is G_ILA;
+    attribute mark_debug of r_lfsr_data : signal is G_ILA;
 
 begin
 
