@@ -17,7 +17,7 @@ architecture bench of tb_psram_aps6404_ctrl_wrap32 is
   -- Clock period
   constant clk_period : time := 7.5 ns;
   -- Generics
-  constant G_BURST_LEN : integer := 32;
+  constant G_BURST_LEN : integer := 8;
   constant G_FREQ_KHZ : integer := 133_000;
   constant G_SIM : boolean := true;
   -- Ports

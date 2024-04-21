@@ -13,7 +13,7 @@ use unisim.vcomponents.all;
 entity psram_aps6404_ctrl_wrap32 is
     generic
     (
-        G_BURST_LEN : integer := 32;
+        G_BURST_LEN : integer range 1 to 32 := 32; --! 32-byte max as using wrap32 mode for faster potential clock speeds
         G_FREQ_KHZ : integer := 75000; -- 75MHz to start? Aim for 109MHz+
         G_SIM      : boolean := false -- skip power on init (150us wait)
     );
@@ -63,7 +63,7 @@ architecture rtl of psram_aps6404_ctrl_wrap32 is
     
     --eg 44 go throughs of a 256 cycle counter @ 75MHz
     constant PWR_ON_DELAY_CYCLES : integer              := 150 * G_FREQ_KHZ / 1000; -- 150us
-    constant PWR_ON_DELAY_COUNT  : integer              := PWR_ON_DELAY_CYCLES / 256;
+    constant PWR_ON_DELAY_COUNT  : integer              := (PWR_ON_DELAY_CYCLES / 256) + 1;
     signal power_on_counter      : unsigned(7 downto 0) := to_unsigned(PWR_ON_DELAY_COUNT, 8); -- power on done when "11111"
 
     -- We need 18ns of CS_N deasserted between each burst for DRAM auto-refresh
@@ -237,13 +237,14 @@ begin
                             cycle_counter <= x"00";
                             if reg_we then -- send write data
                                 state <= QPI_DATA;
-                            else -- switch to SIO input and wait 
+                            else -- wait for PSRAM to start sending RDATA
                                 state <= QPI_WAIT;
-                                psram_qpi_io_dir_input <= '1';
+                                
                             end if;
                         end if;
 
                     when QPI_WAIT => 
+                        psram_qpi_io_dir_input <= '1';
                         if cycle_counter = FAST_QUAD_READ_WAIT_CYCLES-1 then
                             cycle_counter <= x"00";
                             state <= QPI_DATA;
