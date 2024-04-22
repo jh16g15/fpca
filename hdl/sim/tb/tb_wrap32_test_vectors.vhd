@@ -15,12 +15,13 @@ end;
 
 architecture bench of tb_wrap32_test_vectors is
     -- Clock period
-    constant clk_period : time := 10 ns;
+    constant clk_period : time := 200 ns;
     -- Generics
     constant G_BURST_LEN : integer range 4 to 32 := 4;
-    constant G_FREQ_KHZ : integer := 100_000;
+    constant G_FREQ_KHZ : integer := 5_000;
     constant G_SIM : boolean := false;
-    constant G_TEST_LENGTH : integer := 16 * 1024; -- 64KB is modelled as memory
+    -- constant G_TEST_LENGTH : integer := 16 * 1024; -- 64KB is modelled as memory
+    constant G_TEST_LENGTH : integer := 4; -- smaller test for speed
     -- Ports
     signal clk : std_logic := '0';
     signal reset : std_logic := '1';
@@ -32,7 +33,7 @@ architecture bench of tb_wrap32_test_vectors is
     signal psram_sio : std_logic_vector(3 downto 0);
 begin
 
-    reset <= '0' after 100 ns;
+    reset <= '0' after 10 * clk_period;
 
     wrap32_test_vectors_inst : entity work.wrap32_test_vectors
     generic map (

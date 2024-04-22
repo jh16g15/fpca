@@ -111,6 +111,17 @@ architecture rtl of psram_aps6404_ctrl_wrap32 is
     signal mode_qpi : std_logic := '0';
 
     signal psram_cmd_addr : std_logic_vector(31 downto 0);
+    
+    attribute mark_debug : boolean;
+    attribute mark_debug of state : signal is true;
+    attribute mark_debug of psram_clk_en : signal is true;
+    attribute mark_debug of cycle_counter : signal is true;
+    attribute mark_debug of reg_data : signal is true;
+    attribute mark_debug of psram_qpi_sio_out : signal is true;
+    attribute mark_debug of reg_psram_qpi_sio_in : signal is true;
+    attribute mark_debug of psram_cs_n : signal is true;
+    attribute mark_debug of psram_qpi_io_dir_input : signal is true;
+       
        
 begin
 
@@ -157,8 +168,9 @@ begin
                                 psram_qpi_sio_out <= x"6";
                             when x"07" =>
                                 psram_qpi_sio_out <= x"6";
-                            when x"08" => -- stop the clock, start deasserting CSn
+                            when x"08" => -- stop the clock
                                 psram_clk_en <= '0';
+                            when x"09" => -- start deasserting CSn
                                 psram_cs_n   <= '1';
                             when x"10" => -- =========== QPI RST 0x99 ==================== 
                                 psram_cs_n <= '0'; -- start assert of CSn (watch out for propagation delay)
@@ -167,46 +179,57 @@ begin
                                 psram_qpi_sio_out <= x"9";
                             when x"17" =>
                                 psram_qpi_sio_out <= x"9";
-                            when x"18" => -- stop the clock, start deasserting CSn
-                                psram_clk_en <= '0';
+                            when x"18" => -- stop the clock
+                            psram_clk_en <= '0';
+                            when x"19" => -- start deasserting CSn
                                 psram_cs_n   <= '1';
                                 -- After approx 50ns for reset to complete
-                            when x"20" => -- =========== SPI Enter Quad 0x35 ==================== 
+                            when x"30" => -- =========== SPI Enter Quad 0x35 ==================== 
                                 psram_cs_n <= '0'; -- start assert of CSn (watch out for propagation delay)
                                 mode_qpi   <= '0'; -- now in SPI mode
-                            when x"26" => -- chip select propagated, start the clock and send SPI Enter Quad 0x35 ("00110101")
+                            when x"36" => -- chip select propagated, start the clock and send SPI Enter Quad 0x35 ("00110101")
                                 psram_clk_en <= '1';
                                 psram_spi_so <= '0';
-                            when x"27" =>
+                                psram_qpi_sio_out <= x"0";
+                            when x"37" =>
                                 psram_spi_so <= '0';
-                            when x"28" =>
+                                psram_qpi_sio_out <= x"0";
+                            when x"38" =>
                                 psram_spi_so <= '1';
-                            when x"29" =>
+                                psram_qpi_sio_out <= x"1";
+                            when x"39" =>
                                 psram_spi_so <= '1';
-                            when x"2a" =>
+                                psram_qpi_sio_out <= x"1";
+                            when x"3a" =>
                                 psram_spi_so <= '0';
-                            when x"2b" =>
+                                psram_qpi_sio_out <= x"0";
+                            when x"3b" =>
                                 psram_spi_so <= '1';
-                            when x"2c" =>
+                                psram_qpi_sio_out <= x"1";
+                            when x"3c" =>
                                 psram_spi_so <= '0';
-                            when x"2d" =>
+                                psram_qpi_sio_out <= x"0";
+                            when x"3d" =>
                                 psram_spi_so <= '1'; -- last bit of SPI Enter Quad
-                            when x"2e" => -- stop the clock, start deasserting CSn
-                                psram_clk_en <= '0';
+                                psram_qpi_sio_out <= x"1";
+                            when x"3e" => -- stop the clock
+                            psram_clk_en <= '0';
+                            when x"3f" => -- start deasserting CSn
                                 psram_cs_n   <= '1';
                                 mode_qpi     <= '1'; -- back in QPI mode
-                            when x"30" => -- =========== Wrap32 Toggle 0xC0 ====================
+                            when x"40" => -- =========== Wrap32 Toggle 0xC0 ====================
                                 psram_cs_n <= '0'; -- start assert of CSn (watch out for propagation delay)
-                            when x"36" => -- chip select propagated, start the clock
+                            when x"46" => -- chip select propagated, start the clock
                                 psram_clk_en      <= '1';
                                 psram_qpi_sio_out <= x"C";
-                            when x"37" =>
+                            when x"47" =>
                                 psram_qpi_sio_out <= x"0";
-                            when x"38" => -- stop the clock, start deasserting CSn
+                            when x"48" => -- stop the clock
                                 psram_clk_en <= '0';
+                            when x"49" => -- start deasserting CSn
                                 psram_cs_n   <= '1';
                                 -- =============== PSRAM INIT done ===================
-                            when x"50" => --move to next PSRAM and reset cycle counter
+                            when x"60" => --move to next PSRAM and reset cycle counter
                                 if psram_sel_u = "11" then
                                     state <= IDLE; -- All PSRAMs init'ed
                                     cmd_ready <= '1';
@@ -295,15 +318,8 @@ begin
     process (all)
     begin
         psram_qpi_sio_in <= psram_sio;
---        psram_spi_si     <= '0';
-        if mode_qpi then
-            psram_sio <= psram_qpi_sio_out when psram_qpi_io_dir_input = '0' else
-                "ZZZZ";
-        else
-            psram_sio(0)          <= psram_spi_so; -- Serial IN for APS6404, Serial OUT for controller
-            psram_sio(3 downto 1) <= "ZZZ";
---            psram_spi_si          <= psram_sio(1); -- Serial OUT for APS6404, Serial IN for controller
-        end if;
+        psram_sio <= psram_qpi_sio_out when psram_qpi_io_dir_input = '0' else
+            "ZZZZ";
     end process;
 
     -- Invert the clock and forward to PSRAM

@@ -65,9 +65,11 @@ architecture rtl of wrap32_test_vectors is
     attribute mark_debug of rsp_valid : signal is G_ILA;
     attribute mark_debug of rsp_rdata_out : signal is G_ILA;
     attribute mark_debug of r_lfsr_data : signal is G_ILA;
+    attribute mark_debug of w_lfsr_data : signal is G_ILA;
 
 begin
-
+    cmd_wdata_in <= w_lfsr_data;
+    
     process (clk)
     begin
         if rising_edge(clk) then
@@ -90,7 +92,7 @@ begin
                         cmd_valid <= '1';
                         cmd_we_in <= '1';
                         cmd_address_in <= std_logic_vector(write_address_under_test);
-                        cmd_wdata_in <= w_lfsr_data;
+                        -- cmd_wdata_in <= w_lfsr_data;
                         if cmd_valid and cmd_ready then -- cmd accepted
                             cmd_valid <= '0';                            
                             state <= S_WRITE_WAIT;
