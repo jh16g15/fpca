@@ -60,6 +60,7 @@ begin
                         in_pixel.red   := wdat(23 downto 16);
                         in_pixel.green := wdat(15 downto 8);
                         in_pixel.blue  := wdat(7 downto 0);
+                        report "in pixel: " & to_string(in_pixel);
                         if addr(8) = '0' then
                             palette0(slv2uint(addr(7 downto 0))) <= in_pixel;
                         else
@@ -76,6 +77,7 @@ begin
                             out_pixel := palette1(slv2uint(addr(7 downto 0)));
                             rdat <= out_pixel.red & out_pixel.green & out_pixel.blue;
                         end if;
+                        report "out pixel: " & to_string(out_pixel);
                     end if;
                 end if;
             end if;

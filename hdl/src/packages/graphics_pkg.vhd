@@ -29,6 +29,7 @@ package graphics_pkg is
 
     function func_combine_pixel_or(a : t_pixel; b : t_pixel) return t_pixel;
 
+    function to_string(pixel : t_pixel) return string;
 
 end package;
 
@@ -40,4 +41,8 @@ package body graphics_pkg is
         return v_pixel;
     end function;
 
+    function to_string(pixel : t_pixel) return string is 
+    begin
+        return "R=0x" & to_hstring(pixel.red) & ", G=0x" & to_hstring(pixel.green) & ", B=0x" & to_hstring(pixel.blue);
+    end function;
 end package body;

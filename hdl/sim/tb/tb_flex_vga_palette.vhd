@@ -91,11 +91,12 @@ begin
         
             elsif run("access test") then
                 write_palette_ram(0, x"11_22_33", '0');
+                wait until rising_edge(memclk);
                 write_palette_ram(30, x"44_55_66", '1');
-
+                wait until rising_edge(memclk);
                 read_palette_ram(0, pixel_data, '0');
                 check_equal(pixel_data, std_logic_vector'(x"11_22_33"));
-                
+                wait until rising_edge(memclk);
                 read_palette_ram(30, pixel_data, '1');
                 check_equal(pixel_data, std_logic_vector'(x"44_55_66"));
                 test_runner_cleanup(runner);
