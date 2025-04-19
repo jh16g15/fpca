@@ -1,9 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
--- use work.pkg_vga_params_1280_720_60hz.all;
-
 --! 
 entity flex_vga_counters is
     generic (

@@ -91,14 +91,14 @@ set_property -dict {PACKAGE_PIN B15 IOSTANDARD LVCMOS33} [get_ports {PSRAM_QSPI_
 set_property -dict {PACKAGE_PIN B16 IOSTANDARD LVCMOS33} [get_ports PSRAM_QSPI_SCK]
 set_property -dict {PACKAGE_PIN A15 IOSTANDARD LVCMOS33} [get_ports {PSRAM_QSPI_SIO[2]}]
 set_property -dict {PACKAGE_PIN A17 IOSTANDARD LVCMOS33} [get_ports {PSRAM_QSPI_SIO[3]}]
-set_property -dict {PACKAGE_PIN C15 IOSTANDARD LVCMOS33} [get_ports NUNCHUCK_I2C_SCL]
-set_property -dict {PACKAGE_PIN C16 IOSTANDARD LVCMOS33} [get_ports NUNCHUCK_I2C_SDA]
+set_property -dict {PACKAGE_PIN C15 IOSTANDARD LVCMOS33} [get_ports {PSRAM_SEL[0]}]
+set_property -dict {PACKAGE_PIN C16 IOSTANDARD LVCMOS33} [get_ports {PSRAM_SEL[1]}]
 
 ##Pmod Header JC
 set_property -dict {PACKAGE_PIN K17 IOSTANDARD LVCMOS33} [get_ports {JC[0]}]
 set_property -dict {PACKAGE_PIN M18 IOSTANDARD LVCMOS33} [get_ports {JC[1]}]
-#set_property -dict { PACKAGE_PIN N17   IOSTANDARD LVCMOS33 } [get_ports {JC[2]}];#Sch name = JC3
-#set_property -dict { PACKAGE_PIN P18   IOSTANDARD LVCMOS33 } [get_ports {JC[3]}];#Sch name = JC4
+set_property -dict { PACKAGE_PIN N17   IOSTANDARD LVCMOS33 } [get_ports AUX_UART_TX]; #Sch name = JC3
+set_property -dict { PACKAGE_PIN P18   IOSTANDARD LVCMOS33 } [get_ports AUX_UART_RX]; #Sch name = JC4
 #set_property -dict { PACKAGE_PIN L17   IOSTANDARD LVCMOS33 } [get_ports {JC[4]}];#Sch name = JC7
 #set_property -dict { PACKAGE_PIN M19   IOSTANDARD LVCMOS33 } [get_ports {JC[5]}];#Sch name = JC8
 #set_property -dict { PACKAGE_PIN P17   IOSTANDARD LVCMOS33 } [get_ports {JC[6]}];#Sch name = JC9
@@ -128,8 +128,8 @@ set_property -dict {PACKAGE_PIN J17 IOSTANDARD LVCMOS33} [get_ports {vgaGreen[0]
 set_property -dict {PACKAGE_PIN H17 IOSTANDARD LVCMOS33} [get_ports {vgaGreen[1]}]
 set_property -dict {PACKAGE_PIN G17 IOSTANDARD LVCMOS33} [get_ports {vgaGreen[2]}]
 set_property -dict {PACKAGE_PIN D17 IOSTANDARD LVCMOS33} [get_ports {vgaGreen[3]}]
-set_property -dict {PACKAGE_PIN P19 IOSTANDARD LVCMOS33} [get_ports Hsync]
-set_property -dict {PACKAGE_PIN R19 IOSTANDARD LVCMOS33} [get_ports Vsync]
+set_property -dict {PACKAGE_PIN P19 IOSTANDARD LVCMOS33} [get_ports vgaHsync]
+set_property -dict {PACKAGE_PIN R19 IOSTANDARD LVCMOS33} [get_ports vgaVsync]
 
 
 ##USB-RS232 Interface
