@@ -5,6 +5,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.graphics_pkg.all;
+use work.joe_common_pkg.all;
 
 entity basys3_display_test_top is
     generic
@@ -134,6 +135,14 @@ architecture rtl of basys3_display_test_top is
             probe_out2 : out std_logic_vector(7 downto 0)
         );
     end component;
+
+    signal req_pixel : std_logic;
+    signal load_line : std_logic;
+    signal load_frame : std_logic;
+    signal pixel_valid : std_logic;
+    signal red_out : std_logic_vector(4 downto 0);
+    signal green_out : std_logic_vector(5 downto 0);
+    signal blue_out : std_logic_vector(4 downto 0);
     
 
 begin
@@ -231,13 +240,45 @@ begin
         )
         port map(
             pixelclk   => pixelclk,
-            req_pixel  => open,
-            load_line  => open,
-            load_frame => open,
+            req_pixel  => req_pixel,
+            load_line  => load_line,
+            load_frame => load_frame,
             VGA_HSYNC  => hsync,
             VGA_VSYNC  => vsync,
             VGA_BLANK  => blank
         );
+
+    disp_text : entity work.flex_display_text
+        generic map(
+            G_PROJECT_ROOT   => G_PROJECT_ROOT,
+            TARGET_LATENCY   => TARGET_LATENCY,
+            G_TEXT_RAM_DEPTH => 128*38
+        )
+        port map(
+            pixelclk         => pixelclk,
+            -- frame_start_char => frame_start_char,
+            line_chars       => uint2slv(128, 16),
+            -- busclk           => busclk,
+            -- font_enable_in   => font_enable_in,
+            -- font_we_in       => font_we_in,
+            -- font_addr_in     => font_addr_in,
+            -- font_wdata_in    => font_wdata_in,
+            -- text_enable_in   => text_enable_in,
+            -- text_we_in       => text_we_in,
+            -- text_addr_in     => text_addr_in,
+            -- text_wdata_in    => text_wdata_in,
+            req_pixel        => req_pixel,
+            load_line        => load_line,
+            load_frame       => load_frame,
+            pixel_valid      => pixel_valid,
+            red_out          => red_out,
+            green_out        => green_out,
+            blue_out         => blue_out
+        );
+    
+    pixel.red(7 downto 3) <= red_out;
+    pixel.green(7 downto 2) <= green_out;
+    pixel.blue(7 downto 3) <= blue_out;
     
     vga_trim : entity work.flex_vga_colour_trim
         generic map(
@@ -258,12 +299,12 @@ begin
             vga_blu   => vgaBlue
         );
     
-    pixel_vio : component vio_0
-        port map(
-            clk        => pixelclk,
-            probe_out0 => pixel.red,
-            probe_out1 => pixel.green,
-            probe_out2 => pixel.blue
-        );
+    -- pixel_vio : component vio_0
+    --     port map(
+    --         clk        => pixelclk,
+    --         probe_out0 => pixel.red,
+    --         probe_out1 => pixel.green,
+    --         probe_out2 => pixel.blue
+    --     );
     
 end architecture;
