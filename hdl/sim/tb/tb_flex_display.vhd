@@ -6,6 +6,9 @@ use work.joe_common_pkg.all;
 use work.graphics_pkg.all;
 
 entity tb_flex_display is
+generic(
+    G_PROJECT_ROOT : string := "C:/Users/joehi/Documents/fpga/fpca/"
+);
 end entity tb_flex_display;
 
 architecture RTL of tb_flex_display is
@@ -30,6 +33,8 @@ architecture RTL of tb_flex_display is
 	signal red_out : std_logic_vector(4 downto 0);
 	signal green_out : std_logic_vector(5 downto 0);
 	signal blue_out : std_logic_vector(4 downto 0);
+
+    signal pixel : t_pixel := (x"00", x"00", x"00");
 
     constant PIXELCLK_PERIOD : time := 22.73 ns;
     
@@ -63,6 +68,7 @@ begin
 
     dut_text : entity work.flex_display_text
         generic map(
+            G_PROJECT_ROOT => G_PROJECT_ROOT,
             TARGET_LATENCY => TARGET_LATENCY,
             G_TEXT_RAM_DEPTH => 128 * 40
         )
@@ -77,7 +83,25 @@ begin
             green_out  => green_out,
             blue_out   => blue_out
         );
+
+    pixel.red(7 downto 3) <= red_out;
+    pixel.green(7 downto 2) <= green_out;
+    pixel.blue(7 downto 3) <= blue_out;
     
+    sim_vga_log_inst : entity work.sim_vga_log
+        generic map(
+            G_PROJECT_ROOT => G_PROJECT_ROOT,
+            G_LOG_NAME     => "tools/sim_vga_log.txt"
+        )
+        port map(
+            pixelclk => pixelclk,
+            red      => pixel.red,
+            green    => pixel.green,
+            blue     => pixel.blue,
+            blank    => VGA_BLANK,
+            hsync    => VGA_HSYNC,
+            vsync    => VGA_VSYNC
+        );
     
 
 end architecture RTL;
