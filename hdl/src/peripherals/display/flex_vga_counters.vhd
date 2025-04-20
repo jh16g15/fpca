@@ -61,19 +61,16 @@ begin
     begin
         if rising_edge(pixelclk) then
             -- counters
-            if h_count >= END_BPORCH_X then
+            if h_count = END_BPORCH_X-1 then
                 h_count <= 0;
+                if v_count = END_BPORCH_Y-1 then
+                    v_count <= 0;
+                else
+                    v_count <= v_count + 1;
+                end if;
             else
                 h_count <= h_count + 1;
             end if;
-            if v_count >= END_BPORCH_Y then
-                v_count <= 0;
-            else
-                if h_count >= END_BPORCH_X then
-                    v_count <= v_count + 1;
-                end if;
-            end if;
-    
         end if;
     end process;
 
