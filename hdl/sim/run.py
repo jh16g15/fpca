@@ -51,7 +51,7 @@ def main():
     # increase stack size to prevent GHDL crashing
     resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
 
-    VU = VUnit.from_argv(compile_builtins=False)
+    VU = VUnit.from_argv()
     VU.add_vhdl_builtins()
     VU.add_verification_components()
     print(f"Added verification components to library!")
@@ -104,6 +104,7 @@ def main():
 
     VU.add_library("lib")
     VU.add_source_files(sim_tb_dir / "**/*.vhd", "lib")
+    VU.add_source_files(FPGA_DIR / "fpca/tools/**/*.vhd", "lib")
     add_some_files_to_vunit(VU, sim_helpers_dir, sim_helpers_exclude, "lib")
     add_some_files_to_vunit(VU, src_dir, src_exclude, "lib")
     # add_some_files_to_vunit(VU, pynq_dir, boards_exclude, "lib")
