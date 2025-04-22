@@ -131,11 +131,11 @@ begin
         variable v_tag_match : boolean;
         variable v_matched_block : integer;
         -- upper search
-        variable v_tag_u : std_logic_vector(C_TAG_W-1 downto 0);
-        variable v_index_u : integer;
-        variable v_word_offset_u : integer;
-        variable v_tag_match_u : boolean;
-        variable v_matched_block_u : integer;
+        -- variable v_tag_u : std_logic_vector(C_TAG_W-1 downto 0);
+        -- variable v_index_u : integer;
+        -- variable v_word_offset_u : integer;
+        -- variable v_tag_match_u : boolean;
+        -- variable v_matched_block_u : integer;
 
         -- cache block replacement
         variable v_set_base : integer;  -- base block addr of the set our req addr is in
@@ -243,12 +243,12 @@ begin
                         state <= READY;
                     else
                         -- check next cache line for upper 16 bits
-                        decode_addr(upper_addr, v_tag_u, v_index_u, v_word_offset_u);
-                        combinational_cache_lookup(upper_addr, v_tag_match_u, v_matched_block_u);
-                        if v_tag_match_u then
+                        decode_addr(upper_addr, v_tag, v_index, v_word_offset);
+                        combinational_cache_lookup(upper_addr, v_tag_match, v_matched_block);
+                        if v_tag_match then
                             oflow_count <= oflow_count + 1;
                             state <= READY;
-                            data1 <= cache_block_data(v_matched_block_u)((v_word_offset_u+1)*16+15 downto (v_word_offset_u+1)*16);
+                            data1 <= cache_block_data(v_matched_block)((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
                             out_instr_valid <= '1';
                         else
                             state <= MISS;
