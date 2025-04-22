@@ -196,7 +196,10 @@ begin
                 cache_block_valid <= (others => '0');
                 hit_count <= (others => '0');
                 miss_count <= (others => '0');
-                wb_mosi <= C_WB_MOSI_INIT;
+                wb_mosi.adr <= C_WB_MOSI_INIT.adr;
+                wb_mosi.cyc <= C_WB_MOSI_INIT.cyc;
+                wb_mosi.stb <= C_WB_MOSI_INIT.stb;
+                wb_mosi.lock <= C_WB_MOSI_INIT.lock;
             else
 
                 case(state) is
@@ -213,14 +216,17 @@ begin
                             -- lower 16b is always in this fetched cache block
                             data0 <= cache_block_data(v_matched_block)(v_word_offset*16+15 downto v_word_offset*16);
                             if may_cross_cache_line = '1' then -- if may cross cache line
+                                msg("Cache partial hit, overflow into next block");
                                 state <= OFLOW;
                             else -- upper 16 bits is in the same cache block, CACHE HIT
+                                msg("Cache hit!");
                                 hit_count <= hit_count + 1;
                                 data1 <= cache_block_data(v_matched_block)((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
                                 out_instr_valid <= '1';
                             end if;
                             -- out_instr <= cache_block_data(v_matched_block);
                         else
+                            msg("Cache miss");
                             state <= MISS;
                             miss_count <= miss_count + 1;
                             -- set up WB DMA to load cache line
@@ -238,6 +244,7 @@ begin
                     -- check if 32b RISC-V instruction (ie do we need the upper 16 bits at all?)
                     if data0(1 downto 0) /= "11" then 
                         -- 16 bit instruction, can conclude here
+                        msg("RISC-V 16b compressed instruction detected, no need for upper bits");
                         hit_count <= hit_count + 1;
                         out_instr_valid <= '1'; -- can this be done combinationally for reduced latency?
                         state <= READY;
@@ -246,11 +253,13 @@ begin
                         decode_addr(upper_addr, v_tag, v_index, v_word_offset);
                         combinational_cache_lookup(upper_addr, v_tag_match, v_matched_block);
                         if v_tag_match then
+                            msg("Cache hit for overflowed upper half");
                             oflow_count <= oflow_count + 1;
                             state <= READY;
                             data1 <= cache_block_data(v_matched_block)((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
                             out_instr_valid <= '1';
                         else
+                            msg("Cache miss for overflowed upper half");
                             state <= MISS;
                             miss_count <= miss_count + 1;
                             -- set up WB DMA to load cache line
@@ -276,7 +285,9 @@ begin
                     if wb_miso.ack = '1' then
                         -- shift in 4-bytes from wishbone bus
                         wb_rsps_to_go <= wb_rsps_to_go-1;
-                        fetched_cache_block <= fetched_cache_block(G_BLOCK_SIZE*8-C_WB_DATA_W-1 downto 0) & wb_miso.rdat;
+                        -- shift in from the top [255:] each word, so the first word is [:0]
+                        -- fetched_cache_block <= fetched_cache_block(G_BLOCK_SIZE*8-C_WB_DATA_W-1 downto 0) & wb_miso.rdat; -- shift from bottom to top
+                        fetched_cache_block <= wb_miso.rdat & fetched_cache_block(G_BLOCK_SIZE*8-1 downto C_WB_DATA_W); -- shift from top to bottom
                         if wb_rsps_to_go = 1 then   -- this cycle is final response arriving
                             wb_mosi.cyc <= '0'; -- mark end of burst
                             state <= REPLACE; 
@@ -284,8 +295,6 @@ begin
                     end if;
                 when REPLACE => 
                     -- Replace Cache Line
-                    -- TODO support non-direct mapped cache here
-
                     -- HOW TO CHOOSE CACHE BLOCK FOR REPLACEMENT 
                     -- 1. Select which cache index our address is in
                     -- 2. If set is not full, Select a random block in that set to replace, mark as valid
@@ -294,14 +303,20 @@ begin
                     --look for empty block
                     for i in v_set_base to v_set_base + G_SET_SIZE - 1 loop
                         if cache_block_valid(i) = '0' then -- empty
+                            msg("found empty block");
                             v_empty_block_found := true;
                             v_replace_block_addr := i;
+                            exit;
                         end if;
                     end loop;
                     if not v_empty_block_found then
-                        v_random_block_in_set := slv2uint(lfsr(clog2(G_SET_SIZE)-1 downto 0));
+                        -- TODO change back
+                        -- v_random_block_in_set := slv2uint(lfsr(clog2(G_SET_SIZE)-1 downto 0));
+                        v_random_block_in_set := 0;
                         v_replace_block_addr := v_set_base + v_random_block_in_set;
+                        msg("lfsr selected block " & to_string(v_random_block_in_set) & " for replacement");
                     end if;
+                    msg("Replaced block " & to_string(v_replace_block_addr));
                     cache_block_data(v_replace_block_addr) <= fetched_cache_block;
                     cache_block_tag(v_replace_block_addr)  <= v_tag;
                     cache_block_valid(v_replace_block_addr) <= '1';
@@ -311,10 +326,12 @@ begin
                     -- lower 16b is always in this fetched cache block
                     data0 <= fetched_cache_block(v_word_offset*16+15 downto v_word_offset*16);
                     if may_cross_cache_line = '1' then -- if may cross cache line (if 32b), check next cache block
+                        msg("Second half is in another cache block");
                         state <= OFLOW;
                     else -- upper 16 bits is in the same cache block
                         data1 <= fetched_cache_block((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
                         out_instr_valid <= '1';
+                        state  <= READY;
                     end if;
                 end case;
             end if;

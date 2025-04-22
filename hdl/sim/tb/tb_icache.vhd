@@ -34,9 +34,11 @@ begin
             variable expected : std_logic_vector(31 downto 0);
             
         begin
+            msg("Read Instruction at Address " & to_string(addr) & " (0x" & to_hstring(uint2slv(addr)) & ")");
             in_addr <= v_addr;
             in_addr_valid <= '1';
             wait until out_instr_valid = '1' and rising_edge(clk);
+            in_addr_valid <= '0';
             -- if 32-bit aligned, expected=addr
             if v_addr(1 downto 0) = "00" then
                 expected := v_addr;
@@ -48,6 +50,10 @@ begin
                 report "Misaligned transfer from " & to_hstring(v_addr);
             end if;
             assert out_instr = expected report "Expected " & to_hstring(expected) & " Got " & to_hstring(out_instr) severity error;
+            if out_instr = expected then
+                msg("OK");
+            end if;
+
 
         end procedure read_instr;
     begin
