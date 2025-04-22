@@ -6,6 +6,8 @@ use std.textio.all;
 
 package joe_common_pkg is
 
+    procedure msg(msg: in string; unit : time := ns);
+
     --! Common array types
     type t_slv64_arr is array (integer range <>) of std_logic_vector(63 downto 0);
     type t_slv32_arr is array (integer range <>) of std_logic_vector(31 downto 0);
@@ -53,7 +55,8 @@ package joe_common_pkg is
     function s_sub(a, b : std_logic_vector) return std_logic_vector;
 
     --! Returns the Ceiling of Log2(a)
-    function clog2(a : positive) return positive;
+    impure function clog2(a : positive) return positive;
+    -- function clog2(a : positive) return positive;
 
     --! Initialises a 32bit wide RAM from the contents of a file
     --! Supports "hex" and "bin" modes
@@ -67,9 +70,14 @@ package joe_common_pkg is
 
     function byte_swap(in_vec : std_logic_vector; swap : boolean := true) return std_logic_vector;
 
+    
 end package;
 
 package body joe_common_pkg is
+    procedure msg(msg: in string; unit : time := ns) is
+    begin
+        write(OUTPUT, to_string(now, unit) & " " & msg & LF);
+    end procedure msg;
 
     --! Converts (lower-case only!) ASCII to a hex nibble
     function ascii2nibble(ascii:std_logic_vector(7 downto 0)) return std_logic_vector is
@@ -121,8 +129,10 @@ package body joe_common_pkg is
 
 
     --! Returns the Ceiling of Log2(a)
-    function clog2(a : positive) return positive is
+    -- function clog2(a : positive) return positive is
+    impure function clog2(a : positive) return positive is
     begin
+        report "clog2 called on " & to_string(a);
         return positive(ceil(log2(real(a))));
     end function;
 
