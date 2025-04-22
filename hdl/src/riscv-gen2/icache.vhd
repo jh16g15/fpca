@@ -8,6 +8,7 @@ use work.joe_common_pkg.all;
 entity icache is
     generic(
         G_DBG_LOG    : boolean := false;
+        -- G_RV32C_OPT  : boolean := true; -- optimisation: 
         G_NUM_BLOCKS : integer := 16;
         G_BLOCK_SIZE : integer := 32; -- bytes
         G_SET_SIZE : integer := 1   -- blocks per set: 1 for direct-mapped
@@ -90,7 +91,7 @@ architecture RTL of icache is
     signal data1 : std_logic_vector(15 downto 0); -- upper 16 bits of a 32-bit fetch
 
     signal may_cross_cache_line : std_logic;
-    -- signal second_word_oflow : std_logic; -- upper half of 32b instruction crosses cache line
+    signal second_word_oflow_replace : std_logic := '0'; -- upper half of 32b instruction crosses cache line
 
     type t_state is (READY, OFLOW, MISS, REPLACE);
     signal state : t_state := READY;
@@ -211,6 +212,7 @@ begin
             if rst = '1' then
                 state <= READY;
                 cache_block_valid <= (others => '0');
+                second_word_oflow_replace <= '0';
                 hit_count <= (others => '0');
                 miss_count <= (others => '0');
                 wb_mosi.adr <= C_WB_MOSI_INIT.adr;
@@ -281,6 +283,7 @@ begin
                             out_instr_valid <= '1';
                         else
                             dbg_msg("Cache miss for overflowed upper half");
+                            second_word_oflow_replace <= '1'; -- set flag so we load data1 when cache block replaced 
                             state <= MISS;
                             miss_count <= miss_count + 1;
                             -- set up WB DMA to load cache line
@@ -346,13 +349,20 @@ begin
 
 
                     -- output data valid from block retrieved from memory
-                    -- lower 16b is always in this fetched cache block
-                    data0 <= fetched_cache_block(v_word_offset*16+15 downto v_word_offset*16);
-                    if may_cross_cache_line = '1' then -- if may cross cache line (if 32b), check next cache block
-                        dbg_msg("Second half is in another cache block");
-                        state <= OFLOW;
-                    else -- upper 16 bits is in the same cache block
-                        data1 <= fetched_cache_block((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
+                    if second_word_oflow_replace = '0' then -- normal operation
+                        -- lower 16b is always in this fetched cache block
+                        data0 <= fetched_cache_block(v_word_offset*16+15 downto v_word_offset*16);
+                        if may_cross_cache_line = '1' then -- if may cross cache line (if 32b), check next cache block
+                            dbg_msg("Second half is in another cache block");
+                            state <= OFLOW;
+                        else -- upper 16 bits is in the same cache block
+                            data1 <= fetched_cache_block((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
+                            out_instr_valid <= '1';
+                            state  <= READY;
+                        end if;
+                    else -- this cache block replace was triggered by overflow into the next (just replaced) cache block 
+                        second_word_oflow_replace <= '0'; -- clear flag
+                        data1 <= fetched_cache_block(v_word_offset*16+15 downto v_word_offset*16); -- data1 instead of data0
                         out_instr_valid <= '1';
                         state  <= READY;
                     end if;

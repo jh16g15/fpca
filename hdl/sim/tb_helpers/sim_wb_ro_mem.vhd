@@ -22,10 +22,13 @@ begin
     wb_miso.rty <= '0';
 
     process (clk) is
+        variable v_addr_int : integer;
     begin
         if rising_edge(clk) then
             wb_miso.ack <= wb_mosi.stb and not wb_miso.stall;
-            wb_miso.rdat <= wb_mosi.adr(31 downto 2) & "00";
+            v_addr_int := to_integer(unsigned(wb_mosi.adr(31 downto 2))); -- word address 
+            -- each 16-bit location is numbered in an incrememting fashion (so 0x0 32b = 0x0001_0000, 0x4 = 0x0003_0002 etc 
+            wb_miso.rdat <= std_logic_vector(to_unsigned(v_addr_int * 2 + 1, 16) & to_unsigned(v_addr_int * 2, 16)); 
         end if;
     end process;
     

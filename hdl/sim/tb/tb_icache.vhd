@@ -42,16 +42,26 @@ begin
             if out_instr_valid = '0' then
                 wait until out_instr_valid = '1' and rising_edge(clk);
             end if;
-            -- if 32-bit aligned, expected=addr
-            if v_addr(1 downto 0) = "00" then
-                expected := v_addr;
-            -- 16-bit aligned, bottom 16bits is upper 16-bits of addr, uppwer
-            elsif v_addr(1 downto 0) = "10" then
-                expected(15 downto 0) := v_addr(31 downto 16);
-                expected(31 downto 16) := v_addr_next(15 downto 0);
-            else
-                report "Misaligned transfer from " & to_hstring(v_addr);
-            end if;
+
+            -- rdata is halfword address
+            -- eg 0x0 => 0x0001_0000 
+            --    0x2 => 0x0002_0001 
+            --    0x4 => 0x0003_0002
+            --    0x6 => 0x0004_0003
+            --    0x8 => 0x0005_0004
+            expected(15 downto 0) := uint2slv(addr/2, 16);
+            expected(31 downto 16) := uint2slv((addr/2)+1, 16);
+
+            -- -- if 32-bit aligned, expected=addr
+            -- if v_addr(1 downto 0) = "00" then
+            --     expected := v_addr;
+            -- -- 16-bit aligned, bottom 16bits is upper 16-bits of addr, uppwer
+            -- elsif v_addr(1 downto 0) = "10" then
+            --     expected(15 downto 0) := v_addr(31 downto 16);
+            --     expected(31 downto 16) := v_addr_next(15 downto 0);
+            -- else
+            --     report "Misaligned transfer from " & to_hstring(v_addr);
+            -- end if;
             assert out_instr = expected report "Expected " & to_hstring(expected) & " Got " & to_hstring(out_instr) severity error;
             if out_instr = expected then
                 msg("OK");
