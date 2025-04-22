@@ -155,6 +155,7 @@ begin
             tag := addr(C_TAG_H downto C_TAG_L);
             index := slv2uint(addr(C_INDEX_H downto C_INDEX_L));
             word_offset := slv2uint(addr(C_WORD_OFFSET_H downto C_WORD_OFFSET_L));
+            msg("Decoded address " & to_hstring(addr) & " tag " & to_hstring(tag) & " index " & to_string(index) & " offset " & to_string(word_offset) );
         end procedure decode_addr;
         
 
@@ -200,8 +201,9 @@ begin
                 wb_mosi.cyc <= C_WB_MOSI_INIT.cyc;
                 wb_mosi.stb <= C_WB_MOSI_INIT.stb;
                 wb_mosi.lock <= C_WB_MOSI_INIT.lock;
+                out_instr_valid <= '0';
             else
-
+                out_instr_valid <= '0'; -- default
                 case(state) is
                 when READY => 
                     if in_addr_valid then
@@ -214,13 +216,15 @@ begin
                         if v_tag_match then
 
                             -- lower 16b is always in this fetched cache block
+                            msg("data0 is from block " & to_string(v_matched_block) & " bits " & to_string(v_word_offset*16+15) & " downto " & to_string(v_word_offset*16));
                             data0 <= cache_block_data(v_matched_block)(v_word_offset*16+15 downto v_word_offset*16);
                             if may_cross_cache_line = '1' then -- if may cross cache line
                                 msg("Cache partial hit, overflow into next block");
                                 state <= OFLOW;
                             else -- upper 16 bits is in the same cache block, CACHE HIT
-                                msg("Cache hit!");
+                                msg("Cache hit in block " & to_string(v_matched_block));
                                 hit_count <= hit_count + 1;
+                                msg("data1 is from block " & to_string(v_matched_block) & " bits " & to_string((v_word_offset+1)*16+15) & " downto " & to_string((v_word_offset+1)*16));
                                 data1 <= cache_block_data(v_matched_block)((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
                                 out_instr_valid <= '1';
                             end if;
@@ -253,7 +257,7 @@ begin
                         decode_addr(upper_addr, v_tag, v_index, v_word_offset);
                         combinational_cache_lookup(upper_addr, v_tag_match, v_matched_block);
                         if v_tag_match then
-                            msg("Cache hit for overflowed upper half");
+                            msg("Cache hit for overflowed upper half in block " & to_string(v_matched_block));
                             oflow_count <= oflow_count + 1;
                             state <= READY;
                             data1 <= cache_block_data(v_matched_block)((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);

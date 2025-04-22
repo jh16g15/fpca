@@ -37,8 +37,11 @@ begin
             msg("Read Instruction at Address " & to_string(addr) & " (0x" & to_hstring(uint2slv(addr)) & ")");
             in_addr <= v_addr;
             in_addr_valid <= '1';
-            wait until out_instr_valid = '1' and rising_edge(clk);
+            wait until rising_edge(clk);
             in_addr_valid <= '0';
+            if out_instr_valid = '0' then
+                wait until out_instr_valid = '1' and rising_edge(clk);
+            end if;
             -- if 32-bit aligned, expected=addr
             if v_addr(1 downto 0) = "00" then
                 expected := v_addr;
@@ -63,6 +66,7 @@ begin
         read_instr(8);
         read_instr(12);
         read_instr(40);
+        read_instr(1024);
         wait;
     end process;
 
