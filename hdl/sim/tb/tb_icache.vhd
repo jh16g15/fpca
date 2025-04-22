@@ -11,7 +11,7 @@ end entity tb_icache;
 architecture RTL of tb_icache is
 	constant G_NUM_BLOCKS : integer := 16;
 	constant G_BLOCK_SIZE : integer := 32; -- bytes
-	constant G_SET_SIZE : integer := 1; -- direct mapped
+	constant G_SET_SIZE : integer := 2; -- 1=direct mapped 2+ = set associativity
 	signal clk : std_logic := '0';
 	signal rst : std_logic := '1';
 	signal in_addr : std_logic_vector(31 downto 0);
@@ -30,7 +30,7 @@ begin
     stim_proc : process is
         procedure read_instr(addr : integer) is            
             variable v_addr : std_logic_vector(31 downto 0) := uint2slv(addr);
-            variable v_addr_next : std_logic_vector(31 downto 0) := uint2slv(addr+1);
+            variable v_addr_next : std_logic_vector(31 downto 0) := uint2slv(addr+2); -- byte addressed, 16-bit aligned
             variable expected : std_logic_vector(31 downto 0);
             
         begin
@@ -61,18 +61,32 @@ begin
         end procedure read_instr;
     begin
         wait for 150 ns;
+        msg("=== Test basic 32-bit aligned cache misses, hits and block replacement ===");
         read_instr(0);
         read_instr(4);
         read_instr(8);
         read_instr(12);
         read_instr(40);
         read_instr(1024);
+        read_instr(2060);
+
+        msg("=== Test 16-bit aligned ===");
+        read_instr(2062);
+        read_instr(28);
+        read_instr(30);
+        read_instr(32);
+
+        msg("=== Test 16-bit aligned with both halves misses ===");
+        read_instr(1024+32+30);
+
+        msg("All tests done");
         wait;
     end process;
 
 
 dut_icache : entity work.icache
     generic map(
+        G_DBG_LOG => true,
         G_NUM_BLOCKS => G_NUM_BLOCKS,
         G_BLOCK_SIZE => G_BLOCK_SIZE,
         G_SET_SIZE   => G_SET_SIZE

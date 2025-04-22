@@ -7,6 +7,7 @@ use work.joe_common_pkg.all;
 --
 entity icache is
     generic(
+        G_DBG_LOG    : boolean := false;
         G_NUM_BLOCKS : integer := 16;
         G_BLOCK_SIZE : integer := 32; -- bytes
         G_SET_SIZE : integer := 1   -- blocks per set: 1 for direct-mapped
@@ -105,6 +106,12 @@ architecture RTL of icache is
     -- for random replacement
     signal lfsr : std_logic_vector(6 downto 0) := (others => '0'); -- 7 bit, XNOR taps at 7th and 6th bits
 
+
+    procedure dbg_msg(str : string) is
+    begin
+        msg("Cache: " & str, G_DBG_LOG);
+    end procedure;
+
 begin
     
     p_lfsr : process(clk) is
@@ -155,7 +162,7 @@ begin
             tag := addr(C_TAG_H downto C_TAG_L);
             index := slv2uint(addr(C_INDEX_H downto C_INDEX_L));
             word_offset := slv2uint(addr(C_WORD_OFFSET_H downto C_WORD_OFFSET_L));
-            msg("Decoded address " & to_hstring(addr) & " tag " & to_hstring(tag) & " index " & to_string(index) & " offset " & to_string(word_offset) );
+            dbg_msg("Decoded address " & to_hstring(addr) & " tag " & to_hstring(tag) & " index " & to_string(index) & " offset " & to_string(word_offset));
         end procedure decode_addr;
         
 
@@ -216,21 +223,21 @@ begin
                         if v_tag_match then
 
                             -- lower 16b is always in this fetched cache block
-                            msg("data0 is from block " & to_string(v_matched_block) & " bits " & to_string(v_word_offset*16+15) & " downto " & to_string(v_word_offset*16));
+                            dbg_msg("data0 is from block " & to_string(v_matched_block) & " bits " & to_string(v_word_offset*16+15) & " downto " & to_string(v_word_offset*16));
                             data0 <= cache_block_data(v_matched_block)(v_word_offset*16+15 downto v_word_offset*16);
                             if may_cross_cache_line = '1' then -- if may cross cache line
-                                msg("Cache partial hit, overflow into next block");
+                                dbg_msg("Cache partial hit, overflow into next block");
                                 state <= OFLOW;
                             else -- upper 16 bits is in the same cache block, CACHE HIT
-                                msg("Cache hit in block " & to_string(v_matched_block));
+                                dbg_msg("Cache hit in block " & to_string(v_matched_block));
                                 hit_count <= hit_count + 1;
-                                msg("data1 is from block " & to_string(v_matched_block) & " bits " & to_string((v_word_offset+1)*16+15) & " downto " & to_string((v_word_offset+1)*16));
+                                dbg_msg("data1 is from block " & to_string(v_matched_block) & " bits " & to_string((v_word_offset+1)*16+15) & " downto " & to_string((v_word_offset+1)*16));
                                 data1 <= cache_block_data(v_matched_block)((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
                                 out_instr_valid <= '1';
                             end if;
                             -- out_instr <= cache_block_data(v_matched_block);
                         else
-                            msg("Cache miss");
+                            dbg_msg("Cache miss");
                             state <= MISS;
                             miss_count <= miss_count + 1;
                             -- set up WB DMA to load cache line
@@ -248,7 +255,7 @@ begin
                     -- check if 32b RISC-V instruction (ie do we need the upper 16 bits at all?)
                     if data0(1 downto 0) /= "11" then 
                         -- 16 bit instruction, can conclude here
-                        msg("RISC-V 16b compressed instruction detected, no need for upper bits");
+                        dbg_msg("RISC-V 16b compressed instruction detected, no need for upper bits");
                         hit_count <= hit_count + 1;
                         out_instr_valid <= '1'; -- can this be done combinationally for reduced latency?
                         state <= READY;
@@ -257,13 +264,13 @@ begin
                         decode_addr(upper_addr, v_tag, v_index, v_word_offset);
                         combinational_cache_lookup(upper_addr, v_tag_match, v_matched_block);
                         if v_tag_match then
-                            msg("Cache hit for overflowed upper half in block " & to_string(v_matched_block));
+                            dbg_msg("Cache hit for overflowed upper half in block " & to_string(v_matched_block));
                             oflow_count <= oflow_count + 1;
                             state <= READY;
                             data1 <= cache_block_data(v_matched_block)((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
                             out_instr_valid <= '1';
                         else
-                            msg("Cache miss for overflowed upper half");
+                            dbg_msg("Cache miss for overflowed upper half");
                             state <= MISS;
                             miss_count <= miss_count + 1;
                             -- set up WB DMA to load cache line
@@ -307,7 +314,7 @@ begin
                     --look for empty block
                     for i in v_set_base to v_set_base + G_SET_SIZE - 1 loop
                         if cache_block_valid(i) = '0' then -- empty
-                            msg("found empty block");
+                            dbg_msg("found empty block");
                             v_empty_block_found := true;
                             v_replace_block_addr := i;
                             exit;
@@ -318,9 +325,9 @@ begin
                         -- v_random_block_in_set := slv2uint(lfsr(clog2(G_SET_SIZE)-1 downto 0));
                         v_random_block_in_set := 0;
                         v_replace_block_addr := v_set_base + v_random_block_in_set;
-                        msg("lfsr selected block " & to_string(v_random_block_in_set) & " for replacement");
+                        dbg_msg("lfsr selected block " & to_string(v_random_block_in_set) & " for replacement");
                     end if;
-                    msg("Replaced block " & to_string(v_replace_block_addr));
+                    dbg_msg("Replaced block " & to_string(v_replace_block_addr));
                     cache_block_data(v_replace_block_addr) <= fetched_cache_block;
                     cache_block_tag(v_replace_block_addr)  <= v_tag;
                     cache_block_valid(v_replace_block_addr) <= '1';
@@ -330,7 +337,7 @@ begin
                     -- lower 16b is always in this fetched cache block
                     data0 <= fetched_cache_block(v_word_offset*16+15 downto v_word_offset*16);
                     if may_cross_cache_line = '1' then -- if may cross cache line (if 32b), check next cache block
-                        msg("Second half is in another cache block");
+                        dbg_msg("Second half is in another cache block");
                         state <= OFLOW;
                     else -- upper 16 bits is in the same cache block
                         data1 <= fetched_cache_block((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
