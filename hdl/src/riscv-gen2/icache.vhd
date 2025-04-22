@@ -35,6 +35,7 @@ end entity icache;
 architecture RTL of icache is
 
     constant C_NUM_SETS : integer := G_NUM_BLOCKS / G_SET_SIZE; -- number of "ways" that our cache is associative
+    constant C_SET_I_WIDTH : integer := clog2(G_SET_SIZE); -- number of bits needed to store an index into the set
 
     -- Tag  : Upper bits of address
     -- Index: which cache set we can go in
@@ -103,8 +104,10 @@ architecture RTL of icache is
 
     signal fetched_cache_block : std_logic_vector(G_BLOCK_SIZE*8-1 downto 0);
 
-    -- for random replacement
-    signal lfsr : std_logic_vector(6 downto 0) := (others => '0'); -- 7 bit, XNOR taps at 7th and 6th bits
+    -- for random replacement, XOR lfsr1 and lfsr2 for better random distribution
+    signal lfsr : std_logic_vector(C_SET_I_WIDTH-1 downto 0) := (others => '0'); 
+    signal lfsr1 : std_logic_vector(9 downto 0) := (others => '0'); -- 10 bit, XNOR taps at 10th and 7th bits
+    signal lfsr2 : std_logic_vector(10 downto 0) := (others => '0'); -- 9 bit, XNOR taps at 7th and 5th bits
 
 
     procedure dbg_msg(str : string) is
@@ -117,9 +120,12 @@ begin
     p_lfsr : process(clk) is
     begin
         if rising_edge(clk) then
-            lfsr <= lfsr(5 downto 0) & (lfsr(6) xnor lfsr(5));
+            -- lfsr <= lfsr(5 downto 0) & (lfsr(6) xnor lfsr(5));
+            lfsr1 <= lfsr1(8 downto 0) & (lfsr1(9) xnor lfsr1(6));
+            lfsr2 <= lfsr2(9 downto 0) & (lfsr2(10) xnor lfsr2(4));
         end if;
     end process;
+    lfsr <= lfsr1(C_SET_I_WIDTH-1 downto 0) xor lfsr2(C_SET_I_WIDTH-1 downto 0);
  
     -- if our address starts at the final 16b word of cache line, upper 16b must be fetched from next cache line (if needed)
     may_cross_cache_line <= '1' when in_addr(C_WORD_OFFSET_H downto C_WORD_OFFSET_L) = C_WORD_OFFSET_MAX else '0';
@@ -182,6 +188,7 @@ begin
             -- check each block in the set for a (valid) tag match, save which cache block has the match
             lv_tag_match := false;
             for i in 0 to G_SET_SIZE-1 loop
+                dbg_msg("check block " & to_string(lv_index+i));
                 if lv_tag = cache_block_tag(lv_index+i) and cache_block_valid(lv_index+i) = '1' then
                     lv_tag_match := true;
                     lv_matched_block := lv_index+i;
@@ -253,7 +260,8 @@ begin
                     -- NOTE: RISC-V Compressed (16b) instructions start with "00", "01" or "10"
                     --       RISC-V 32b Instructions start with "11"
                     -- check if 32b RISC-V instruction (ie do we need the upper 16 bits at all?)
-                    if data0(1 downto 0) /= "11" then 
+                    if false then 
+                    -- if data0(1 downto 0) /= "11" then 
                         -- 16 bit instruction, can conclude here
                         dbg_msg("RISC-V 16b compressed instruction detected, no need for upper bits");
                         hit_count <= hit_count + 1;
@@ -264,10 +272,10 @@ begin
                         decode_addr(upper_addr, v_tag, v_index, v_word_offset);
                         combinational_cache_lookup(upper_addr, v_tag_match, v_matched_block);
                         if v_tag_match then
-                            dbg_msg("Cache hit for overflowed upper half in block " & to_string(v_matched_block));
+                            dbg_msg("Cache hit for overflowed upper half in block " & to_string(v_matched_block) & " bits " & to_string(v_word_offset*16+15) & " downto " & to_string(v_word_offset*16));
                             oflow_count <= oflow_count + 1;
                             state <= READY;
-                            data1 <= cache_block_data(v_matched_block)((v_word_offset+1)*16+15 downto (v_word_offset+1)*16);
+                            data1 <= cache_block_data(v_matched_block)(v_word_offset*16+15 downto v_word_offset*16);
                             out_instr_valid <= '1';
                         else
                             dbg_msg("Cache miss for overflowed upper half");
@@ -321,9 +329,11 @@ begin
                         end if;
                     end loop;
                     if not v_empty_block_found then
-                        -- TODO change back
-                        -- v_random_block_in_set := slv2uint(lfsr(clog2(G_SET_SIZE)-1 downto 0));
-                        v_random_block_in_set := 0;
+                        if G_SET_SIZE = 1 then -- direct mapped
+                            v_random_block_in_set := 0;    
+                        else    -- set-associative
+                            v_random_block_in_set := slv2uint(lfsr);
+                        end if;
                         v_replace_block_addr := v_set_base + v_random_block_in_set;
                         dbg_msg("lfsr selected block " & to_string(v_random_block_in_set) & " for replacement");
                     end if;
@@ -346,6 +356,9 @@ begin
                     end if;
                 end case;
             end if;
+            -- clear cache blocks if invalidate bits are set
+            cache_block_valid <= cache_block_valid and not in_invalidate;
+            
         end if;
     end process name;
     
