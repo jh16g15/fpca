@@ -179,6 +179,7 @@ begin
         ) is 
             variable lv_tag : std_logic_vector(C_TAG_W-1 downto 0);
             variable lv_index : integer;
+            variable lv_set_base : integer;
             variable lv_word_offset : integer;
             variable lv_tag_match : boolean;
             variable lv_matched_block : integer;
@@ -187,11 +188,12 @@ begin
             
             -- check each block in the set for a (valid) tag match, save which cache block has the match
             lv_tag_match := false;
-            for i in 0 to G_SET_SIZE-1 loop
-                dbg_msg("check block " & to_string(lv_index+i));
-                if lv_tag = cache_block_tag(lv_index+i) and cache_block_valid(lv_index+i) = '1' then
+            v_set_base := v_index * G_SET_SIZE; -- cache set of addr * size of each set
+            for i in v_set_base to v_set_base+G_SET_SIZE-1 loop
+                dbg_msg("check block " & to_string(i));
+                if lv_tag = cache_block_tag(i) and cache_block_valid(i) = '1' then
                     lv_tag_match := true;
-                    lv_matched_block := lv_index+i;
+                    lv_matched_block := i;
                 end if;
             end loop;
             hit := lv_tag_match;
