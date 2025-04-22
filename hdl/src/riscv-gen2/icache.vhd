@@ -359,7 +359,11 @@ begin
                 end case;
             end if;
             -- clear cache blocks if invalidate bits are set
-            cache_block_valid <= cache_block_valid and not in_invalidate;
+            for i in G_NUM_BLOCKS-1 downto 0 loop
+                if in_invalidate(i) = '1' then
+                    cache_block_valid(i) <= '0';
+                end if;
+            end loop;
             
         end if;
     end process name;
