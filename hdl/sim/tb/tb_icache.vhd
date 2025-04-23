@@ -89,6 +89,18 @@ begin
         msg("=== Test 16-bit aligned with both halves misses ===");
         read_instr(1024+32+30);
 
+        msg("=== Test cache invalidate ===");
+        for i in 0 to 100 loop
+            read_instr(2*i);
+        end loop;
+        msg("INVALIDATE");
+        in_invalidate <= (others => '1');
+        wait until rising_edge(clk);
+        in_invalidate <= (others => '0');
+        for i in 0 to 100 loop
+            read_instr(2*i);
+        end loop;
+
         msg("All tests done");
         wait;
     end process;
