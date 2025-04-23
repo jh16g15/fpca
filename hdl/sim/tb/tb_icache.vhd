@@ -12,7 +12,8 @@ architecture RTL of tb_icache is
 	constant G_NUM_BLOCKS : integer := 16;
 	constant G_BLOCK_SIZE : integer := 32; -- bytes
 	constant G_SET_SIZE : integer := 2; -- 1=direct mapped 2+ = set associativity
-	signal clk : std_logic := '0';
+	constant G_RV32C_OPT : boolean := true;
+    signal clk : std_logic := '0';
 	signal rst : std_logic := '1';
 	signal in_addr : std_logic_vector(31 downto 0);
 	signal in_addr_valid : std_logic;
@@ -21,6 +22,8 @@ architecture RTL of tb_icache is
 	signal in_invalidate : std_logic_vector(G_NUM_BLOCKS-1 downto 0);
 	signal wb_mosi : t_wb_mosi;
 	signal wb_miso : t_wb_miso;
+	signal out_addr_ready : std_logic;
+	
     
 begin
 
@@ -52,16 +55,6 @@ begin
             expected(15 downto 0) := uint2slv(addr/2, 16);
             expected(31 downto 16) := uint2slv((addr/2)+1, 16);
 
-            -- -- if 32-bit aligned, expected=addr
-            -- if v_addr(1 downto 0) = "00" then
-            --     expected := v_addr;
-            -- -- 16-bit aligned, bottom 16bits is upper 16-bits of addr, uppwer
-            -- elsif v_addr(1 downto 0) = "10" then
-            --     expected(15 downto 0) := v_addr(31 downto 16);
-            --     expected(31 downto 16) := v_addr_next(15 downto 0);
-            -- else
-            --     report "Misaligned transfer from " & to_hstring(v_addr);
-            -- end if;
             assert out_instr = expected report "Expected " & to_hstring(expected) & " Got " & to_hstring(out_instr) severity error;
             if out_instr = expected then
                 msg("OK");
@@ -107,7 +100,24 @@ begin
             read_instr(2*i);
         end loop;
         in_invalidate <= (others => '0');
+        
+        msg("=== Test back-to-back requests with backpressure ====");
+        wait until rising_edge(clk);
+        in_addr_valid <= '1';
+        in_addr <= x"0000_0000";
+        wait until rising_edge(clk) and out_addr_ready = '1';
+        in_addr <= x"0000_0002";
+        wait until rising_edge(clk) and out_addr_ready = '1';
+        in_addr <= x"0000_0004";
+        wait until rising_edge(clk) and out_addr_ready = '1';
+        in_addr <= x"0000_0006";
+        wait until rising_edge(clk) and out_addr_ready = '1';
+        in_addr <= x"0000_0008";
+        wait until rising_edge(clk) and out_addr_ready = '1';
+        in_addr_valid <= '0';
         msg("All tests done");
+        wait for 100ns;
+        std.env.stop;
         wait;
     end process;
 
@@ -115,6 +125,7 @@ begin
 dut_icache : entity work.icache
     generic map(
         G_DBG_LOG => true,
+        G_RV32C_OPT => G_RV32C_OPT,
         G_NUM_BLOCKS => G_NUM_BLOCKS,
         G_BLOCK_SIZE => G_BLOCK_SIZE,
         G_SET_SIZE   => G_SET_SIZE
@@ -124,6 +135,7 @@ dut_icache : entity work.icache
         rst             => rst,
         in_addr         => in_addr,
         in_addr_valid   => in_addr_valid,
+        out_addr_ready  => out_addr_ready,
         out_instr       => out_instr,
         out_instr_valid => out_instr_valid,
         in_invalidate   => in_invalidate,

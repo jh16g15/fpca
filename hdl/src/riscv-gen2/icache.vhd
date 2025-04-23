@@ -17,7 +17,8 @@ entity icache is
         clk : in std_logic;
         rst : in std_logic;
         in_addr : in std_logic_vector(31 downto 0); -- bottom bit must be 0, 2-byte aligned
-        in_addr_valid : std_logic;
+        in_addr_valid : in std_logic;
+        out_addr_ready : out std_logic;
 
         out_instr : out std_logic_vector(31 downto 0); -- could be a 16-bit compressed instr
         out_instr_valid : out std_logic;
@@ -124,6 +125,8 @@ begin
 
     wb_mosi.sel <= x"f";
     wb_mosi.we <= '0';
+    
+    out_addr_ready <= '1' when state = READY else '0';
 
     name : process (clk) is
         -- lower/full search

@@ -6,7 +6,7 @@ use std.textio.all;
 
 package joe_common_pkg is
 
-    procedure msg(msg: in string; unit : time := ns);
+    procedure msg(msg: in string; show : boolean := true; unit : time := ns);
 
     --! Common array types
     type t_slv64_arr is array (integer range <>) of std_logic_vector(63 downto 0);
@@ -74,9 +74,11 @@ package joe_common_pkg is
 end package;
 
 package body joe_common_pkg is
-    procedure msg(msg: in string; unit : time := ns) is
+    procedure msg(msg: in string; show : boolean := true; unit : time := ns) is
     begin
-        write(OUTPUT, to_string(now, unit) & " " & msg & LF);
+        if show then
+            write(OUTPUT, to_string(now, unit) & " " & msg & LF);
+        end if;
     end procedure msg;
 
     --! Converts (lower-case only!) ASCII to a hex nibble
