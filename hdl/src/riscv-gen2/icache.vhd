@@ -8,7 +8,7 @@ use work.joe_common_pkg.all;
 entity icache is
     generic(
         G_DBG_LOG    : boolean := false;
-        -- G_RV32C_OPT  : boolean := true; -- optimisation: 
+        G_RV32C_OPT  : boolean := true; -- optimisation: for overflow into next cache line, only fetch upper half if not 16b-only RVC instruction (opcode(1:0) /= "11")
         G_NUM_BLOCKS : integer := 16;
         G_BLOCK_SIZE : integer := 32; -- bytes
         G_SET_SIZE : integer := 1   -- blocks per set: 1 for direct-mapped
@@ -22,9 +22,7 @@ entity icache is
         out_instr : out std_logic_vector(31 downto 0); -- could be a 16-bit compressed instr
         out_instr_valid : out std_logic;
 
-        -- force_fetch : in std_logic := '0';
         in_invalidate : in std_logic_vector(G_NUM_BLOCKS-1 downto 0) := (others => '0');
-        -- flush : in std_logic := '0'; -- can't write to icache
 
         -- wishbone B4 pipelined for cache line fill/flush
         wb_mosi : out t_wb_mosi;
@@ -71,27 +69,19 @@ architecture RTL of icache is
     -- type t_cache_index is array (G_NUM_BLOCKS-1 downto 0) of std_logic_vector(C_INDEX_W-1 downto 0);
     type t_cache_tag is array (G_NUM_BLOCKS-1 downto 0) of std_logic_vector(C_TAG_W-1 downto 0);
     
-    -- Valid/LRU is per cache line, compared across the set
-    -- type t_cache_set_attr is array (G_NUM_BLOCKS-1 downto 0) of std_logic;
-
     signal cache_block_data : t_cache_data;
-    -- signal cache_block_index : t_cache_index;
     signal cache_block_tag : t_cache_tag;
     signal cache_block_valid : std_logic_vector(G_NUM_BLOCKS-1 downto 0) := (others => '0');
-    -- signal cache_block_lru : std_logic_vector(G_NUM_BLOCKS-1 downto 0) := (others => '0');
 
     signal hit_count : unsigned(63 downto 0) := (others => '0'); -- found in cache
     signal oflow_count : unsigned(63 downto 0) := (others => '0'); -- found over 2 cache lines
-    signal miss_count : unsigned(63 downto 0) := (others => '0'); -- not found in cache
-
-
-    
+    signal miss_count : unsigned(63 downto 0) := (others => '0'); -- not found in cache  
 
     signal data0 : std_logic_vector(15 downto 0); -- lower 16 bits of a 32-bit fetch
     signal data1 : std_logic_vector(15 downto 0); -- upper 16 bits of a 32-bit fetch
 
     signal may_cross_cache_line : std_logic;
-    signal second_word_oflow_replace : std_logic := '0'; -- upper half of 32b instruction crosses cache line
+    signal second_word_oflow_replace_flag : std_logic := '0'; -- upper half of 32b instruction crosses cache line
 
     type t_state is (READY, OFLOW, MISS, REPLACE);
     signal state : t_state := READY;
@@ -110,7 +100,6 @@ architecture RTL of icache is
     signal lfsr1 : std_logic_vector(9 downto 0) := (others => '0'); -- 10 bit, XNOR taps at 10th and 7th bits
     signal lfsr2 : std_logic_vector(10 downto 0) := (others => '0'); -- 9 bit, XNOR taps at 7th and 5th bits
 
-
     procedure dbg_msg(str : string) is
     begin
         msg("Cache: " & str, G_DBG_LOG);
@@ -121,7 +110,6 @@ begin
     p_lfsr : process(clk) is
     begin
         if rising_edge(clk) then
-            -- lfsr <= lfsr(5 downto 0) & (lfsr(6) xnor lfsr(5));
             lfsr1 <= lfsr1(8 downto 0) & (lfsr1(9) xnor lfsr1(6));
             lfsr2 <= lfsr2(9 downto 0) & (lfsr2(10) xnor lfsr2(4));
         end if;
@@ -144,21 +132,13 @@ begin
         variable v_word_offset : integer;
         variable v_tag_match : boolean;
         variable v_matched_block : integer;
-        -- upper search
-        -- variable v_tag_u : std_logic_vector(C_TAG_W-1 downto 0);
-        -- variable v_index_u : integer;
-        -- variable v_word_offset_u : integer;
-        -- variable v_tag_match_u : boolean;
-        -- variable v_matched_block_u : integer;
-
+       
         -- cache block replacement
         variable v_set_base : integer;  -- base block addr of the set our req addr is in
         variable v_replace_block_addr : integer;
         variable v_empty_block_found : boolean;
         variable v_random_block_in_set : integer;
         
-        -- variable v_data0 : std_logic_vector(15 downto 0);
-
         procedure decode_addr(
             addr : in std_logic_vector(31 downto 0);
             tag : out std_logic_vector(C_TAG_W-1 downto 0);
@@ -171,7 +151,6 @@ begin
             word_offset := slv2uint(addr(C_WORD_OFFSET_H downto C_WORD_OFFSET_L));
             dbg_msg("Decoded address " & to_hstring(addr) & " tag " & to_hstring(tag) & " index " & to_string(index) & " offset " & to_string(word_offset));
         end procedure decode_addr;
-        
 
         procedure combinational_cache_lookup(
             addr : in std_logic_vector(31 downto 0);
@@ -212,7 +191,7 @@ begin
             if rst = '1' then
                 state <= READY;
                 cache_block_valid <= (others => '0');
-                second_word_oflow_replace <= '0';
+                second_word_oflow_replace_flag <= '0';
                 hit_count <= (others => '0');
                 miss_count <= (others => '0');
                 wb_mosi.adr <= C_WB_MOSI_INIT.adr;
@@ -264,8 +243,7 @@ begin
                     -- NOTE: RISC-V Compressed (16b) instructions start with "00", "01" or "10"
                     --       RISC-V 32b Instructions start with "11"
                     -- check if 32b RISC-V instruction (ie do we need the upper 16 bits at all?)
-                    if false then 
-                    -- if data0(1 downto 0) /= "11" then 
+                    if data0(1 downto 0) /= "11" and G_RV32C_OPT then 
                         -- 16 bit instruction, can conclude here
                         dbg_msg("RISC-V 16b compressed instruction detected, no need for upper bits");
                         hit_count <= hit_count + 1;
@@ -283,7 +261,7 @@ begin
                             out_instr_valid <= '1';
                         else
                             dbg_msg("Cache miss for overflowed upper half");
-                            second_word_oflow_replace <= '1'; -- set flag so we load data1 when cache block replaced 
+                            second_word_oflow_replace_flag <= '1'; -- set flag so we load data1 when cache block replaced 
                             state <= MISS;
                             miss_count <= miss_count + 1;
                             -- set up WB DMA to load cache line
@@ -347,9 +325,8 @@ begin
                     cache_block_tag(v_replace_block_addr)  <= v_tag;
                     cache_block_valid(v_replace_block_addr) <= '1';
 
-
                     -- output data valid from block retrieved from memory
-                    if second_word_oflow_replace = '0' then -- normal operation
+                    if second_word_oflow_replace_flag = '0' then -- normal operation
                         -- lower 16b is always in this fetched cache block
                         data0 <= fetched_cache_block(v_word_offset*16+15 downto v_word_offset*16);
                         if may_cross_cache_line = '1' then -- if may cross cache line (if 32b), check next cache block
@@ -361,7 +338,7 @@ begin
                             state  <= READY;
                         end if;
                     else -- this cache block replace was triggered by overflow into the next (just replaced) cache block 
-                        second_word_oflow_replace <= '0'; -- clear flag
+                        second_word_oflow_replace_flag <= '0'; -- clear flag
                         data1 <= fetched_cache_block(v_word_offset*16+15 downto v_word_offset*16); -- data1 instead of data0
                         out_instr_valid <= '1';
                         state  <= READY;
