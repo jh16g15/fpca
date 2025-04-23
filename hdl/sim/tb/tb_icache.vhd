@@ -101,6 +101,12 @@ begin
             read_instr(2*i);
         end loop;
 
+        msg("=== Test cache disable by holding INVALIDATE high ===");
+        in_invalidate <= (others => '1');
+        for i in 0 to 100 loop
+            read_instr(2*i);
+        end loop;
+        in_invalidate <= (others => '0');
         msg("All tests done");
         wait;
     end process;
