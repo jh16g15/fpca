@@ -153,9 +153,9 @@ begin
 
         -- set up VUnit Logging
         set_format(display_handler, verbose, true);
-        show(tb_logger, display_handler, verbose);
-        show(default_logger, display_handler, verbose);
-        show(master_logger, display_handler, verbose);
+        show(tb_logger, display_handler, debug);
+        show(default_logger, display_handler, debug);
+        show(master_logger, display_handler, debug);
         -- show passing assertions for tb_checker
         show(get_logger(tb_checker), display_handler, pass);
         -- continue simulating on error

@@ -112,7 +112,7 @@ begin
     SB_Req <= NewID("SB_Req_name");
     SB_Rsp_Addr <= NewID("Rsp_Address");
     SB_Rsp_Rdata <= NewID("Rsp_RData");
-    SB_Rsp_WE <=  := NewID("Rsp_WE");
+    SB_Rsp_WE <= NewID("Rsp_WE");
 
     while test_suite loop
       if run("test_alive") then

@@ -93,8 +93,7 @@ begin
     main : process
     begin
         test_runner_setup(runner, runner_cfg);
-
-        show(tb_logger, display_handler, verbose);
+        show(tb_logger, display_handler, debug);
         -- show passing assertions for tb_checker
         show(get_logger(tb_checker), display_handler, pass);
         -- continue simulating on error

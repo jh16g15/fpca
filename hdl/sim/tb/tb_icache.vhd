@@ -116,7 +116,7 @@ begin
         wait until rising_edge(clk) and out_addr_ready = '1';
         in_addr_valid <= '0';
         msg("All tests done");
-        wait for 100ns;
+        wait for 100 ns;
         std.env.stop;
         wait;
     end process;
