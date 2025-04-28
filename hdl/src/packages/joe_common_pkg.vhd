@@ -70,10 +70,33 @@ package joe_common_pkg is
 
     function byte_swap(in_vec : std_logic_vector; swap : boolean := true) return std_logic_vector;
 
-    
+    function find_highest_set_bit(val : std_logic_vector) return integer;
+    function find_lowest_set_bit(val : std_logic_vector) return integer;
 end package;
 
 package body joe_common_pkg is
+
+    function find_highest_set_bit(val : std_logic_vector) return integer is
+        constant hi : integer := val'high;
+        constant lo : integer := val'low;
+    begin
+        for i in hi downto lo loop
+            if val(i) = '1' then
+                return i;
+            end if;
+        end loop;
+    end function;
+    function find_lowest_set_bit(val : std_logic_vector) return integer is
+        constant hi : integer := val'high;
+        constant lo : integer := val'low;
+    begin
+        for i in lo to hi loop
+            if val(i) = '1' then
+                return i;
+            end if;
+        end loop;
+    end function;
+
     procedure msg(msg: in string; show : boolean := true; unit : time := ns) is
     begin
         if show then
