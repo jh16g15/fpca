@@ -57,6 +57,7 @@ begin
         begin
             csr_op_enable <= '0';
             wait until rising_edge(clk);
+            -- Set up OP
             csr_addr <= addr;
             csr_funct3 <= funct3;
             csr_op_enable <= '1';
@@ -81,7 +82,7 @@ begin
                     imm <= wdat(4 downto 0);
                 when others => failure("invalid funct3");
             end case;
-            
+            -- Execute
             wait until rising_edge(clk);
             csr_op_enable <= '0';
             info("Old value of CSR was " & to_hstring(csr_rdata));
