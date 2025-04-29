@@ -342,4 +342,4 @@ package body rv_csr_pkg is
     end function clr;
     
 
-end package;
+end package body;

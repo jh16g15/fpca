@@ -53,13 +53,13 @@ port (
 
     csr_op_enable : in std_logic;
     csr_addr : in std_logic_vector(11 downto 0);
-    rdata : out std_logic_vector(31 downto 0); -- data from the CSR
+    csr_rdata : out std_logic_vector(31 downto 0); -- data from the CSR
     
     funct3 : in std_logic_vector(2 downto 0);   -- determines which Zicsr instruction this is
 
     -- Technically, we need these to determine if CSR reads/write take place (sometimes skipped if x0)
     -- rd : in std_logic_vector(4 downto 0);
-    rs1 : in std_logic_vector(4 downto 0);
+    -- rs1 : in std_logic_vector(4 downto 0);
 
     rs1_data : in std_logic_vector(31 downto 0);    -- data to write/set/clear to the CSR
     imm : in std_logic_vector(4 downto 0) -- zero-extend this, data to write/set/clear to the CSR
@@ -152,35 +152,36 @@ begin
                     -- TODO: access permissions based on mcounteren (currently unimplemented)
                     case(csr_addr) is
                         when CSR_CYCLE_ADDR => 
-                            rdata <= std_logic_vector(mcycle(31 downto 0));
+                            csr_rdata <= std_logic_vector(mcycle(31 downto 0));
                         when CSR_CYCLEH_ADDR => 
-                            rdata <= std_logic_vector(mcycle(63 downto 32));
+                            csr_rdata <= std_logic_vector(mcycle(63 downto 32));
                         when CSR_TIME_ADDR => 
-                            rdata <= std_logic_vector(mtime(31 downto 0));
+                            csr_rdata <= std_logic_vector(mtime(31 downto 0));
                         when CSR_TIMEH_ADDR => 
-                            rdata <= std_logic_vector(mtime(63 downto 32));
+                            csr_rdata <= std_logic_vector(mtime(63 downto 32));
                         when CSR_INSTRET_ADDR  => 
-                            rdata <= std_logic_vector(minstret(31 downto 0));
+                            csr_rdata <= std_logic_vector(minstret(31 downto 0));
                         when CSR_INSTRETH_ADDR => 
-                            rdata <= std_logic_vector(minstret(63 downto 32));
+                            csr_rdata <= std_logic_vector(minstret(63 downto 32));
+                        when others => null;
                     end case;
                     if current_privilege = C_MODE_M then
                         --======= Machine Mode CSRs ==========
                         case(csr_addr) is
                             ------- Machine CSR Read Only Registers -------
                             when CSR_MVENDORID_ADDR => 
-                                rdata <= CSR_MVENDORID_INIT;
+                                csr_rdata <= CSR_MVENDORID_INIT;
                             when CSR_MARCHID_ADDR => 
-                                rdata <= G_CSR_MARCHID_INIT;
+                                csr_rdata <= G_CSR_MARCHID_INIT;
                             when CSR_MIMPID_ADDR => 
-                                rdata <= G_CSR_MIMPID_INIT;
+                                csr_rdata <= G_CSR_MIMPID_INIT;
                             when CSR_MHARTID_ADDR => 
-                                rdata <= G_CSR_MHARTID_INIT;
+                                csr_rdata <= G_CSR_MHARTID_INIT;
                             when CSR_MCONFIGPTR_ADDR => 
-                                rdata <= G_CSR_MCONFIGPTR_INIT;
+                                csr_rdata <= G_CSR_MCONFIGPTR_INIT;
                             ------- CSR Read/Write Registers -------
                             when CSR_MISA_ADDR=> 
-                                rdata <=  read_misa(misa);
+                                csr_rdata <=  read_misa(misa);
                                 case (csr_opcode) is
                                     when CSRRW => misa <= write_misa(csr_wdata);
                                     when CSRRS => misa <= write_misa(set(read_misa(misa), csr_wdata));
@@ -189,7 +190,7 @@ begin
                                 end case;
 
                             when CSR_MSTATUS_ADDR => 
-                                rdata <= read_mstatus(mstatus); -- Technically we shouldn't read if rd=x0, but there are no side effects
+                                csr_rdata <= read_mstatus(mstatus); -- Technically we shouldn't read if rd=x0, but there are no side effects
                                 case (csr_opcode) is
                                     when CSRRW => mstatus <= write_mstatus(csr_wdata);
                                     when CSRRS => mstatus <= write_mstatus(set(read_mstatus(mstatus), csr_wdata));
@@ -198,7 +199,7 @@ begin
                                 end case;
 
                             when CSR_MTVEC_ADDR =>
-                                rdata <=  read_mtvec(mtvec);
+                                csr_rdata <=  read_mtvec(mtvec);
                                 case (csr_opcode) is
                                     when CSRRW => mtvec <= write_mtvec(csr_wdata);
                                     when CSRRS => mtvec <= write_mtvec(set(read_mtvec(mtvec), csr_wdata));
@@ -207,7 +208,7 @@ begin
                                 end case;
                             
                             when CSR_MIE_ADDR =>
-                                rdata <=  read_mie(mie);
+                                csr_rdata <=  read_mie(mie);
                                 case (csr_opcode) is
                                     when CSRRW => mie <= write_mie(csr_wdata);
                                     when CSRRS => mie <= write_mie(set(read_mie(mie), csr_wdata));
@@ -216,7 +217,7 @@ begin
                                 end case;
 
                             when CSR_MIP_ADDR =>
-                                rdata <=  read_mip(mip);
+                                csr_rdata <=  read_mip(mip);
                                 case (csr_opcode) is
                                     when CSRRW => mip <= write_mip(csr_wdata);
                                     when CSRRS => mip <= write_mip(set(read_mip(mip), csr_wdata));
@@ -225,7 +226,7 @@ begin
                                 end case;
                             
                             when CSR_MCYCLE_ADDR => 
-                                rdata <= std_logic_vector(mcycle(31 downto 0));
+                                csr_rdata <= std_logic_vector(mcycle(31 downto 0));
                                 case (csr_opcode) is
                                     when CSRRW => mcycle(31 downto 0) <= unsigned(csr_wdata);
                                     when CSRRS => mcycle(31 downto 0) <= set(mcycle(31 downto 0), unsigned(csr_wdata));
@@ -234,7 +235,7 @@ begin
                                 end case;
                             
                             when CSR_MCYCLEH_ADDR => 
-                                rdata <= std_logic_vector(mcycle(63 downto 32));
+                                csr_rdata <= std_logic_vector(mcycle(63 downto 32));
                                 case (csr_opcode) is
                                     when CSRRW => mcycle(63 downto 32) <= unsigned(csr_wdata);
                                     when CSRRS => mcycle(63 downto 32) <= set(mcycle(63 downto 32), unsigned(csr_wdata));
@@ -243,7 +244,7 @@ begin
                                 end case;
                             
                             when CSR_MINSTRET_ADDR => 
-                                rdata <= std_logic_vector(minstret(31 downto 0));
+                                csr_rdata <= std_logic_vector(minstret(31 downto 0));
                                 case (csr_opcode) is
                                     when CSRRW => minstret(31 downto 0) <= unsigned(csr_wdata);
                                     when CSRRS => minstret(31 downto 0) <= set(minstret(31 downto 0), unsigned(csr_wdata));
@@ -252,7 +253,7 @@ begin
                                 end case;
                             
                             when CSR_MINSTRETH_ADDR=> 
-                                rdata <= std_logic_vector(minstret(63 downto 32));
+                                csr_rdata <= std_logic_vector(minstret(63 downto 32));
                                 case (csr_opcode) is
                                     when CSRRW => minstret(63 downto 32) <= unsigned(csr_wdata);
                                     when CSRRS => minstret(63 downto 32) <= set(minstret(63 downto 32), unsigned(csr_wdata));
@@ -261,7 +262,7 @@ begin
                                 end case;
                             
                             when CSR_MCOUNTINHIBIT_ADDR=> 
-                                rdata <= mcountinhibit;
+                                csr_rdata <= mcountinhibit;
                                 case (csr_opcode) is
                                     when CSRRW => mcountinhibit <= csr_wdata;
                                     when CSRRS => mcountinhibit <= set(mcountinhibit, csr_wdata);
@@ -270,7 +271,7 @@ begin
                                 end case;
                             
                             when CSR_MSCRATCH_ADDR=> 
-                                rdata <= mscratch;
+                                csr_rdata <= mscratch;
                                 case (csr_opcode) is
                                     when CSRRW => mscratch <= csr_wdata;
                                     when CSRRS => mscratch <= set(mscratch, csr_wdata);
@@ -279,7 +280,7 @@ begin
                                 end case;
                                 
                             when CSR_MEPC_ADDR=> 
-                                rdata <= mepc;
+                                csr_rdata <= mepc;
                                 case (csr_opcode) is
                                     when CSRRW => mepc <= csr_wdata;
                                     when CSRRS => mepc <= set(mepc, csr_wdata);
@@ -288,7 +289,7 @@ begin
                                 end case;
                             
                             when CSR_MCAUSE_ADDR=> 
-                                rdata <= mcause;
+                                csr_rdata <= mcause;
                                 case (csr_opcode) is
                                     when CSRRW => mcause <= csr_wdata;
                                     when CSRRS => mcause <= set(mcause, csr_wdata);
@@ -297,7 +298,7 @@ begin
                                 end case;
                                 
                             when CSR_MTVAL_ADDR=> 
-                                rdata <= mtval;
+                                csr_rdata <= mtval;
                                 case (csr_opcode) is
                                     when CSRRW => mtval <= csr_wdata;
                                     when CSRRS => mtval <= set(mtval, csr_wdata);
@@ -331,6 +332,7 @@ begin
                                 -- TODO vectored mode
                                 trap_pc_out <= mtvec_base(mtvec);
                                 -- trap_pc_out <= mtvec_base(mtvec) + to_unsigned(find_highest_set_bit(read_interrupts(interrupts))(29 downto 0) & unsigned'("00"));
+                            when others => null;
                         end case;
                     else    -- Exception
                         trap_pc_out <= mtvec_base(mtvec); 

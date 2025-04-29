@@ -26,3 +26,11 @@ boards/pynq_z2/hdl/hamsterworks_dvi/
 *tmp.vhd
 *.vo
 # Others
+.settings/com.sigasi.hdt.libraries.active.prefs
+.settings/com.sigasi.hdt.toolchains.active.prefs
+.settings/com.sigasi.hdt.verilog.linting.prefs
+.settings/com.sigasi.hdt.verilog.Verilog.prefs
+.settings/com.sigasi.hdt.verilog.version.prefs
+.settings/com.sigasi.hdt.vhdl.linting.prefs
+.settings/com.sigasi.hdt.vhdl.version.prefs
+.settings/org.eclipse.core.resources.prefs
