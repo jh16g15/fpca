@@ -56,7 +56,7 @@ begin
         ) is
         begin
             csr_op_enable <= '0';
-            wait until rising_edge(clk);
+            -- wait until rising_edge(clk);
             -- Set up OP
             csr_addr <= addr;
             csr_funct3 <= funct3;
@@ -85,6 +85,7 @@ begin
             -- Execute
             wait until rising_edge(clk);
             csr_op_enable <= '0';
+            wait for 0 ns;  -- delta cycle fun
             info("Old value of CSR was " & to_hstring(csr_rdata));
             rdat := csr_rdata;
 
@@ -95,7 +96,20 @@ begin
     begin
         test_runner_setup(runner, runner_cfg);
         info("Vunit is alive!");
+        info("Test MSCRATCH register");
+        wait until reset = '0';
+        wait for 4 ns;
+        csr_op(CSR_MSCRATCH_ADDR, rdat, CSR_FUNCT3_CSRRW, x"1234_5678");    -- write
+        -- check(rdat = x"0000_0000");  -- don't check initial value
+        csr_op(CSR_MSCRATCH_ADDR, rdat, CSR_FUNCT3_CSRRC, x"0000_000F");    -- clear bottom 4 bits
+        check(rdat = x"1234_5678");
+        csr_op(CSR_MSCRATCH_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0008_0000");    -- set bit
+        check(rdat = x"1234_5670");
+        csr_op(CSR_MSCRATCH_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");    -- read, don't change
+        check(rdat = x"123C_5670");
+        info("done");
         wait for 100 ns;
+
         csr_op(CSR_CYCLE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");
         csr_op(CSR_CYCLE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");
         csr_op(CSR_CYCLE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");
@@ -104,6 +118,14 @@ begin
         csr_op(CSR_CYCLE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");
         csr_op(CSR_MCYCLE_ADDR, rdat, CSR_FUNCT3_CSRRW, x"0000_0010"); -- expect successful write to MCYCLE reg
         csr_op(CSR_CYCLE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");   --  which is then mirrored to the CYCLE reg
+        csr_op(CSR_CYCLE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");   --  ...eventually
+        csr_op(CSR_CYCLE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");   --  ...eventually
+        csr_op(CSR_CYCLE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");   --  ...eventually
+
+        info("done check for CYCLE register");
+        
+        
+        wait for 100 ns;
         test_runner_cleanup(runner);
         wait;
     end process;
