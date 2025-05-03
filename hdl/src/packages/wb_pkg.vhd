@@ -68,7 +68,8 @@ package wb_pkg is
 
     --! Align the valid part of the 32 bit input data to the wishbone 32 bit data bus
     function wb_align_store_data(wdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0)) return std_logic_vector;
-
+    function wb_align_load_data(rdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0)) return std_logic_vector;
+    
     function sel2bytes(sel : std_logic_vector(3 downto 0)) return unsigned;
     function bytes2sel(bytes : natural) return std_logic_vector;
 end package;
