@@ -18,22 +18,22 @@ jobs:
         run_file: python hdl/sim/run.py
 
 
-  container-job:
-    runs-on: ubuntu-latest
-    container: ghdl/vunit:mcode-master
-    steps:
+  # container-job:
+  #   runs-on: ubuntu-latest
+  #   container: ghdl/vunit:mcode-master
+  #   steps:
 
-    - uses: actions/checkout@v2
+  #   - uses: actions/checkout@v2
 
-    - run: python3 hdl/sim/run.py
+  #   - run: python3 hdl/sim/run.py
 
 
-  container-step:
-    runs-on: ubuntu-latest
-    steps:
+  # container-step:
+  #   runs-on: ubuntu-latest
+  #   steps:
 
-    - uses: actions/checkout@v2
+  #   - uses: actions/checkout@v2
 
-    - uses: docker://ghdl/vunit:mcode-master
-      with:
-        args: hdl/sim/run.py
+  #   - uses: docker://ghdl/vunit:mcode-master
+  #     with:
+  #       args: hdl/sim/run.py
