@@ -15,7 +15,7 @@ jobs:
     - name: Run VUnit tests
       uses: VUnit/vunit_action@v0.1.0
       with:
-        cmd: hdl/sim/run.py
+        run_file: hdl/sim/run.py
 
 
   container-job:
