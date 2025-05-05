@@ -1,10 +1,11 @@
 
 
 # FPCA
-  <a title="'Test' workflow Status"
-    href="https://github.com/jh16g15/fpca/actions?query=workflow%3ASimulate"
+<p align="left">
+  <a title="'Test' workflow Status"    href="https://github.com/jh16g15/fpca/actions?query=workflow%3ASimulate"
   ><img alt="'Simualtions' workflow Status" src="https://img.shields.io/github/actions/workflow/status/jh16g15/fpca/simulate.yml?branch=main&label=Simulations"
   /></a>
+</p>
 The FPCA (Friendly Programmable Computing Asset) is a RISC-V SoC design with accompanying peripherals.
 
 # Current CPU Status
