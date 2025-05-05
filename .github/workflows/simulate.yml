@@ -16,7 +16,6 @@ jobs:
       run: ls -al && which python && python --version
     - name: check file  
       run: ls hdl/sim/run.py
-    -   
 
     - name: Run VUnit tests
       uses: VUnit/vunit_action@master
