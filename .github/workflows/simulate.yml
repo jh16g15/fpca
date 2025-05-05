@@ -22,6 +22,24 @@ jobs:
       with:
         cmd: hdl/sim/run.py
 
+  manual-installs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run VHDL Simulation
+        uses: ghdl/setup-ghdl@v1
+        with:
+          version: nightly
+          backend: mcode
+          investigate: true
+      - name: install VUnit
+        run: pip install --pre vunit_hdl
+
+      - name: run tests
+        run: |
+          cd hdl/sim
+          python run.py
+
+
 
   # container-job:
   #   runs-on: ubuntu-latest
