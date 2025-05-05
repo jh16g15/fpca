@@ -1,3 +1,6 @@
+
+[![](https://github.com/jh16g15/fpca/workflows/VUnit%20Tests/badge.svg)](https://github.com/jh16g15/fpca/actions)
+
 # FPCA
 The FPCA (Friendly Programmable Computing Asset) is a RISC-V SoC design with accompanying peripherals.
 
