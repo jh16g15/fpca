@@ -2,6 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.joe_common_pkg.all;
+
 package rv_csr_pkg is
 
     constant CSR_FUNCT3_CSRRW : std_logic_vector(2 downto 0) := "001";
@@ -81,17 +83,17 @@ package rv_csr_pkg is
     constant MTVEC_MODE_DIRECT : std_logic_vector(1 downto 0)  := "00";
     constant MTVEC_MODE_VECTORED : std_logic_vector(1 downto 0)  := "01";
 
-    -- use for mie (enabled) and mip (pending), as they have the same fields
-    type t_mi is record
-        msi : std_logic;    -- machine software interrupt
-        mti : std_logic;    -- machine timer interrupt
-        mei : std_logic;    -- machine external interrupt
-        platform : std_logic_vector(15 downto 0); -- platform specific interrupts
-    end record;
-    function read_mip(m : in t_mi) return std_logic_vector;
-    function write_mip(val : in std_logic_vector(31 downto 0)) return t_mi;
-    function read_mie(m : in t_mi) return std_logic_vector;
-    function write_mie(val : in std_logic_vector(31 downto 0)) return t_mi;
+    -- -- use for mie (enabled) and mip (pending), as they have the same fields
+    -- type t_mi is record
+    --     msi : std_logic;    -- machine software interrupt
+    --     mti : std_logic;    -- machine timer interrupt
+    --     mei : std_logic;    -- machine external interrupt
+    --     platform : std_logic_vector(15 downto 0); -- platform specific interrupts
+    -- end record;
+    -- function read_mip(m : in t_mi) return std_logic_vector;
+    -- function write_mip(val : in std_logic_vector(31 downto 0)) return t_mi;
+    -- function read_mie(m : in t_mi) return std_logic_vector;
+    -- function write_mie(val : in std_logic_vector(31 downto 0)) return t_mi;
 
     
     -- use for mie (enabled) and mip (pending), as they have the same fields
@@ -129,6 +131,25 @@ package rv_csr_pkg is
         hardware_error : std_logic;
         -- Lowest Priority
     end record;
+    constant C_EXCEPTIONS_NULL : t_exceptions := (
+        instr_misaligned => '0',
+        instr_access => '0',
+        illegal_instr => '0',
+        ebreak => '0',
+        load_misaligned => '0',
+        load_access => '0',
+        store_amo_misaligned => '0',
+        store_amo_access => '0',
+        ecall_from_u => '0',
+        ecall_from_s => '0',
+        ecall_from_m => '0',
+        instr_page_fault => '0',
+        load_page_fault => '0',
+        store_amo_page_fault => '0',
+        double_trap => '0',
+        software_check => '0',
+        hardware_error => '0'
+    );
     function read_exceptions(m : in t_exceptions) return std_logic_vector;
     function write_exceptions(val : in std_logic_vector(31 downto 0)) return t_exceptions;
     
@@ -142,12 +163,42 @@ package rv_csr_pkg is
         lcofi : std_logic;  -- local counter overflow interrupt
         platform : std_logic_vector(14 downto 0);
     end record;
+    constant C_INTERRUPTS_NULL : t_interrupts := (
+        ssi => '0',
+        msi => '0',
+        sti => '0',
+        mti => '0',
+        sei => '0',
+        mei => '0',
+        lcofi => '0',
+        platform => (others => '0')
+    );
+    
     function read_interrupts(m : in t_interrupts) return std_logic_vector;
     function write_interrupts(val : in std_logic_vector(31 downto 0)) return t_interrupts;
-
+    function get_exception_code(m : in t_exceptions) return integer;
+    function get_interrupt_code(m : in t_interrupts) return integer;
 end package rv_csr_pkg;
 
 package body rv_csr_pkg is
+
+    function get_exception_code(m : in t_exceptions) return integer is
+        constant val : std_logic_vector(31 downto 0)  := read_exceptions(m);
+        variable lowest_bit_set : integer;
+    begin
+        -- For Exceptions, prio is bit 0 highest
+        lowest_bit_set := find_lowest_set_bit(val);
+        return lowest_bit_set;
+    end function;
+    
+    function get_interrupt_code(m : in t_interrupts) return integer is
+        constant val : std_logic_vector(31 downto 0)  := read_interrupts(m);
+        variable highest_bit_set : integer;
+    begin
+        -- For Interrupts, prio is bit 30 highest
+        highest_bit_set := find_highest_set_bit(val);
+        return highest_bit_set;
+    end function;
 
     function read_interrupts(m : in t_interrupts) return std_logic_vector is 
         variable val : std_logic_vector(31 downto 0)  := (others => '0');
@@ -160,7 +211,7 @@ package body rv_csr_pkg is
         val(11) := m.mei;
         val(13) := m.lcofi;
         val(30 downto 16) := m.platform;
-        val(31) := '1'; -- INTERRUPT, not exception
+        -- val(31) := '1'; -- INTERRUPT, not exception
         return val;
     end function;
     
@@ -252,43 +303,6 @@ package body rv_csr_pkg is
         return m;
     end function;
     
-    function read_mip(m : in t_mi) return std_logic_vector is 
-        variable val : std_logic_vector(31 downto 0)  := (others => '0');
-    begin 
-        val(31 downto 16) := m.platform;
-        val(11) := m.mei;
-        val(7) := m.mti;
-        val(3) := m.msi;
-        return val;
-    end function;
-
-    function read_mie(m : in t_mi) return std_logic_vector is 
-    begin 
-        -- MIP and MIE have same format for reads
-        return read_mip(m);
-    end function;
-    
-    function write_mie(val : in std_logic_vector(31 downto 0)) return t_mi is
-        variable m : t_mi;
-    begin
-        m.platform := val(31 downto 16);
-        m.mei := val(11);
-        m.mti := val(7);
-        m.msi := val(3);
-        return m;
-    end function;
-
-    function write_mip(val : in std_logic_vector(31 downto 0)) return t_mi is
-        variable m : t_mi;
-    begin
-        m.platform := val(31 downto 16); -- assume these are all R/W in mip for now
-        -- m.mei := val(11);    -- mei is read-only, cleared by platform interrupt controller
-        -- m.mti := val(7);     -- mti is read-only, cleared by writing to memory mapped mtcmp (machine timer compare)
-        -- m.msi := val(3);     -- msi is read-only, cleared by interprocessor comms memory mapped control reg
-        return m;
-    end function;
-
-
     function read_mtvec(m : in t_mtvec) return std_logic_vector is 
         variable val : std_logic_vector(31 downto 0)  := (others => '0');
     begin 

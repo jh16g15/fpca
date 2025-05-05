@@ -3,6 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.rv_csr_pkg.all;
+use work.joe_common_pkg.all;
 
 --! RISC-V Priviledged CSRs 20240411
 --! in the EXECUTE pipeline state
@@ -34,10 +35,7 @@ port (
     cycle_incr : in std_logic;  --! Increase Cycle Counter
     instret_incr : in std_logic; --! Increase Instructions Retired (complete)
     
-    exception : in std_logic;
     exceptions : in t_exceptions;
-
-    interrupt : in std_logic;
     interrupts : in t_interrupts;
 
     exec_pc : in std_logic_vector(31 downto 0);     -- Address of Instruction Currently being executed
@@ -67,6 +65,12 @@ port (
 end entity;
 
 architecture rtl of rv_csr is
+
+    signal interrupts_global_mask : std_logic_vector(31 downto 0); -- copies of mstatus.mie (global interrupt enable)
+    signal interrupts_masked : t_interrupts;
+
+    signal exception_trig : std_logic;
+    signal interrupt_trig : std_logic;
 
     -- CSR Instructions
     -- CSRRW (Atomic Read/Write CSR): reads CSR, zero-extends, writes to rd (unless rd=x0). New value of CSR=rs1
@@ -103,8 +107,8 @@ architecture rtl of rv_csr is
     signal misa : t_misa := G_CSR_MISA_INIT;
     signal mstatus : t_mstatus; --! Machine Mode Status 
     signal mtvec : t_mtvec; --! Machine Mode Trap Vectir
-    signal mie : t_mi; --! Machine Mode Interrupt Enable
-    signal mip : t_mi; --! Machine Mode Interrupt Pending
+    signal mie : t_interrupts; --! Machine Mode Interrupt Enable
+    signal mip : t_interrupts; --! Machine Mode Interrupt Pending
     signal mcountinhibit : std_logic_vector(31 downto 0) := (others => '0');
     signal mscratch : std_logic_vector(31 downto 0) := (others => '0');
     signal mepc : std_logic_vector(31 downto 0) := (others => '0');
@@ -126,6 +130,16 @@ begin
     csr_opcode <= funct3(1 downto 0);
     csr_wdata <= rs1_data when use_imm = '0' else imm_extended;
 
+    interrupts_global_mask  <= (others => mstatus.mie);
+    -- do ANDing as std_logic_vectors
+    interrupts_masked <= write_interrupts(read_interrupts(interrupts) and read_interrupts(mie) and interrupts_global_mask);
+    mip <= interrupts_masked;
+
+    -- set high if any bit is set
+    exception_trig <= or read_exceptions(exceptions);
+    interrupt_trig <= or read_interrupts(interrupts_masked);
+
+
     -- RW - so write the fields
     
     csr_proc : process(clk) is
@@ -136,6 +150,7 @@ begin
                 mstatus <= (mpp=>"11", mpie=>'0', mie=>'0'); -- no interrupts until setup complete
                 mtvec <= (base => (others => '0'), mode => MTVEC_MODE_DIRECT); -- must be written by software on boot!
                 misa <= G_CSR_MISA_INIT;
+                mie <= C_INTERRUPTS_NULL;
                 mcountinhibit <= (others => '0');
             else
 
@@ -208,22 +223,23 @@ begin
                                 end case;
                             
                             when CSR_MIE_ADDR =>
-                                csr_rdata <=  read_mie(mie);
+                                csr_rdata <=  read_interrupts(mie);
                                 case (csr_opcode) is
-                                    when CSRRW => mie <= write_mie(csr_wdata);
-                                    when CSRRS => mie <= write_mie(set(read_mie(mie), csr_wdata));
-                                    when CSRRC => mie <= write_mie(clr(read_mie(mie), csr_wdata));    
+                                    when CSRRW => mie <= write_interrupts(csr_wdata);
+                                    when CSRRS => mie <= write_interrupts(set(read_interrupts(mie), csr_wdata));
+                                    when CSRRC => mie <= write_interrupts(clr(read_interrupts(mie), csr_wdata));    
                                     when others => null;    -- TODO Illegal instruction
                                 end case;
 
                             when CSR_MIP_ADDR =>
-                                csr_rdata <=  read_mip(mip);
-                                case (csr_opcode) is
-                                    when CSRRW => mip <= write_mip(csr_wdata);
-                                    when CSRRS => mip <= write_mip(set(read_mip(mip), csr_wdata));
-                                    when CSRRC => mip <= write_mip(clr(read_mip(mip), csr_wdata));    
-                                    when others => null;    -- TODO Illegal instruction
-                                end case;
+                                csr_rdata <=  read_interrupts(mip);
+                                -- all fields read-only, clear interrupts externally (via memory mapped interrupt controller)
+                                -- case (csr_opcode) is
+                                --     when CSRRW => mip <= write_mip(csr_wdata);
+                                --     when CSRRS => mip <= write_mip(set(read_mip(mip), csr_wdata));
+                                --     when CSRRC => mip <= write_mip(clr(read_mip(mip), csr_wdata));    
+                                --     when others => null;    -- TODO Illegal instruction
+                                -- end case;
                             
                             when CSR_MCYCLE_ADDR => 
                                 csr_rdata <= std_logic_vector(mcycle(31 downto 0));
@@ -313,30 +329,27 @@ begin
                 end if; -- end CSR op
 
                 ------- Trap Handling (overwrite normal CSR read/write) -------
-                -- TODO set this interrupt flag via mip/mie/mstatus
                 use_trap_pc_out <= '0';
-                if exception = '1' or interrupt = '1' then
+                if exception_trig = '1' or interrupt_trig = '1' then
                     use_trap_pc_out <= '1';
                     
                     mepc <= exec_pc;    -- save PC to resume to (ISR may need to increment past this)
                     mstatus.mpp <= current_privilege;   -- save privilege level to come back to
                     mstatus.mpie <= mstatus.mie;    -- save interrupt enable status
                     mstatus.mie <= '0';     -- disable interrupts
-                    if interrupt = '1' then -- interrupts take prio over exceptions
-                        mcause  <=  read_interrupts(interrupts);
+                    if interrupt_trig = '1' then -- interrupts take prio over exceptions (otherwise page-faults etc cause massive interrupt latency)
+                        mcause  <=  '1' & uint2slv(get_interrupt_code(interrupts_masked), 31); -- set top bit to show cause is Interrupt
                         mtval <= (others => '0');
                         case mtvec.mode is
                             when MTVEC_MODE_DIRECT => 
                                 trap_pc_out <= mtvec_base(mtvec);
                             when MTVEC_MODE_VECTORED => 
-                                -- TODO vectored mode
-                                trap_pc_out <= mtvec_base(mtvec);
-                                -- trap_pc_out <= mtvec_base(mtvec) + to_unsigned(find_highest_set_bit(read_interrupts(interrupts))(29 downto 0) & unsigned'("00"));
+                                trap_pc_out <= std_logic_vector(unsigned(mtvec_base(mtvec)) + to_unsigned(get_interrupt_code(interrupts_masked) * 4, 32));                               
                             when others => null;
                         end case;
                     else    -- Exception
                         trap_pc_out <= mtvec_base(mtvec); 
-                        mcause <= read_exceptions(exceptions);
+                        mcause <= '0' & uint2slv(get_exception_code(exceptions), 31); -- clear top bit to show cause is Exception
                         if exceptions.instr_misaligned = '1' or exceptions.instr_access = '1'  or exceptions.instr_page_fault = '1' or 
                             exceptions.load_misaligned = '1' or exceptions.load_access = '1' or exceptions.load_page_fault = '1' or
                             exceptions.store_amo_misaligned = '1' or exceptions.store_amo_access = '1' or exceptions.store_amo_page_fault = '1' or

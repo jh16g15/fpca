@@ -23,7 +23,7 @@ architecture tb of tb_rv_csr is
 	signal exception : std_logic;
 	signal exceptions : t_exceptions;
 	signal interrupt : std_logic;
-	signal interrupts : t_interrupts;
+	signal interrupts : t_interrupts := C_INTERRUPTS_NULL;
 	signal exec_pc : std_logic_vector(31 downto 0);
 	signal exec_instr : std_logic_vector(31 downto 0);
 	signal fault_addr : std_logic_vector(31 downto 0);
@@ -42,7 +42,6 @@ architecture tb of tb_rv_csr is
 begin
 
     cycle_incr <= '1'; -- increment while not halted
-
 
     clk <= not clk after 5 ns;  
     reset <='0' after 15 ns;  
@@ -96,17 +95,18 @@ begin
     begin
         test_runner_setup(runner, runner_cfg);
         info("Vunit is alive!");
+        show(get_logger(default_checker), display_handler, pass);
         info("Test MSCRATCH register");
         wait until reset = '0';
         wait for 4 ns;
         csr_op(CSR_MSCRATCH_ADDR, rdat, CSR_FUNCT3_CSRRW, x"1234_5678");    -- write
         -- check(rdat = x"0000_0000");  -- don't check initial value
         csr_op(CSR_MSCRATCH_ADDR, rdat, CSR_FUNCT3_CSRRC, x"0000_000F");    -- clear bottom 4 bits
-        check(rdat = x"1234_5678");
+        check_equal(rdat, std_logic_vector'(x"1234_5678"));
         csr_op(CSR_MSCRATCH_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0008_0000");    -- set bit
-        check(rdat = x"1234_5670");
+        check_equal(rdat, std_logic_vector'(x"1234_5670"));
         csr_op(CSR_MSCRATCH_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");    -- read, don't change
-        check(rdat = x"123C_5670");
+        check_equal(rdat, std_logic_vector'(x"123C_5670"));
         info("done");
         wait for 100 ns;
 
@@ -124,6 +124,32 @@ begin
 
         info("done check for CYCLE register");
         
+        info("Enable Interrupts");
+
+        -- assert external and timer interrupts
+        interrupts.mei <= '1';
+        interrupts.mti <= '1';
+
+        csr_op(CSR_MIP_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000"); -- check pending interrupts
+        check_equal(rdat, std_logic_vector'(x"0000_0000"), "Check all interrupts are masked off");
+
+        csr_op(CSR_MSTATUS_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0008"); -- set mstatus.mie (global interrupt enable)
+        csr_op(CSR_MSTATUS_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000");
+        csr_op(CSR_MTVEC_ADDR, rdat, CSR_FUNCT3_CSRRW, x"0001_0001"); -- VECTORED mode @0x00010000
+        csr_op(CSR_MTVEC_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000"); 
+        check_equal(rdat, std_logic_vector'(x"0001_0001"), "Check MTVEC set correctly");
+
+        csr_op(CSR_MIP_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000"); -- check pending interrupts
+        check_equal(rdat, std_logic_vector'(x"0000_0000"), "Check all interrupts are masked off");
+
+        csr_op(CSR_MIE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0800"); -- enable M External Interrupt
+        
+        csr_op(CSR_MIP_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000"); -- check pending interrupts
+        check_equal(rdat, std_logic_vector'(x"0000_0800"), "Check only Machine External Interrupt (11) pending");
+        check_equal(trap_pc_out, std_logic_vector'(x"0001_002C"), "Check Trap branch address");
+        csr_op(CSR_MCAUSE_ADDR, rdat, CSR_FUNCT3_CSRRS, x"0000_0000"); -- check mcause
+        check_equal(rdat, std_logic_vector'(x"8000_000B"), "Check Exception Code in MCAUSE");
+                -- check_equal(rdat, std_logic_vector'(x"8000_000B"), "Check Exception Code in MCAUSE");
         
         wait for 100 ns;
         test_runner_cleanup(runner);
@@ -145,9 +171,9 @@ begin
             reset           => reset,
             cycle_incr      => cycle_incr,
             instret_incr    => instret_incr,
-            exception       => exception,
+            -- exception       => exception,
             exceptions      => exceptions,
-            interrupt       => interrupt,
+            -- interrupt       => interrupt,
             interrupts      => interrupts,
             exec_pc         => exec_pc,
             exec_instr      => exec_instr,
