@@ -42,7 +42,8 @@ jobs:
           cd hdl/sim
           ls -al
           echo $PATH
-          ls /home/runner/work/fpca/fpca/install/bin
+          tree /home/runner/work/fpca/
+          ls /home/runner/work/fpca/fpca/install/bin -al
           /home/runner/work/fpca/fpca/install/bin/ghdl --version
           which ghdl
           python run_ci.py -m
