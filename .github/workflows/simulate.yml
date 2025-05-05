@@ -16,10 +16,10 @@ jobs:
       run: ls -al && which python && python --version
     - name: check file  
       run: ls hdl/sim/run.py
-      
+    -   
 
     - name: Run VUnit tests
-      uses: VUnit/vunit_action@v0.1.0
+      uses: VUnit/vunit_action@master
       with:
         run_file: hdl/sim/run.py
 
