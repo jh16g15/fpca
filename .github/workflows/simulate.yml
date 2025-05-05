@@ -5,24 +5,7 @@ on:
   pull_request:
 
 jobs:
-
   simulate:
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Checkout Repo
-      uses: actions/checkout@v4
-    - name: See what's here
-      run: ls -al && which python && python --version
-    - name: check file  
-      run: ls -al hdl/sim/run.py
-
-    - name: Run VUnit tests
-      uses: VUnit/vunit_action@master
-      with:
-        cmd: hdl/sim/run.py
-
-  manual-installs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo (with submodules)
@@ -40,13 +23,24 @@ jobs:
       - name: run tests
         run: |
           cd hdl/sim
-          ls -al
-          echo $PATH
-          #find ~ -name install
-          which ghdl
-          # ls /home/runner/work/fpca/fpca/install/bin -al
-          # /home/runner/work/fpca/fpca/install/bin/ghdl --version
           python run_ci.py -m
+
+  # simulate:
+  #   runs-on: ubuntu-latest
+  #   steps:
+
+  #   - name: Checkout Repo
+  #     uses: actions/checkout@v4
+  #   - name: See what's here
+  #     run: ls -al && which python && python --version
+  #   - name: check file  
+  #     run: ls -al hdl/sim/run.py
+
+  #   - name: Run VUnit tests
+  #     uses: VUnit/vunit_action@master
+  #     with:
+  #       cmd: hdl/sim/run.py
+
 
 
 

@@ -20,7 +20,7 @@ entity rv_data_access is
         data_in : in std_logic_vector(31 downto 0); --! 32-bit aligned to bottom
 
         data_out : out std_logic_vector(31 downto 0); --! 32-bit aligned to the bottom
-        rsp_valid_out : out std_logic;
+        rsp_valid_out : out std_logic; -- either valid data, or an exception
         -- rsp_stall_in : in std_logic; -- no backpressure implemented here
 
         write_en_in : std_logic; -- load vs store
@@ -66,7 +66,6 @@ architecture RTL of rv_data_access is
     -- signal mem_rdata_reg : std_logic_vector(31 downto 0);
 begin
     
-
     --! Alignment Handling (base on bottom two bits)
     -- decode the LOAD/STORE funct3 field
     size          <= wb_get_transfer_size(func3_in); -- b8, b16, b32
@@ -123,7 +122,7 @@ begin
         rsp_err_out          => wb_err
     );
 
-    -- Exceptions (TODO pipeline stages)
+    -- Exceptions
     -- upfront exceptions
     wb_req <= req_valid_in and not addr_align_err; -- don't request transaction if address is misaligned - throw exception
     err_load_misaligned <= not write_en_in and addr_align_err;

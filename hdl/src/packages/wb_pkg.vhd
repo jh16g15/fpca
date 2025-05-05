@@ -70,7 +70,7 @@ package wb_pkg is
 
     --! Align the valid part of the 32 bit input data to the wishbone 32 bit data bus
     function wb_align_store_data(wdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0)) return std_logic_vector;
-    function wb_align_load_data(rdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0; sign_ext : std_logic := '0') return std_logic_vector;
+    function wb_align_load_data(rdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0); sign_ext : std_logic := '0') return std_logic_vector;
 
     function sel2bytes(sel : std_logic_vector(3 downto 0)) return unsigned;
     function bytes2sel(bytes : natural) return std_logic_vector;
@@ -173,7 +173,7 @@ package body wb_pkg is
     
     --! Align the data from to the wishbone 32 bit data bus to the bottom of the 32bit output
     --! Sign Extends if requested
-    function wb_align_load_data(rdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0; sign_ext : std_logic := '0') return std_logic_vector is
+    function wb_align_load_data(rdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0); sign_ext : std_logic := '0') return std_logic_vector is
     begin
         case (byte_sel) is
             when b"1111" => return rdata;

@@ -5,9 +5,6 @@
   <a title="'Test' workflow Status"    href="https://github.com/jh16g15/fpca/actions?query=workflow%3ASimulate"
   ><img alt="'Simulations Status" src="https://img.shields.io/github/actions/workflow/status/jh16g15/fpca/simulate.yml?branch=main&label=VUnit%20Simulations"
   /></a>
-  <a title="'Test' workflow Status"    href="https://github.com/jh16g15/fpca/actions?query=workflow%3Amanual-installs"
-  ><img alt="'Simulations Status" src="https://img.shields.io/github/actions/workflow/status/jh16g15/fpca/simulate.yml?branch=main&label=VUnit%20Simulations"
-  /></a>
 </p>
 The FPCA (Friendly Programmable Computing Asset) is a RISC-V SoC design with accompanying peripherals.
 
