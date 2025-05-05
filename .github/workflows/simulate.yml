@@ -25,6 +25,10 @@ jobs:
   manual-installs:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repo (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: install ghdl
         uses: ghdl/setup-ghdl@v1.2.1
         with:
@@ -33,17 +37,13 @@ jobs:
           investigate: true
       - name: install VUnit
         run: pip install --pre vunit_hdl
-      - name: Checkout Repo (with submodules)
-        uses: actions/checkout@v4
-        with:
-          submodules: true
       - name: run tests
         run: |
           cd hdl/sim
           ls -al
           echo $PATH
-          find ~ -name install
-          #which ghdl
+          #find ~ -name install
+          which ghdl
           # ls /home/runner/work/fpca/fpca/install/bin -al
           # /home/runner/work/fpca/fpca/install/bin/ghdl --version
           python run_ci.py -m
