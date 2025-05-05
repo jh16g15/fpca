@@ -1,0 +1,39 @@
+name: Simulate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  action:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Run VUnit tests
+      uses: VUnit/vunit_action@v0.1.0
+      with:
+        cmd: hdl/sim/run.py
+
+
+  container-job:
+    runs-on: ubuntu-latest
+    container: ghdl/vunit:mcode-master
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - run: hdl/sim/run.py
+
+
+  container-step:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - uses: docker://ghdl/vunit:mcode-master
+      with:
+        args: hdl/sim/run.py
