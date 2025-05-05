@@ -38,7 +38,7 @@ jobs:
       - name: run tests
         run: |
           cd hdl/sim
-          python run.py
+          python run.py -m
 
 
 
