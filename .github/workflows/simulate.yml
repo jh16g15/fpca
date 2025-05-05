@@ -42,7 +42,7 @@ jobs:
           cd hdl/sim
           ls -al
           echo $PATH
-          find -name install ~
+          find ~ -name install
           #which ghdl
           # ls /home/runner/work/fpca/fpca/install/bin -al
           # /home/runner/work/fpca/fpca/install/bin/ghdl --version
