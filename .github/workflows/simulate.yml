@@ -10,7 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@v2
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+    - name: See what's here
+      run: ls -al
 
     - name: Run VUnit tests
       uses: VUnit/vunit_action@v0.1.0
