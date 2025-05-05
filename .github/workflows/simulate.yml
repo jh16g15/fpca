@@ -33,12 +33,14 @@ jobs:
           investigate: true
       - name: install VUnit
         run: pip install --pre vunit_hdl
-      - name: Checkout Repo
+      - name: Checkout Repo (with submodules)
         uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: run tests
         run: |
           cd hdl/sim
-          python run.py -m
+          python run_ci.py -m
 
 
 
