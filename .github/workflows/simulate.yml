@@ -25,7 +25,7 @@ jobs:
   manual-installs:
     runs-on: ubuntu-latest
     steps:
-      - name: Run VHDL Simulation
+      - name: install ghdl
         uses: ghdl/setup-ghdl@v1
         with:
           version: nightly
@@ -41,6 +41,8 @@ jobs:
         run: |
           cd hdl/sim
           ls -al
+          echo $PATH
+          which ghdl
           python run_ci.py -m
 
 
