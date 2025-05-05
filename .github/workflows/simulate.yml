@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: install ghdl
-        uses: ghdl/setup-ghdl@v1
+        uses: ghdl/setup-ghdl@v1.2.1
         with:
           version: nightly
           backend: mcode
@@ -43,8 +43,9 @@ jobs:
           ls -al
           echo $PATH
           tree /home/runner/work/fpca/
-          ls /home/runner/work/fpca/fpca/install/bin -al
-          /home/runner/work/fpca/fpca/install/bin/ghdl --version
+              '/home/runner/work/fpca/fpca/install'.
+          # ls /home/runner/work/fpca/fpca/install/bin -al
+          # /home/runner/work/fpca/fpca/install/bin/ghdl --version
           which ghdl
           python run_ci.py -m
 
