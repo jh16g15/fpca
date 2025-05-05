@@ -52,7 +52,8 @@ def main():
     cli.parser.add_argument('--skip-wave', help="Skip saving waveforms for each simulation (to speed up sim)")
     args=cli.parse_args()
     # print(f"{args=}")
-    args.viewer_fmt = "vcd"     # Always 
+    if not args.skip_wave:
+        args.viewer_fmt = "ghw"     # Always dump GTKWave files
     # print(f"{args=}")
 
 
