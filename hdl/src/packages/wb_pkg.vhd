@@ -1,6 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.joe_common_pkg.all;
+
 package wb_pkg is
 
     constant C_WB_ADDR_W : integer := 32;
@@ -68,8 +70,8 @@ package wb_pkg is
 
     --! Align the valid part of the 32 bit input data to the wishbone 32 bit data bus
     function wb_align_store_data(wdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0)) return std_logic_vector;
-    function wb_align_load_data(rdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0)) return std_logic_vector;
-    
+    function wb_align_load_data(rdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0; sign_ext : std_logic := '0') return std_logic_vector;
+
     function sel2bytes(sel : std_logic_vector(3 downto 0)) return unsigned;
     function bytes2sel(bytes : natural) return std_logic_vector;
 end package;
@@ -170,16 +172,17 @@ package body wb_pkg is
     end function;
     
     --! Align the data from to the wishbone 32 bit data bus to the bottom of the 32bit output
-    function wb_align_load_data(rdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0)) return std_logic_vector is
+    --! Sign Extends if requested
+    function wb_align_load_data(rdata : std_logic_vector(31 downto 0); byte_sel : std_logic_vector(3 downto 0; sign_ext : std_logic := '0') return std_logic_vector is
     begin
         case (byte_sel) is
             when b"1111" => return rdata;
-            when b"0011" => return x"0000" & rdata(15 downto 0);
-            when b"1100" => return x"0000" & rdata(31 downto 16);
-            when b"0001" => return x"000000" & rdata(7 downto 0);
-            when b"0010" => return x"000000" & rdata(15 downto 8);
-            when b"0100" => return x"000000" & rdata(23 downto 16);
-            when b"1000" => return x"000000" & rdata(31 downto 24);
+        when b"0011" => return extend_slv(rdata(15 downto 0), new_len => 32, sign_ext => sign_ext);
+        when b"1100" => return extend_slv(rdata(31 downto 16), new_len => 32, sign_ext => sign_ext);
+        when b"0001" => return extend_slv(rdata(7 downto 0), new_len => 32, sign_ext => sign_ext);
+        when b"0010" => return extend_slv(rdata(15 downto 8), new_len => 32, sign_ext => sign_ext);
+        when b"0100" => return extend_slv(rdata(23 downto 16), new_len => 32, sign_ext => sign_ext);
+        when b"1000" => return extend_slv(rdata(31 downto 24), new_len => 32, sign_ext => sign_ext);
             when others  => return rdata;
         end case;
     end function;
