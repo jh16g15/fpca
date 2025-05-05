@@ -15,7 +15,7 @@ jobs:
     - name: See what's here
       run: ls -al && which python && python --version
     - name: check file  
-      run: ls hdl/sim/run.py
+      run: ls -al hdl/sim/run.py
 
     - name: Run VUnit tests
       uses: VUnit/vunit_action@master
@@ -42,7 +42,8 @@ jobs:
           cd hdl/sim
           ls -al
           echo $PATH
-          which ghdl
+          find -name install ~
+          #which ghdl
           # ls /home/runner/work/fpca/fpca/install/bin -al
           # /home/runner/work/fpca/fpca/install/bin/ghdl --version
           python run_ci.py -m
