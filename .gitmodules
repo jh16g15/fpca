@@ -1,3 +1,6 @@
 [submodule "software/src/lib/printf"]
 	path = software/src/lib/printf
 	url = git@github.com:eyalroz/printf.git
+[submodule "hdl/xpm_vhdl"]
+	path = hdl/xpm_vhdl
+	url = git@github.com:fransschreuder/xpm_vhdl.git
