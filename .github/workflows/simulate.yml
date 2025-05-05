@@ -43,8 +43,6 @@ jobs:
           ls -al
           echo $PATH
           which ghdl
-          tree /home/runner/work/fpca/
-              '/home/runner/work/fpca/fpca/install'.
           # ls /home/runner/work/fpca/fpca/install/bin -al
           # /home/runner/work/fpca/fpca/install/bin/ghdl --version
           python run_ci.py -m
