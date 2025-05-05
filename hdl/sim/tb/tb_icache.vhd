@@ -5,7 +5,11 @@ use ieee.numeric_std.all;
 use work.wb_pkg.all;
 use work.joe_common_pkg.all;
 
+library vunit_lib;
+context vunit_lib.vunit_context;
+
 entity tb_icache is
+    generic (runner_cfg : string);
 end entity tb_icache;
 
 architecture RTL of tb_icache is
@@ -63,6 +67,12 @@ begin
 
         end procedure read_instr;
     begin
+        test_runner_setup(runner, runner_cfg);
+        info("Vunit is alive!");
+        show(get_logger(default_checker), display_handler, pass);
+
+        
+        
         wait for 150 ns;
         msg("=== Test basic 32-bit aligned cache misses, hits and block replacement ===");
         read_instr(0);
@@ -117,7 +127,7 @@ begin
         in_addr_valid <= '0';
         msg("All tests done");
         wait for 100 ns;
-        std.env.stop;
+        test_runner_cleanup(runner);
         wait;
     end process;
 
