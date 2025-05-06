@@ -278,7 +278,7 @@ begin
                     end if;
                 when MISS =>
                     -- wishbone master, does burst of C_WB_XFERS to load cache line
-                    if wb_miso.stall = '0' then
+                    if wb_miso.stall = '0' and wb_mosi.stb = '1' then
                         wb_cmds_to_go <= wb_cmds_to_go-1;
                         wb_mosi.adr <= wb_next_addr;
                         wb_next_addr <= u_add(wb_next_addr, x"0000_0004");

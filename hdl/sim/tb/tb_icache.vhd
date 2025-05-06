@@ -71,6 +71,9 @@ begin
         info("Vunit is alive!");
         show(get_logger(default_checker), display_handler, pass);
 
+        info("G_NUM_BLOCKS = " & to_string(G_NUM_BLOCKS));
+        info("G_BLOCK_SIZE = " & to_string(G_BLOCK_SIZE));
+        info("G_SET_SIZE   = " & to_string(G_SET_SIZE));
         
         
         wait for 150 ns;
