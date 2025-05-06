@@ -24,7 +24,7 @@ jobs:
       - name: run tests
         run: |
           cd hdl/sim
-          python run_ci.py
+          python run_ci.py -v
 
   # simulate:
   #   runs-on: ubuntu-latest
