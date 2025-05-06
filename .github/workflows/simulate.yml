@@ -15,7 +15,8 @@ jobs:
       - name: install ghdl
         uses: ghdl/setup-ghdl@v1.2.1
         with:
-          version: nightly
+          # version: nightly
+          version: 5.0.1
           backend: mcode
           investigate: true
       - name: install VUnit
