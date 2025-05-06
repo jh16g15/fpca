@@ -54,8 +54,7 @@ begin
     axi_mosi_out.wid     <= x"000";         -- ID = 0 (all transactions must be in order)
     axi_mosi_out.wlast   <= '1';            -- only transaction per burst
     axi_mosi_out.wstrb   <= wb_mosi_in.sel; -- wishbone byte strobe
-    -- assign Wishbone MISO signals (single transaction only)
-    wb_miso_out.rdat <= axi_miso_in.rdata;
+    -- assign Wishbone MISO signals (single transaction only)    
     wb_miso_out.rty  <= '0'; -- unsupported
 
     -- proper handshaking - we could register other signals here to improve timing as well, but as they are all going into the ZYNQ PS probably unecessary.
@@ -105,6 +104,7 @@ begin
                     wb_miso_out.stall <= '0';
                     wb_miso_out.ack   <= '1' when axi_miso_in.rresp = b"00" else '0';
                     wb_miso_out.err   <= '1' when axi_miso_in.rresp /= b"00" else '0';
+                    wb_miso_out.rdat  <= axi_miso_in.rdata;
                 end if;
 
             end if;
