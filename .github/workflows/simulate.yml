@@ -23,7 +23,7 @@ jobs:
       - name: run tests
         run: |
           cd hdl/sim
-          python run_ci.py --exit-0
+          python run_ci.py --fail-fast
 
   # simulate:
   #   runs-on: ubuntu-latest
