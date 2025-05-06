@@ -70,6 +70,10 @@ def main():
     VU.add_source_files(xpm_dir / "src/xpm/xpm_memory/hdl/*.vhd", "xpm")
     VU.add_source_files(xpm_dir / "src/xpm/xpm_fifo/hdl/*.vhd", "xpm")
 
+    unsim_ci_dir = Path(__file__).parent / "unisim_ci"
+    VU.add_library("unisim")
+    VU.add_source_files(unsim_ci_dir / "**/*.vhd", "unisim")
+
     # GHDL compile options (allow attributes on ports etc)
     VU.add_compile_option("ghdl.a_flags", ["--ieee=standard", "--std=08", "-frelaxed-rules", "-frelaxed"])
 
