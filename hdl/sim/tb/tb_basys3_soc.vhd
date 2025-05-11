@@ -16,7 +16,8 @@ architecture bench of tb_basys3_soc is
     constant clk_period : time := 40 ns;    -- 25MHz
     constant mem_ctrl_clk_period : time := 10 ns;    -- 100MHz
     -- Generics
-    constant G_PROJECT_ROOT : string := "/mnt/c/Users/joehi/Documents/fpga/fpca/";
+    -- constant G_PROJECT_ROOT : string := "/mnt/c/Users/joehi/Documents/fpga/fpca/";
+    constant G_PROJECT_ROOT : string := tb_path(runner_cfg) & "../../../";
     -- constant G_MEM_INIT_FILE : string := "data/blinky.hex"; -- simulation
     constant G_MEM_INIT_FILE : string := "software/hex/main.hex"; -- from toolchain
 
