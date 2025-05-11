@@ -60,8 +60,10 @@ def main():
     # Ignore the "no-ci" testbench folder
     # see if we really limit the testbench list that prevents "Error Code 143" in the CI
 
-    VU.add_source_files(sim_tb_dir / "*.vhd", "lib")  
     VU.add_source_files(sim_tb_dir / "riscv-gen2/**/*.vhd", "lib")
+    VU.add_source_files(sim_tb_dir / "tb_vunit.vhd", "lib")
+
+    # VU.add_source_files(sim_tb_dir / "*.vhd", "lib")  
 
 
 
