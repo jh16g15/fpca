@@ -30,7 +30,7 @@ def add_some_files_to_vunit(vunit_obj, dir, exclude_patterns, library):
 
 def main():
     # increase stack size to prevent GHDL crashing
-    resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+    # resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
     
     VU = VUnit.from_argv()
 
@@ -56,9 +56,15 @@ def main():
 
 
     VU.add_library("lib")
+    
     # Ignore the "no-ci" testbench folder
-    VU.add_source_files(sim_tb_dir / "*.vhd", "lib")
+    # see if we really limit the testbench list that prevents "Error Code 143" in the CI
+
+    VU.add_source_files(sim_tb_dir / "*.vhd", "lib")  
     VU.add_source_files(sim_tb_dir / "riscv-gen2/**/*.vhd", "lib")
+
+
+
     VU.add_source_files(src_dir / "../../tools/**/*.vhd", "lib")
     add_some_files_to_vunit(VU, sim_helpers_dir, sim_helpers_exclude, "lib")
     add_some_files_to_vunit(VU, src_dir, src_exclude, "lib")
